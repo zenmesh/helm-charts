@@ -1,0 +1,36 @@
+apiVersion: v2
+name: zen-flow
+description: A Helm chart for zen-flow - Kubernetes-native job orchestration controller
+type: application
+version: 0.0.1-alpha
+appVersion: "0.0.1-alpha"
+keywords:
+  - kubernetes
+  - kube-zen
+  - workflow
+  - job-orchestration
+  - dag
+  - batch-processing
+  - operator
+
+home: https://github.com/kube-zen/zen-flow
+sources:
+  - https://github.com/kube-zen/zen-flow
+
+maintainers:
+  - name: Kube-ZEN Team
+    email: team@kube-zen.io
+
+annotations:
+  category: Workflow
+  artifacthub.io/changes: |
+    - Initial release
+  artifacthub.io/links: |
+    - name: Documentation
+      url: https://github.com/kube-zen/zen-flow/blob/main/README.md
+    - name: Source
+      url: https://github.com/kube-zen/zen-flow
+    - name: Support
+      url: https://github.com/kube-zen/zen-flow/issues
+  artifacthub.io/imagesWhitelist: |
+    - kubezen/zen-flow

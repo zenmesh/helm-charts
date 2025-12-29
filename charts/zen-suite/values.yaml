@@ -1,0 +1,46 @@
+# Copyright 2025 Kube-ZEN Contributors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Default values for zen-suite
+# This is an umbrella chart that installs multiple Kube-Zen components.
+# Each component can be enabled/disabled independently.
+
+# Global settings applied to all subcharts
+global:
+  # Common labels applied to all resources
+  commonLabels:
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/part-of: zen-suite
+
+# Enable/disable components
+zenLock:
+  enabled: true
+  # Pass-through values to zen-lock chart
+  # See zen-lock/values.yaml for all available options
+
+zenFlow:
+  enabled: true
+  # Pass-through values to zen-flow chart
+  # See zen-flow/values.yaml for all available options
+
+zenGc:
+  enabled: true
+  # Pass-through values to zen-gc chart
+  # See zen-gc/values.yaml for all available options
+
+zenWatcher:
+  enabled: true
+  # Pass-through values to zen-watcher chart
+  # See zen-watcher/values.yaml for all available options
+

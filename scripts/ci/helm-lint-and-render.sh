@@ -42,8 +42,11 @@ echo "Helm version: $(helm version --short)"
 echo ""
 
 CHARTS=(
-    "charts/zen-agent"
+    "charts/zen-lock"
+    "charts/zen-flow"
+    "charts/zen-gc"
     "charts/zen-watcher"
+    "charts/zen-suite"
 )
 
 FAILED=0
@@ -73,62 +76,33 @@ for chart in "${CHARTS[@]}"; do
     # Lint chart
     echo "[1/2] Running helm lint..."
     
-    # zen-agent requires specific values, provide minimal sample
-    if [[ "$chart" == *"zen-agent"* ]]; then
-        LINT_OUTPUT=$(helm lint "$chart" \
-            --set saas.apiBase=https://api.example.com \
-            --set saas.wsBase=wss://api.example.com 2>&1 || true)
-        
-        # Check for critical errors (ignore dependency metadata warnings)
-        if echo "$LINT_OUTPUT" | grep -q "chart metadata is missing these dependencies"; then
-            echo "⚠️  Lint warning for $chart (dependency metadata issue - non-blocking)"
-        elif echo "$LINT_OUTPUT" | grep -qE "\[ERROR\]" && ! echo "$LINT_OUTPUT" | grep -q "chart metadata is missing"; then
-            echo "$LINT_OUTPUT"
-            echo "❌ Lint failed for $chart"
-            FAILED=$((FAILED + 1))
-        else
-            echo "✅ Lint passed for $chart"
-        fi
+    # zen-suite requires dependencies to be built first
+    if [[ "$chart" == *"zen-suite"* ]]; then
+        echo "  Building dependencies for zen-suite..."
+        helm dependency build "$chart" > /dev/null 2>&1 || true
+    fi
+    
+    if helm lint "$chart"; then
+        echo "✅ Lint passed for $chart"
     else
-        if helm lint "$chart"; then
-            echo "✅ Lint passed for $chart"
-        else
-            echo "❌ Lint failed for $chart"
-            FAILED=$((FAILED + 1))
-        fi
+        echo "❌ Lint failed for $chart"
+        FAILED=$((FAILED + 1))
     fi
     echo ""
 
     # Template render (matrix tests)
     echo "[2/2] Running helm template (matrix tests)..."
     
-    # zen-agent requires specific values, test multiple configurations
-    if [[ "$chart" == *"zen-agent"* ]]; then
-        # Matrix: Default, SaaS-like (TLS), Demo
-        MATRIX_CONFIGS=(
-            "default:--set saas.apiBase=https://api.example.com --set saas.wsBase=wss://api.example.com"
-            "saas-tls:--set saas.apiBase=https://api.kube-zen.io --set saas.wsBase=wss://ws.kube-zen.io --set saas.tlsEnabled=true"
-            "demo:--set saas.apiBase=http://localhost:8080 --set saas.wsBase=ws://localhost:8080 --set environment=dev"
-        )
-        
-        for config in "${MATRIX_CONFIGS[@]}"; do
-            config_name="${config%%:*}"
-            config_values="${config#*:}"
-            
-            echo "  Testing configuration: $config_name"
-            if eval "helm template test-release \"$chart\" $config_values > /dev/null 2>&1"; then
-                echo "  ✓ $config_name passed"
-            else
-                echo "  ❌ $config_name failed"
-                FAILED=$((FAILED + 1))
-            fi
-        done
-        
-        if [ $FAILED -eq 0 ]; then
-            echo "✅ Template render passed for $chart (3 configurations)"
+    # zen-suite: test with all components enabled
+    if [[ "$chart" == *"zen-suite"* ]]; then
+        if helm template test-release "$chart" > /dev/null 2>&1; then
+            echo "✅ Template render passed for $chart (all components enabled)"
+        else
+            echo "❌ Template render failed for $chart"
+            FAILED=$((FAILED + 1))
         fi
     else
-        # zen-watcher: test with default values
+        # Other charts: test with default values
         if helm template test-release "$chart" > /dev/null; then
             echo "✅ Template render passed for $chart"
         else
@@ -154,18 +128,20 @@ if [ "$RUN_HELM_EXAMPLE_MATRIX" = "1" ]; then
                 example_name=$(basename "$example_file")
                 echo "Testing example: $example_name"
                 
-                # Test zen-agent chart with example values
-                if helm template test-release "$SCRIPT_DIR/../../charts/zen-agent" \
-                    -f "$example_file" \
-                    --set saas.clusterToken=test-token \
-                    --set tenant.id=test-tenant \
-                    --set cluster.id=test-cluster \
-                    > /dev/null 2>&1; then
-                    echo "  ✓ $example_name renders successfully"
-                else
-                    echo "  ❌ $example_name failed to render"
-                    FAILED=$((FAILED + 1))
-                fi
+                # Test charts with example values (skip zen-suite for examples)
+                for chart in "${CHARTS[@]}"; do
+                    if [[ "$chart" != *"zen-suite"* ]]; then
+                        chart_name=$(basename "$chart")
+                        if [[ "$example_file" == *"$chart_name"* ]] || [[ "$example_file" == *"values"* ]]; then
+                            if helm template test-release "$SCRIPT_DIR/../../$chart" -f "$example_file" > /dev/null 2>&1; then
+                                echo "  ✓ $example_name renders successfully for $chart_name"
+                            else
+                                echo "  ❌ $example_name failed to render for $chart_name"
+                                FAILED=$((FAILED + 1))
+                            fi
+                        fi
+                    fi
+                done
             fi
         done
         echo ""
@@ -188,7 +164,8 @@ if [ "$RUN_GUARDRAILS" = "1" ]; then
     echo "[1/2] Checking registry policies..."
     for chart in "${CHARTS[@]}"; do
         if [ -f "$chart/values.yaml" ]; then
-            if grep -q "repository:.*docker.io" "$chart/values.yaml" 2>/dev/null; then
+            # Check for docker.io (should use kubezen/*)
+            if grep -E "repository:.*docker\.io" "$chart/values.yaml" 2>/dev/null | grep -v "kubezen" > /dev/null; then
                 echo "  ⚠️  $chart uses docker.io registry (should use kubezen/*)"
                 GUARDRAIL_WARNINGS=$((GUARDRAIL_WARNINGS + 1))
             fi

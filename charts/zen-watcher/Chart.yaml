@@ -1,0 +1,55 @@
+# Copyright 2025 Kube-ZEN Contributors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: v2
+name: zen-watcher
+description: A Helm chart for zen-watcher - Universal Kubernetes Event Aggregator
+type: application
+version: 1.0.1
+appVersion: "1.0.19"
+
+keywords:
+  - kubernetes
+  - kube-zen
+  - observability
+  - events
+  - monitoring
+  - security
+  - compliance
+  - operator
+
+home: https://github.com/kube-zen/zen-watcher
+sources:
+  - https://github.com/kube-zen/zen-watcher
+
+maintainers:
+  - name: Kube-ZEN Team
+    email: team@kube-zen.io
+
+annotations:
+  category: Observability
+  artifacthub.io/changes: |
+    - Universal Kubernetes Event Aggregator
+    - Secure, Extensible Event Collection
+    - Supports multiple sources (Trivy, Kyverno, Falco, Audit logs, Kube-bench)
+  artifacthub.io/links: |
+    - name: Documentation
+      url: https://github.com/kube-zen/zen-watcher/blob/main/README.md
+    - name: Source
+      url: https://github.com/kube-zen/zen-watcher
+    - name: Support
+      url: https://github.com/kube-zen/zen-watcher/issues
+  artifacthub.io/imagesWhitelist: |
+    - kubezen/zen-watcher
+

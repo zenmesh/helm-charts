@@ -1,0 +1,69 @@
+# Copyright 2025 Kube-ZEN Contributors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: v2
+name: zen-suite
+description: Umbrella chart for Kube-Zen platform components - Complete security and observability suite
+type: application
+version: 0.0.1-alpha
+appVersion: "0.0.1-alpha"
+
+keywords:
+  - kubernetes
+  - kube-zen
+  - security
+  - observability
+  - workflow
+  - operator
+  - suite
+
+home: https://github.com/kube-zen/helm-charts
+sources:
+  - https://github.com/kube-zen/helm-charts
+
+maintainers:
+  - name: Kube-ZEN Team
+    email: team@kube-zen.io
+
+annotations:
+  category: Integration
+  artifacthub.io/changes: |
+    - Initial release
+    - Umbrella chart for zen-lock, zen-flow, zen-gc, and zen-watcher
+  artifacthub.io/links: |
+    - name: Documentation
+      url: https://github.com/kube-zen/helm-charts/blob/main/docs/INSTALL.md
+    - name: Source
+      url: https://github.com/kube-zen/helm-charts
+    - name: Support
+      url: https://github.com/kube-zen/helm-charts/issues
+
+dependencies:
+  - name: zen-lock
+    version: ">=0.0.1-alpha"
+    repository: "@"
+    condition: zenLock.enabled
+  - name: zen-flow
+    version: ">=0.0.1-alpha"
+    repository: "@"
+    condition: zenFlow.enabled
+  - name: zen-gc
+    version: ">=0.0.1-alpha"
+    repository: "@"
+    condition: zenGc.enabled
+  - name: zen-watcher
+    version: ">=1.0.1"
+    repository: "@"
+    condition: zenWatcher.enabled
+
