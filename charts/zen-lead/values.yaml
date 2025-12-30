@@ -48,17 +48,16 @@ leaderElectionID: ""  # If empty, defaults to "<release-name>-zen-lead-controlle
 metrics:
   enabled: true
   port: 8080
-  serviceMonitor:
-    enabled: false
-    interval: 30s
-    scrapeTimeout: 10s
-    labels: {}
 
-# Health probes
+# Health probe configuration
+health:
+  port: 8081
+
+# Health probes (target health port, not metrics)
 livenessProbe:
   httpGet:
     path: /healthz
-    port: metrics
+    port: health
   initialDelaySeconds: 30
   periodSeconds: 10
   timeoutSeconds: 5
@@ -67,7 +66,7 @@ livenessProbe:
 readinessProbe:
   httpGet:
     path: /readyz
-    port: metrics
+    port: health
   initialDelaySeconds: 5
   periodSeconds: 5
   timeoutSeconds: 3

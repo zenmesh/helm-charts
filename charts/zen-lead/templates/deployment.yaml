@@ -34,7 +34,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - --metrics-bind-address=:{{ .Values.metrics.port }}
-            - --health-probe-bind-address=:{{ .Values.metrics.port }}
+            - --health-probe-bind-address=:{{ .Values.health.port }}
             {{- if .Values.leaderElectionID }}
             - --leader-election-id={{ .Values.leaderElectionID }}
             {{- else }}
@@ -43,6 +43,9 @@ spec:
           ports:
             - name: metrics
               containerPort: {{ .Values.metrics.port }}
+              protocol: TCP
+            - name: health
+              containerPort: {{ .Values.health.port }}
               protocol: TCP
           {{- if .Values.livenessProbe }}
           livenessProbe:
