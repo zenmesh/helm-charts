@@ -92,15 +92,9 @@ leaderElection:
   namespace: ""  # Defaults to release namespace
 
 # Controller arguments
+# Note: --ha-mode is automatically added by the deployment template based on ha.mode
 args:
   - --metrics-addr=:8080
-  {{- if eq .Values.ha.mode "none" }}
-  - --ha-mode=none
-  {{- else if eq .Values.ha.mode "external" }}
-  - --ha-mode=external
-  {{- else }}
-  - --ha-mode=internal
-  {{- end }}
 
 # Liveness and readiness probes
 livenessProbe:
