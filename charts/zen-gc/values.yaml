@@ -76,15 +76,12 @@ tolerations: []
 affinity: {}
 
 # High Availability (HA) configuration
-# Three modes available:
+# Two modes available:
 #   - "none": No leader election (single replica, accepts split-brain risk)
 #   - "internal": Built-in leader election via zen-sdk/pkg/leader (default, recommended)
-#   - "external": External leader election via zen-lead controller (advanced)
 ha:
   enabled: true
-  mode: internal  # Options: none, internal, external
-  # For external mode, specify the LeaderPolicy name
-  externalPolicyName: ""  # e.g., "zen-gc-ha-policy"
+  mode: internal  # Options: none, internal
 
 # Leader election configuration (deprecated: use ha.mode instead)
 leaderElection:

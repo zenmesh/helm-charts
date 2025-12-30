@@ -1,0 +1,40 @@
+apiVersion: v2
+name: zen-lead
+description: A Helm chart for zen-lead - Non-invasive leader election for Kubernetes workloads
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - kubernetes
+  - kube-zen
+  - leader-election
+  - high-availability
+  - ha
+  - operator
+  - controller
+
+home: https://github.com/kube-zen/zen-lead
+sources:
+  - https://github.com/kube-zen/zen-lead
+
+maintainers:
+  - name: Kube-ZEN Team
+    email: team@kube-zen.io
+
+annotations:
+  category: High Availability
+  artifacthub.io/changes: |
+    - Initial release
+    - Non-invasive leader election via selector-less Service + EndpointSlice
+    - Service-first opt-in interface
+    - Controller-driven leader selection
+  artifacthub.io/links: |
+    - name: Documentation
+      url: https://github.com/kube-zen/zen-lead/blob/main/README.md
+    - name: Source
+      url: https://github.com/kube-zen/zen-lead
+    - name: Support
+      url: https://github.com/kube-zen/zen-lead/issues
+  artifacthub.io/imagesWhitelist: |
+    - kubezen/zen-lead
+

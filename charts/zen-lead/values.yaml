@@ -1,0 +1,117 @@
+# Default values for zen-lead
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 2
+
+image:
+  repository: kubezen/zen-lead
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "0.1.0"
+
+imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65534
+  fsGroup: 65534
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+
+# Leader election ID (must be unique per controller instance in the same namespace)
+# Defaults to release name-based ID if not specified
+leaderElectionID: ""  # If empty, defaults to "<release-name>-zen-lead-controller-leader-election"
+
+# Metrics configuration
+metrics:
+  enabled: true
+  port: 8080
+  serviceMonitor:
+    enabled: false
+    interval: 30s
+    scrapeTimeout: 10s
+    labels: {}
+
+# Health probes
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: metrics
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /readyz
+    port: metrics
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 8080
+  targetPort: 8080
+
+# Resource limits and requests
+resources:
+  limits:
+    cpu: 500m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 64Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Topology spread constraints (default: prevent both replicas on same node when replicaCount > 1)
+topologySpreadConstraints: []
+
+# Pod Disruption Budget (optional, enabled by default when replicaCount > 1)
+pdb:
+  enabled: true
+  minAvailable: 1  # Or use maxUnavailable
+  # maxUnavailable: 1
+
+# Namespace configuration
+namespace:
+  create: false  # Default: use release namespace (no extra namespace creation)
+  name: ""  # Default: uses .Release.Namespace
+
+# RBAC scope (cluster-scoped or namespace-scoped)
+rbac:
+  # If true, creates ClusterRole/ClusterRoleBinding (cluster-scoped)
+  # If false, creates Role/RoleBinding (namespace-scoped)
+  # Default: false (namespace-scoped for minimal blast radius)
+  clusterScoped: false
+

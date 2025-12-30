@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "zen-lead.fullname" . }}
+  namespace: {{ include "zen-lead.namespace" . }}
+  labels:
+    {{- include "zen-lead.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+  selector:
+    {{- include "zen-lead.selectorLabels" . | nindent 4 }}
+

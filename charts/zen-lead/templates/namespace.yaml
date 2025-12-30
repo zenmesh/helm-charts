@@ -1,0 +1,9 @@
+{{- if .Values.namespace.create }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ if .Values.namespace.name }}{{ .Values.namespace.name }}{{ else }}{{ .Release.Namespace }}{{ end }}
+  labels:
+    {{- include "zen-lead.labels" . | nindent 4 }}
+{{- end }}
+

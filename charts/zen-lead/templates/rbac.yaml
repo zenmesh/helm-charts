@@ -1,0 +1,69 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: {{ if .Values.rbac.clusterScoped }}ClusterRole{{ else }}Role{{ end }}
+metadata:
+  name: {{ include "zen-lead.fullname" . }}
+  {{- if not .Values.rbac.clusterScoped }}
+  namespace: {{ include "zen-lead.namespace" . }}
+  {{- end }}
+  labels:
+    {{- include "zen-lead.labels" . | nindent 4 }}
+rules:
+  # Read-only access to pods (for leader selection)
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+  
+  # Read and write access to services (to detect opt-in annotations, mirror ports, and manage leader services)
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  
+  # Read access to existing endpointslices (for drift detection)
+  # Write access to leader endpointslices (managed by zen-lead)
+  - apiGroups: ["discovery.k8s.io"]
+    resources: ["endpointslices"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  
+  # Events for observability (leader changes, warnings)
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "patch"]
+  
+  # Leader election (required by controller-runtime for HA)
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+---
+{{- if .Values.rbac.clusterScoped }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "zen-lead.fullname" . }}
+  labels:
+    {{- include "zen-lead.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "zen-lead.fullname" . }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "zen-lead.serviceAccountName" . }}
+    namespace: {{ include "zen-lead.namespace" . }}
+{{- else }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "zen-lead.fullname" . }}
+  namespace: {{ include "zen-lead.namespace" . }}
+  labels:
+    {{- include "zen-lead.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "zen-lead.fullname" . }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "zen-lead.serviceAccountName" . }}
+    namespace: {{ include "zen-lead.namespace" . }}
+{{- end }}

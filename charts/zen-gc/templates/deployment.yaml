@@ -30,12 +30,6 @@ spec:
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        {{- if eq .Values.ha.mode "external" }}
-        {{- if .Values.ha.externalPolicyName }}
-        zen-lead/pool: {{ .Values.ha.externalPolicyName }}
-        zen-lead/join: "true"
-        {{- end }}
-        {{- end }}
       labels:
         {{- include "gc-controller.selectorLabels" . | nindent 8 }}
     spec:
