@@ -39,12 +39,8 @@ spec:
           args:
             - --metrics-bind-address=:{{ .Values.metrics.port }}
             - --health-probe-bind-address=:8081
-            {{- if .Values.leaderElection.enabled }}
-            - --leader-elect=true
-            - --leader-election-namespace={{ include "zen-lock.leaderElectionNamespace" . }}
-            {{- else }}
-            - --leader-elect=false
-            {{- end }}
+            # Leader election is always enabled for controller (mandatory for HA safety)
+            # No --leader-elect flag needed (handled automatically by zen-sdk)
             - --enable-controller=true
             - --enable-webhook=false
           ports:
