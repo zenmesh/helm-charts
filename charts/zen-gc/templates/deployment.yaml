@@ -50,9 +50,8 @@ spec:
             {{- range .Values.args }}
             - {{ . }}
             {{- end }}
-            {{- if and (eq .Values.ha.mode "internal") .Values.leaderElection.namespace }}
-            - --leader-election-namespace={{ .Values.leaderElection.namespace | default (.Values.namespace | default "gc-system") }}
-            {{- end }}
+            # Leader election is mandatory and handled automatically via zen-sdk
+            # No --ha-mode or --enable-leader-election flags needed
           env:
             - name: POD_NAME
               valueFrom:

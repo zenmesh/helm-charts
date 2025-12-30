@@ -76,17 +76,9 @@ tolerations: []
 affinity: {}
 
 # High Availability (HA) configuration
-# Two modes available:
-#   - "none": No leader election (single replica, accepts split-brain risk)
-#   - "internal": Built-in leader election via zen-sdk/pkg/leader (default, recommended)
-ha:
-  enabled: true
-  mode: internal  # Options: none, internal
-
-# Leader election configuration (deprecated: use ha.mode instead)
-leaderElection:
-  enabled: true
-  namespace: ""  # Defaults to release namespace
+# Leader election is mandatory and always enabled (via zen-sdk/pkg/leader)
+# No configuration needed - safe defaults enforced
+replicaCount: 2  # Default: 2 replicas for HA (leader election mandatory)
 
 # Controller arguments
 # Note: --ha-mode is automatically added by the deployment template based on ha.mode
