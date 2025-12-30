@@ -30,6 +30,12 @@ spec:
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+        {{- if eq .Values.ha.mode "external" }}
+        {{- if .Values.ha.externalPolicyName }}
+        zen-lead/pool: {{ .Values.ha.externalPolicyName }}
+        zen-lead/join: "true"
+        {{- end }}
+        {{- end }}
       labels:
         {{- include "gc-controller.selectorLabels" . | nindent 8 }}
     spec:
@@ -50,18 +56,22 @@ spec:
             {{- range .Values.args }}
             - {{ . }}
             {{- end }}
-            {{- if .Values.leaderElection.enabled }}
+            {{- if and (eq .Values.ha.mode "internal") .Values.leaderElection.namespace }}
             - --leader-election-namespace={{ .Values.leaderElection.namespace | default (.Values.namespace | default "gc-system") }}
             {{- end }}
-          ports:
-            - name: metrics
-              containerPort: {{ .Values.service.port }}
-              protocol: TCP
           env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
             - name: POD_NAMESPACE
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+          ports:
+            - name: metrics
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
           {{- if .Values.livenessProbe }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}

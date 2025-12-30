@@ -1,0 +1,12 @@
+{{- if and (eq .Values.ha.mode "external") .Values.ha.externalPolicyName }}
+apiVersion: coordination.kube-zen.io/v1alpha1
+kind: LeaderPolicy
+metadata:
+  name: {{ .Values.ha.externalPolicyName }}
+  namespace: {{ .Values.namespace | default "gc-system" }}
+spec:
+  leaseDurationSeconds: 15
+  identityStrategy: pod
+  followerMode: standby
+{{- end }}
+
