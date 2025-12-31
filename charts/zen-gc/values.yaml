@@ -81,7 +81,7 @@ affinity: {}
 replicaCount: 2  # Default: 2 replicas for HA (leader election mandatory)
 
 # Controller arguments
-# Note: --ha-mode is automatically added by the deployment template based on ha.mode
+# Leader election is mandatory and handled automatically via zen-sdk
 args:
   - --metrics-addr=:8080
 
@@ -89,7 +89,7 @@ args:
 livenessProbe:
   httpGet:
     path: /healthz
-    port: metrics
+    port: health
   initialDelaySeconds: 30
   periodSeconds: 10
   timeoutSeconds: 5
@@ -98,7 +98,7 @@ livenessProbe:
 readinessProbe:
   httpGet:
     path: /readyz
-    port: metrics
+    port: health
   initialDelaySeconds: 5
   periodSeconds: 5
   timeoutSeconds: 3
