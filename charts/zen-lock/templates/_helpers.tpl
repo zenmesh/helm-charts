@@ -104,3 +104,20 @@ Leader election namespace
 {{- end }}
 {{- end }}
 
+{{/*
+Validate controller leader election configuration (H074.2 safety rules)
+*/}}
+{{- define "zen-lock.validateControllerLeaderElection" -}}
+{{- if and .Values.controller.enabled (gt (.Values.controller.replicaCount | default .Values.replicaCount) 1) (eq .Values.controller.leaderElection.mode "disabled") }}
+{{- fail "Unsafe HA configuration: controller.replicaCount > 1 but controller.leaderElection.mode is disabled. Either set controller.replicaCount=1 or enable leader election (mode: builtin or zenlead)" }}
+{{- end }}
+{{- if and .Values.controller.enabled (eq .Values.controller.leaderElection.mode "zenlead") }}
+{{- if not .Values.controller.leaderElection.leaseName }}
+{{- fail "controller.leaderElection.leaseName is required when controller.leaderElection.mode=zenlead" }}
+{{- end }}
+{{- end }}
+{{- if and .Values.controller.enabled (not (has .Values.controller.leaderElection.mode (list "builtin" "zenlead" "disabled"))) }}
+{{- fail (printf "Invalid controller.leaderElection.mode: %q (must be builtin, zenlead, or disabled)" .Values.controller.leaderElection.mode) }}
+{{- end }}
+{{- end }}
+

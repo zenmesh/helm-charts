@@ -22,7 +22,7 @@ metadata:
     {{- include "zen-lock.labels" . | nindent 4 }}
     app.kubernetes.io/component: webhook
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.webhook.replicaCount | default .Values.replicaCount }}
   selector:
     matchLabels:
       {{- include "zen-lock.selectorLabels" . | nindent 6 }}

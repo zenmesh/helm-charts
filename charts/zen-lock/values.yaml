@@ -34,7 +34,12 @@ controller:
   # Enable the controller component
   enabled: true
   # Number of controller replicas (defaults to replicaCount if not set)
-  replicaCount: 1
+  replicaCount: 2
+  # Leader election configuration (Profiles B/C)
+  leaderElection:
+    mode: builtin        # builtin | zenlead | disabled
+    electionID: ""       # default to "zen-lock-controller-leader-election" if empty
+    leaseName: ""       # required if mode=zenlead
   serviceAccount:
     create: true
     name: ""
@@ -81,14 +86,10 @@ tolerations: []
 
 affinity: {}
 
-# Leader election configuration
-leaderElection:
-  enabled: false
-  namespace: ""
-
 # Webhook configuration
 webhook:
   enabled: true
+  replicaCount: 2  # Webhooks scale horizontally (no leader election)
   port: 9443
   certDir: /tmp/k8s-webhook-server/serving-certs
   # Certificate secret name (managed by cert-manager if using webhook.certManager)
