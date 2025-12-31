@@ -2,7 +2,7 @@ apiVersion: v2
 name: zen-flow
 description: A Helm chart for zen-flow - Kubernetes-native job orchestration controller
 type: application
-version: 0.0.1-alpha
+version: 0.0.2-alpha
 appVersion: "0.0.1-alpha"
 keywords:
   - kubernetes

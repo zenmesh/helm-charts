@@ -16,7 +16,7 @@ apiVersion: v2
 name: zen-gc
 description: A Helm chart for the Generic Garbage Collection Controller for Kubernetes
 type: application
-version: 0.0.1-alpha
+version: 0.0.2-alpha
 appVersion: "0.0.1-alpha"
 keywords:
   - kubernetes
