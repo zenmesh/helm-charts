@@ -40,6 +40,9 @@ spec:
             {{- else }}
             - --leader-election-id={{ include "zen-lead.fullname" . }}-zen-lead-controller-leader-election
             {{- end }}
+            {{- if .Values.leadergroups.enabled }}
+            - --enable-leader-groups=true
+            {{- end }}
           ports:
             - name: metrics
               containerPort: {{ .Values.metrics.port }}

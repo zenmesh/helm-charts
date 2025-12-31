@@ -7,8 +7,6 @@ Expand the name of the chart.
 
 {{/*
 Create a default fully qualified app name.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-If release name contains chart name it will be used as a full name.
 */}}
 {{- define "zen-flow.fullname" -}}
 {{- if .Values.fullnameOverride }}
@@ -62,20 +60,25 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
-Namespace to use
+Create the namespace
 */}}
 {{- define "zen-flow.namespace" -}}
-{{- default .Values.namespace.name .Release.Namespace }}
+{{- default .Release.Namespace .Values.namespace.name }}
 {{- end }}
 
 {{/*
-Leader election namespace
+Validate leader election configuration (H074.2 safety rules)
 */}}
-{{- define "zen-flow.leaderElectionNamespace" -}}
-{{- if .Values.leaderElection.namespace }}
-{{- .Values.leaderElection.namespace }}
-{{- else }}
-{{- include "zen-flow.namespace" . }}
+{{- define "zen-flow.validateLeaderElection" -}}
+{{- if and (gt .Values.replicaCount 1) (eq .Values.leaderElection.mode "disabled") }}
+{{- fail "Unsafe HA configuration: replicaCount > 1 but leaderElection.mode is disabled. Either set replicaCount=1 or enable leader election (mode: builtin or zenlead)" }}
+{{- end }}
+{{- if eq .Values.leaderElection.mode "zenlead" }}
+{{- if not .Values.leaderElection.leaseName }}
+{{- fail "leaderElection.leaseName is required when leaderElection.mode=zenlead" }}
 {{- end }}
 {{- end }}
-
+{{- if not (has .Values.leaderElection.mode (list "builtin" "zenlead" "disabled")) }}
+{{- fail (printf "Invalid leaderElection.mode: %q (must be builtin, zenlead, or disabled)" .Values.leaderElection.mode) }}
+{{- end }}
+{{- end }}

@@ -44,6 +44,12 @@ securityContext:
 # Defaults to release name-based ID if not specified
 leaderElectionID: ""  # If empty, defaults to "<release-name>-zen-lead-controller-leader-election"
 
+# LeaderGroup CRD support (Profile C: CRD-driven controller HA)
+# Default: false (Profile A only, CRD-free)
+# Set to true to enable LeaderGroup CRD and controller HA management
+leadergroups:
+  enabled: false  # Enable LeaderGroup CRD support (requires CRD installation)
+
 # Metrics configuration
 metrics:
   enabled: true
