@@ -63,7 +63,7 @@ Create the name of the service account to use
 Create the namespace
 */}}
 {{- define "zen-watcher.namespace" -}}
-{{- default .Release.Namespace .Values.namespace.name }}
+{{- .Release.Namespace }}
 {{- end }}
 
 {{/*
