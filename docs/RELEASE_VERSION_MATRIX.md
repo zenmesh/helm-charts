@@ -8,8 +8,8 @@
 | Chart | Chart Version | App Version | Component Git Tag | zen-sdk Tag | Notes |
 |-------|--------------|-------------|-------------------|-------------|-------|
 | zen-flow | 0.0.2-alpha | 0.0.1-alpha | v0.0.1-alpha | v0.1.0-alpha | Schema added in 0.0.2-alpha |
-| zen-gc | 0.0.2-alpha | 0.0.1-alpha | v0.0.1-alpha | v0.1.0-alpha | Schema added in 0.0.2-alpha |
-| zen-watcher | 1.0.1 | 1.0.19 | v1.0.19 | v0.1.0-alpha | Schema added in 1.0.1 |
+| zen-gc | 0.0.2-alpha | 0.0.1-alpha | v0.0.1-alpha | v0.1.1-alpha | Schema added in 0.0.2-alpha; GC primitives migrated (H115) |
+| zen-watcher | 1.0.1 | 1.0.19 | v1.0.19 | v0.1.1-alpha | Schema added in 1.0.1; Rate limiting migrated (H115) |
 | zen-lock | 0.0.2-alpha | 0.0.1-alpha | v0.0.1-alpha | v0.1.0-alpha | Schema added in 0.0.2-alpha |
 | zen-lead | 0.1.0 | 0.1.0 | v0.1.0 | N/A | Network-only (Profile A) |
 
@@ -29,9 +29,12 @@
 
 ### zen-sdk Dependency
 
-- **All components** pin to `zen-sdk v0.1.0-alpha` (H104)
+- **zen-gc, zen-watcher**: Pin to `zen-sdk v0.1.1-alpha` (H115: GC primitives migration)
+- **Other components**: Pin to `zen-sdk v0.1.0-alpha` (H104)
 - No pseudo-versions allowed in production
 - Components must update go.mod to reference tagged version
+
+**Migration Note (v0.1.1-alpha)**: GC backoff/ratelimiter now sourced from zen-sdk. See [VERSION_MATRIX.md](../../docs/VERSION_MATRIX.md) for details.
 
 ## Upgrade Path
 
