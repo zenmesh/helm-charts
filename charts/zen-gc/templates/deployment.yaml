@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+{{- include "zen-gc.validateLeaderElection" . }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -66,6 +67,8 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+            - name: REPLICA_COUNT
+              value: "{{ .Values.replicaCount }}"
           ports:
             - name: metrics
               containerPort: {{ .Values.service.port }}
