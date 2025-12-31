@@ -63,7 +63,7 @@ Create the name of the service account to use
 Validate leader election configuration (H074.2 safety rules)
 */}}
 {{- define "zen-gc.validateLeaderElection" -}}
-{{- if and (gt .Values.replicaCount 1) (eq .Values.leaderElection.mode "disabled") }}
+{{- if and (gt (int .Values.replicaCount) 1) (eq .Values.leaderElection.mode "disabled") }}
 {{- fail "Unsafe HA configuration: replicaCount > 1 but leaderElection.mode is disabled. Either set replicaCount=1 or enable leader election (mode: builtin or zenlead)" }}
 {{- end }}
 {{- if eq .Values.leaderElection.mode "zenlead" }}
