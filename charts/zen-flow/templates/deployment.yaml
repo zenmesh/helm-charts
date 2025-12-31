@@ -46,15 +46,14 @@ spec:
             {{- else }}
             - --enable-webhook=false
             {{- end }}
-            {{- if .Values.leaderElection.enabled }}
-            - --enable-leader-election=true
-            - --leader-election-namespace={{ include "zen-flow.leaderElectionNamespace" . }}
-            {{- else }}
-            - --enable-leader-election=false
+            {{- if .Values.leaderElectionID }}
+            - --leader-election-id={{ .Values.leaderElectionID }}
             {{- end }}
             {{- if .Values.controller.maxConcurrentReconciles }}
             - --max-concurrent-reconciles={{ .Values.controller.maxConcurrentReconciles }}
             {{- end }}
+            # Leader election is mandatory and handled automatically via zen-sdk
+            # No --enable-leader-election flag needed
           ports:
             - name: metrics
               containerPort: {{ .Values.metrics.port }}

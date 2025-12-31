@@ -54,14 +54,10 @@ spec:
             - --cert-dir={{ .Values.webhook.certDir }}
             - --metrics-bind-address=:{{ .Values.metrics.port }}
             - --health-probe-bind-address=:8081
-            {{- if .Values.leaderElection.enabled }}
-            - --leader-elect=true
-            - --leader-election-namespace={{ include "zen-lock.leaderElectionNamespace" . }}
-            {{- else }}
-            - --leader-elect=false
-            {{- end }}
             - --enable-controller=false
             - --enable-webhook=true
+            # Webhook-only mode: leader election disabled (webhooks scale horizontally)
+            # No --leader-elect flag needed
           ports:
             - name: webhook
               containerPort: {{ .Values.webhook.port }}
