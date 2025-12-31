@@ -1,28 +1,14 @@
-# Copyright 2025 Kube-ZEN Contributors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "gc-controller.name" -}}
+{{- define "zen-gc.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Create a default fully qualified app name.
 */}}
-{{- define "gc-controller.fullname" -}}
+{{- define "zen-gc.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -38,16 +24,16 @@ Create a default fully qualified app name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "gc-controller.chart" -}}
+{{- define "zen-gc.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "gc-controller.labels" -}}
-helm.sh/chart: {{ include "gc-controller.chart" . }}
-{{ include "gc-controller.selectorLabels" . }}
+{{- define "zen-gc.labels" -}}
+helm.sh/chart: {{ include "zen-gc.chart" . }}
+{{ include "zen-gc.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -57,19 +43,35 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "gc-controller.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "gc-controller.name" . }}
+{{- define "zen-gc.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "zen-gc.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "gc-controller.serviceAccountName" -}}
+{{- define "zen-gc.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "gc-controller.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "zen-gc.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
 
+{{/*
+Validate leader election configuration (H074.2 safety rules)
+*/}}
+{{- define "zen-gc.validateLeaderElection" -}}
+{{- if and (gt .Values.replicaCount 1) (eq .Values.leaderElection.mode "disabled") }}
+{{- fail "Unsafe HA configuration: replicaCount > 1 but leaderElection.mode is disabled. Either set replicaCount=1 or enable leader election (mode: builtin or zenlead)" }}
+{{- end }}
+{{- if eq .Values.leaderElection.mode "zenlead" }}
+{{- if not .Values.leaderElection.leaseName }}
+{{- fail "leaderElection.leaseName is required when leaderElection.mode=zenlead" }}
+{{- end }}
+{{- end }}
+{{- if not (has .Values.leaderElection.mode (list "builtin" "zenlead" "disabled")) }}
+{{- fail (printf "Invalid leaderElection.mode: %q (must be builtin, zenlead, or disabled)" .Values.leaderElection.mode) }}
+{{- end }}
+{{- end }}

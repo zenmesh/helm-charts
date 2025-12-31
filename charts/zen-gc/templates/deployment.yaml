@@ -50,8 +50,13 @@ spec:
             {{- range .Values.args }}
             - {{ . }}
             {{- end }}
-            # Leader election is mandatory and handled automatically via zen-sdk
-            # No --ha-mode or --enable-leader-election flags needed
+            - --leader-election-mode={{ .Values.leaderElection.mode }}
+            {{- if .Values.leaderElection.electionID }}
+            - --leader-election-id={{ .Values.leaderElection.electionID }}
+            {{- end }}
+            {{- if eq .Values.leaderElection.mode "zenlead" }}
+            - --leader-election-lease-name={{ .Values.leaderElection.leaseName }}
+            {{- end }}
           env:
             - name: POD_NAME
               valueFrom:
