@@ -93,12 +93,39 @@ for chart in "${CHARTS[@]}"; do
     # Template render (matrix tests)
     echo "[2/2] Running helm template (matrix tests)..."
     
-    # zen-suite: test with all components enabled
+    # zen-suite: test with multiple scenarios
     if [[ "$chart" == *"zen-suite"* ]]; then
+        echo "  Testing zen-suite scenarios..."
+        
+        # Scenario 1: Default (all core enabled, integrations off)
         if helm template test-release "$chart" > /dev/null 2>&1; then
-            echo "✅ Template render passed for $chart (all components enabled)"
+            echo "  ✅ Default scenario (all core enabled, integrations off)"
         else
-            echo "❌ Template render failed for $chart"
+            echo "  ❌ Default scenario failed"
+            FAILED=$((FAILED + 1))
+        fi
+        
+        # Scenario 2: Integration enabled (positive case)
+        if helm template test-release "$chart" --set integrations.observationsGc.enabled=true > /dev/null 2>&1; then
+            echo "  ✅ Integration enabled (positive case)"
+        else
+            echo "  ❌ Integration enabled scenario failed"
+            FAILED=$((FAILED + 1))
+        fi
+        
+        # Scenario 3: Negative case (integration enabled but zenGc disabled) - should fail
+        if helm template test-release "$chart" --set integrations.observationsGc.enabled=true --set zenGc.enabled=false > /dev/null 2>&1; then
+            echo "  ❌ Negative case should have failed (integration enabled but zenGc disabled)"
+            FAILED=$((FAILED + 1))
+        else
+            echo "  ✅ Negative case correctly failed (validation working)"
+        fi
+        
+        # Scenario 4: zenLead enabled
+        if helm template test-release "$chart" --set zenLead.enabled=true > /dev/null 2>&1; then
+            echo "  ✅ zenLead enabled scenario"
+        else
+            echo "  ❌ zenLead enabled scenario failed"
             FAILED=$((FAILED + 1))
         fi
     else

@@ -1,0 +1,8 @@
+{{- if and .Values.integrations.observationsGc.enabled (not .Values.zenGc.enabled) }}
+{{- fail "integrations.observationsGc.enabled=true requires zenGc.enabled=true" }}
+{{- end }}
+
+{{- if and .Values.integrations.observationsGc.enabled (not .Values.zenWatcher.enabled) }}
+{{- fail "integrations.observationsGc.enabled=true requires zenWatcher.enabled=true" }}
+{{- end }}
+

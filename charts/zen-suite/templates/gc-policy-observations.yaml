@@ -1,0 +1,45 @@
+{{- if and .Values.integrations.observationsGc.enabled .Values.zenGc.enabled .Values.zenWatcher.enabled }}
+apiVersion: gc.kube-zen.io/v1alpha1
+kind: GarbageCollectionPolicy
+metadata:
+  name: {{ .Release.Name }}-observations-gc
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ include "zen-suite.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/component: integration
+    kube-zen.io/integration: observations-gc
+spec:
+  targetResource:
+    apiVersion: zen.kube-zen.io/v1
+    kind: Observation
+    {{- if .Values.integrations.observationsGc.targetNamespace }}
+    namespace: {{ .Values.integrations.observationsGc.targetNamespace }}
+    {{- end }}
+    {{- if .Values.integrations.observationsGc.labelSelector }}
+    labelSelector:
+      {{- toYaml .Values.integrations.observationsGc.labelSelector | nindent 6 }}
+    {{- end }}
+  ttl:
+    {{- if .Values.integrations.observationsGc.ttl.fieldPath }}
+    fieldPath: {{ .Values.integrations.observationsGc.ttl.fieldPath }}
+    {{- end }}
+    {{- if .Values.integrations.observationsGc.ttl.defaultSeconds }}
+    default: {{ .Values.integrations.observationsGc.ttl.defaultSeconds }}
+    {{- end }}
+  behavior:
+    {{- if ne .Values.integrations.observationsGc.behavior.dryRun nil }}
+    dryRun: {{ .Values.integrations.observationsGc.behavior.dryRun }}
+    {{- end }}
+    {{- if .Values.integrations.observationsGc.behavior.batchSize }}
+    batchSize: {{ .Values.integrations.observationsGc.behavior.batchSize }}
+    {{- end }}
+    {{- if .Values.integrations.observationsGc.behavior.maxDeletionsPerSecond }}
+    maxDeletionsPerSecond: {{ .Values.integrations.observationsGc.behavior.maxDeletionsPerSecond }}
+    {{- end }}
+    {{- if .Values.integrations.observationsGc.behavior.propagationPolicy }}
+    propagationPolicy: {{ .Values.integrations.observationsGc.behavior.propagationPolicy }}
+    {{- end }}
+{{- end }}
+

@@ -1,0 +1,190 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "zen-suite values.yaml schema",
+  "type": "object",
+  "properties": {
+    "zenLock": {
+      "type": "object",
+      "description": "zen-lock component configuration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable zen-lock component",
+          "default": true
+        }
+      }
+    },
+    "zenFlow": {
+      "type": "object",
+      "description": "zen-flow component configuration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable zen-flow component",
+          "default": true
+        }
+      }
+    },
+    "zenGc": {
+      "type": "object",
+      "description": "zen-gc component configuration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable zen-gc component",
+          "default": true
+        }
+      }
+    },
+    "zenWatcher": {
+      "type": "object",
+      "description": "zen-watcher component configuration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable zen-watcher component",
+          "default": true
+        },
+        "observationsCrd": {
+          "type": "object",
+          "description": "Observation CRD installation",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Install Observation CRD",
+              "default": false
+            }
+          }
+        }
+      }
+    },
+    "zenLead": {
+      "type": "object",
+      "description": "zen-lead component configuration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable zen-lead component",
+          "default": false
+        }
+      }
+    },
+    "integrations": {
+      "type": "object",
+      "description": "Suite integrations",
+      "properties": {
+        "observationsGc": {
+          "type": "object",
+          "description": "Observation GC integration (zen-watcher → zen-gc)",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Enable Observation GC integration",
+              "default": false
+            },
+            "targetNamespace": {
+              "type": "string",
+              "description": "Target namespace (empty = cluster-wide)",
+              "default": ""
+            },
+            "labelSelector": {
+              "type": "object",
+              "description": "Label selector for Observations",
+              "default": {}
+            },
+            "ttl": {
+              "type": "object",
+              "description": "TTL configuration",
+              "properties": {
+                "fieldPath": {
+                  "type": "string",
+                  "description": "JSONPath to TTL field",
+                  "default": "spec.ttlSecondsAfterCreation"
+                },
+                "defaultSeconds": {
+                  "type": "integer",
+                  "description": "Default TTL in seconds",
+                  "minimum": 0,
+                  "default": 604800
+                }
+              },
+              "required": ["fieldPath", "defaultSeconds"]
+            },
+            "behavior": {
+              "type": "object",
+              "description": "GC behavior configuration",
+              "properties": {
+                "dryRun": {
+                  "type": "boolean",
+                  "description": "Dry run mode (no actual deletions)",
+                  "default": false
+                },
+                "batchSize": {
+                  "type": "integer",
+                  "description": "Batch size for deletions",
+                  "minimum": 1,
+                  "maximum": 1000,
+                  "default": 200
+                },
+                "maxDeletionsPerSecond": {
+                  "type": "integer",
+                  "description": "Maximum deletions per second",
+                  "minimum": 1,
+                  "maximum": 100,
+                  "default": 5
+                },
+                "propagationPolicy": {
+                  "type": "string",
+                  "description": "Deletion propagation policy",
+                  "enum": ["Background", "Foreground", "Orphan"],
+                  "default": "Background"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "integrations": {
+            "properties": {
+              "observationsGc": {
+                "properties": {
+                  "enabled": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "zenGc": {
+            "properties": {
+              "enabled": {
+                "const": true
+              }
+            },
+            "required": ["enabled"]
+          },
+          "zenWatcher": {
+            "properties": {
+              "enabled": {
+                "const": true
+              }
+            },
+            "required": ["enabled"]
+          }
+        },
+        "required": ["zenGc", "zenWatcher"]
+      }
+    }
+  ]
+}
+

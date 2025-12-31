@@ -12,7 +12,7 @@ The zen-suite chart is a reference installation that bundles:
 
 ## Installation
 
-### Quick Start (All Components)
+### Quick Start (Install All)
 
 ```bash
 # Add repository
@@ -24,6 +24,43 @@ helm install zen-suite kube-zen/zen-suite \
   --namespace zen-system \
   --create-namespace
 ```
+
+### Install with zen-lead (Optional)
+
+Enable zen-lead for network-only leader election (Profile A):
+
+```bash
+helm install zen-suite kube-zen/zen-suite \
+  --namespace zen-system \
+  --create-namespace \
+  --set zenLead.enabled=true
+```
+
+### Install with Observation GC Integration
+
+Enable automatic pruning of zen-watcher Observations via zen-gc:
+
+```bash
+helm install zen-suite kube-zen/zen-suite \
+  --namespace zen-system \
+  --create-namespace \
+  --set integrations.observationsGc.enabled=true
+```
+
+**Prerequisites**: `zenGc.enabled=true` and `zenWatcher.enabled=true` (enabled by default)
+
+### Install with Observation CRD
+
+Enable Observation CRD installation (suite-managed):
+
+```bash
+helm install zen-suite kube-zen/zen-suite \
+  --namespace zen-system \
+  --create-namespace \
+  --set zenWatcher.observationsCrd.enabled=true
+```
+
+**Note**: By default, the Observation CRD is not installed. Enable this if you need the CRD managed by the suite chart.
 
 ### Selective Installation
 
@@ -63,6 +100,24 @@ zenGc:
 zenWatcher:
   enabled: true
   # zen-watcher specific values
+  observationsCrd:
+    enabled: false  # Install Observation CRD via suite (default: false)
+
+zenLead:
+  enabled: false  # Enable zen-lead for network-only leader election
+
+integrations:
+  observationsGc:
+    enabled: false  # Enable Observation GC integration (zen-watcher → zen-gc)
+    targetNamespace: ""  # Empty = cluster-wide
+    ttl:
+      fieldPath: "spec.ttlSecondsAfterCreation"
+      defaultSeconds: 604800  # 7 days
+    behavior:
+      dryRun: false
+      batchSize: 200
+      maxDeletionsPerSecond: 5
+      propagationPolicy: Background
 ```
 
 See individual component charts for detailed configuration options:
@@ -75,11 +130,14 @@ See individual component charts for detailed configuration options:
 
 Each component chart manages its own CRDs. The suite chart does not duplicate CRDs - they are installed as part of each component's chart.
 
+**Observation CRD**: The Observation CRD can be installed via the suite chart using `zenWatcher.observationsCrd.enabled=true`. This uses the `zen-observations-crds` subchart for explicit CRD management.
+
 CRDs are installed in the following order:
 1. zen-lock CRDs
 2. zen-flow CRDs
 3. zen-gc CRDs
 4. zen-watcher CRDs
+5. Observation CRD (if `zenWatcher.observationsCrd.enabled=true`)
 
 ## Production Recommendations
 
