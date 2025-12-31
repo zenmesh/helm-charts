@@ -64,6 +64,11 @@ EXCLUDE_PATTERNS=(
     "e2e"
 )
 
+# Legacy/deprecated code paths to exclude (Model A: runtime-only with legacy exclusion)
+LEGACY_EXCLUDE_PATHS=(
+    "zen-sdk/pkg/controller"  # Deprecated guard.go package (H090: will be removed)
+)
+
 # Parse arguments
 EXPLAIN_MODE=0
 VERBOSE=0
@@ -140,6 +145,18 @@ for pattern in "${BANNED_PATTERNS[@]}"; do
     
     # Search in each runtime path
     for search_path in "${SEARCH_PATHS[@]}"; do
+        # Skip legacy/deprecated paths (Model A: runtime-only with legacy exclusion)
+        SKIP_PATH=0
+        for legacy_path in "${LEGACY_EXCLUDE_PATHS[@]}"; do
+            if [[ "${search_path}" == *"${legacy_path}"* ]]; then
+                SKIP_PATH=1
+                break
+            fi
+        done
+        if [ ${SKIP_PATH} -eq 1 ]; then
+            continue
+        fi
+        
         # Use grep to find matches (case-insensitive) in runtime code only
         PATH_MATCHES=$(grep -r -i \
             --include="*.go" \
@@ -157,7 +174,7 @@ for pattern in "${BANNED_PATTERNS[@]}"; do
             "${pattern}" "${search_path}" 2>/dev/null | \
             grep -v "DEPRECATED" | \
             grep -v "deprecated" | \
-            grep -v "zen-sdk/pkg/controller/guard.go" || true)  # Legacy guard code (deprecated but kept for compatibility)
+            grep -v "zen-sdk/pkg/controller" || true)  # Legacy guard code excluded (H090)
         
         if [ -n "${PATH_MATCHES}" ]; then
             if [ -z "${MATCHES}" ]; then
