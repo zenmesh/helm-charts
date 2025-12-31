@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "replicaCount": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 1,
+      "description": "Number of replicas (legacy, use controller.replicaCount)"
+    },
+    "controller": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable the controller component"
+        },
+        "replicaCount": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 2,
+          "description": "Number of controller replicas"
+        },
+        "leaderElection": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "type": "string",
+              "enum": ["builtin", "zenlead", "disabled"],
+              "default": "builtin",
+              "description": "Leader election mode: builtin (Profile B), zenlead (Profile C), or disabled"
+            },
+            "electionID": {
+              "type": "string",
+              "default": "",
+              "description": "Leader election ID (defaults to component-leader-election if empty)"
+            },
+            "leaseName": {
+              "type": "string",
+              "default": "",
+              "description": "Lease name (required if mode=zenlead)"
+            }
+          },
+          "required": ["mode"],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "mode": {
+                    "const": "zenlead"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "leaseName": {
+                    "minLength": 1,
+                    "description": "leaseName is required when mode=zenlead"
+                  }
+                },
+                "required": ["leaseName"]
+              }
+            }
+          ]
+        }
+      },
+      "required": ["leaderElection"]
+    }
+  }
+}
+
