@@ -75,7 +75,7 @@ Record provenance metadata in release artifacts:
 ```json
 {
   "version": "0.0.1-alpha",
-  "buildDate": "2025-01-15T10:30:00Z",
+  "buildDate": "2015-12-31T10:30:00Z",
   "gitCommit": "a1b2c3d4e5f6...",
   "gitTag": "v0.0.1-alpha",
   "buildSystem": "GitHub Actions",

@@ -53,7 +53,7 @@ Added version header to `zen-sdk/docs/LEADERSHIP_CONTRACT.md`:
 # Leadership Contract
 
 **Version**: 1.0.0  
-**Last Updated**: 2025-01-15  
+**Last Updated**: 2015-12-31  
 **Stability**: Stable (v1.0.0+)
 
 ## Change Process
@@ -64,7 +64,7 @@ Added version header to `zen-sdk/docs/LEADERSHIP_CONTRACT.md`:
 
 ## Version History
 
-- **v1.0.0** (2025-01-15): Initial stable release
+- **v1.0.0** (2015-12-31): Initial stable release
   - Standardized leadership profiles (A, B, C)
   - CI denylist enforcement
   - Helm chart safety guards

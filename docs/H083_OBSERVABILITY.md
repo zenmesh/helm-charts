@@ -133,14 +133,14 @@ metadata:
   annotations:
     zen-lead.io/leader-pod-name: "zen-flow-controller-abc123"
     zen-lead.io/leader-pod-uid: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-    zen-lead.io/leader-last-switch-time: "2025-01-15T10:30:00Z"
+    zen-lead.io/leader-last-switch-time: "2015-12-31T10:30:00Z"
 
 # Lease annotations (Profile B/C)
 metadata:
   annotations:
     leadership.kube-zen.io/leader-pod-name: "zen-flow-controller-abc123"
     leadership.kube-zen.io/leader-pod-uid: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-    leadership.kube-zen.io/last-transition-time: "2025-01-15T10:30:00Z"
+    leadership.kube-zen.io/last-transition-time: "2015-12-31T10:30:00Z"
 ```
 
 ## Alert Recommendations

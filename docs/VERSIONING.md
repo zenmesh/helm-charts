@@ -214,7 +214,7 @@ Consider using:
 Example changelog entry:
 
 ```markdown
-## [0.0.2-alpha] - 2025-01-15
+## [0.0.2-alpha] - 2015-12-31
 
 ### Added
 - New configuration option for custom namespaces
