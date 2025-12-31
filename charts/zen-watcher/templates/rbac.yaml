@@ -1,0 +1,41 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "zen-watcher.fullname" . }}
+  namespace: {{ include "zen-watcher.namespace" . }}
+  labels:
+    {{- include "zen-watcher.labels" . | nindent 4 }}
+rules:
+  # Read access to ConfigMaps (for filter config)
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch"]
+  # Read/write access to Observations CRD
+  - apiGroups: ["zen.kube-zen.io"]
+    resources: ["observations"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # Read access to Ingester CRD
+  - apiGroups: ["zen.kube-zen.io"]
+    resources: ["ingesters"]
+    verbs: ["get", "list", "watch"]
+  # Leader election (required by controller-runtime for HA)
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "zen-watcher.fullname" . }}
+  namespace: {{ include "zen-watcher.namespace" . }}
+  labels:
+    {{- include "zen-watcher.labels" . | nindent 4 }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "zen-watcher.serviceAccountName" . }}
+    namespace: {{ include "zen-watcher.namespace" . }}
+roleRef:
+  kind: Role
+  name: {{ include "zen-watcher.fullname" . }}
+  apiGroup: rbac.authorization.k8s.io
+

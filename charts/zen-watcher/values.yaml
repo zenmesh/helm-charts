@@ -16,7 +16,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-replicaCount: 1
+replicaCount: 2
 
 image:
   repository: kubezen/zen-watcher
@@ -65,4 +65,18 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+# Leader election configuration (Profiles B/C)
+leaderElection:
+  mode: builtin        # builtin | zenlead | disabled
+  electionID: ""       # default to "zen-watcher-leader-election" if empty
+  leaseName: ""        # required if mode=zenlead
+
+# Pod Disruption Budget
+pdb:
+  enabled: true
+  minAvailable: 1
+
+# Topology spread constraints
+topologySpreadConstraints: []
 
