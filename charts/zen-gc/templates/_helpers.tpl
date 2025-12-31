@@ -75,3 +75,30 @@ Validate leader election configuration (H074.2 safety rules)
 {{- fail (printf "Invalid leaderElection.mode: %q (must be builtin, zenlead, or disabled)" .Values.leaderElection.mode) }}
 {{- end }}
 {{- end }}
+
+{{/*
+Legacy template aliases for backward compatibility (gc-controller.*)
+*/}}
+{{- define "gc-controller.name" -}}
+{{- include "zen-gc.name" . }}
+{{- end }}
+
+{{- define "gc-controller.fullname" -}}
+{{- include "zen-gc.fullname" . }}
+{{- end }}
+
+{{- define "gc-controller.chart" -}}
+{{- include "zen-gc.chart" . }}
+{{- end }}
+
+{{- define "gc-controller.labels" -}}
+{{- include "zen-gc.labels" . }}
+{{- end }}
+
+{{- define "gc-controller.selectorLabels" -}}
+{{- include "zen-gc.selectorLabels" . }}
+{{- end }}
+
+{{- define "gc-controller.serviceAccountName" -}}
+{{- include "zen-gc.serviceAccountName" . }}
+{{- end }}
