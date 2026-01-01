@@ -1,0 +1,10 @@
+{{- if .Values.crds.enabled }}
+{{- $files := .Files }}
+{{- $crdPath := "crds/ingester_crd.yaml" }}
+{{- if $files.Get $crdPath }}
+{{- $files.Get $crdPath | nindent 0 }}
+{{- else }}
+# CRD file not found in chart files
+# Please ensure ingester_crd.yaml is included in the chart's files/crds/ directory
+{{- end }}
+{{- end }}
