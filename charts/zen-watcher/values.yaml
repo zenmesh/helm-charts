@@ -80,3 +80,9 @@ pdb:
 # Topology spread constraints
 topologySpreadConstraints: []
 
+
+# CRDs configuration
+crds:
+  # Controls whether CRDs are installed with this chart
+  # Set to false if CRDs are managed separately (e.g., via ArgoCD, Flux, or manual install)
+  enabled: false

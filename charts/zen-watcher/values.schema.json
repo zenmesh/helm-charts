@@ -13,7 +13,11 @@
       "properties": {
         "mode": {
           "type": "string",
-          "enum": ["builtin", "zenlead", "disabled"],
+          "enum": [
+            "builtin",
+            "zenlead",
+            "disabled"
+          ],
           "default": "builtin",
           "description": "Leader election mode: builtin (Profile B), zenlead (Profile C), or disabled"
         },
@@ -28,7 +32,9 @@
           "description": "Lease name (required if mode=zenlead)"
         }
       },
-      "required": ["mode"],
+      "required": [
+        "mode"
+      ],
       "allOf": [
         {
           "if": {
@@ -45,12 +51,29 @@
                 "description": "leaseName is required when mode=zenlead"
               }
             },
-            "required": ["leaseName"]
+            "required": [
+              "leaseName"
+            ]
           }
         }
       ]
+    },
+    "crds": {
+      "type": "object",
+      "description": "CRDs configuration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Controls whether CRDs are installed with this chart. Set to false if CRDs are managed separately."
+        }
+      },
+      "required": [
+        "enabled"
+      ]
     }
   },
-  "required": ["leaderElection"]
+  "required": [
+    "leaderElection"
+  ]
 }
-

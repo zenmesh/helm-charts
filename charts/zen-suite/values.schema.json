@@ -55,6 +55,20 @@
               "default": false
             }
           }
+        },
+        "crds": {
+          "type": "object",
+          "description": "CRD installation toggle (passes through to zen-watcher.crds.enabled)",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": false,
+              "description": "Controls whether CRDs are installed with zen-watcher chart. Set to false if CRDs are managed separately."
+            }
+          },
+          "required": [
+            "enabled"
+          ]
         }
       }
     },
@@ -75,7 +89,7 @@
       "properties": {
         "observationsGc": {
           "type": "object",
-          "description": "Observation GC integration (zen-watcher → zen-gc)",
+          "description": "Observation GC integration (zen-watcher \u2192 zen-gc)",
           "properties": {
             "enabled": {
               "type": "boolean",
@@ -108,7 +122,10 @@
                   "default": 604800
                 }
               },
-              "required": ["fieldPath", "defaultSeconds"]
+              "required": [
+                "fieldPath",
+                "defaultSeconds"
+              ]
             },
             "behavior": {
               "type": "object",
@@ -136,7 +153,11 @@
                 "propagationPolicy": {
                   "type": "string",
                   "description": "Deletion propagation policy",
-                  "enum": ["Background", "Foreground", "Orphan"],
+                  "enum": [
+                    "Background",
+                    "Foreground",
+                    "Orphan"
+                  ],
                   "default": "Background"
                 }
               }
@@ -171,7 +192,9 @@
                 "const": true
               }
             },
-            "required": ["enabled"]
+            "required": [
+              "enabled"
+            ]
           },
           "zenWatcher": {
             "properties": {
@@ -179,12 +202,16 @@
                 "const": true
               }
             },
-            "required": ["enabled"]
+            "required": [
+              "enabled"
+            ]
           }
         },
-        "required": ["zenGc", "zenWatcher"]
+        "required": [
+          "zenGc",
+          "zenWatcher"
+        ]
       }
     }
   ]
 }
-

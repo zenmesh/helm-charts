@@ -71,3 +71,6 @@ integrations:
       maxDeletionsPerSecond: 5
       propagationPolicy: Background
 
+  # CRD installation toggle (passes through to zen-watcher.crds.enabled)
+  crds:
+    enabled: false  # Default: CRDs not installed by chart (manage separately)

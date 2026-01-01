@@ -21,3 +21,19 @@ charts/**/*.tgz
 .DS_Store
 Thumbs.db
 
+# H004: Prevent ~ and .kube directories from being committed
+# These are typically user home directory artifacts
+~/
+~/**
+**/~
+**/~/*/
+.kube/
+.kube/**
+**/.kube/
+**/.kube/**
+
+# Prevent kubeconfig and home directory artifacts
+~/
+.kube/
+**/.kube/
+**/~/.kube/config
