@@ -4,7 +4,7 @@
   "description": "Configuration values for zen-observations-crds chart",
   "type": "object",
   "properties": {
-    "install": {
+    "enabled": {
       "type": "boolean",
       "description": "Whether to install the CRDs. Default: false (CRD-free unless explicitly enabled)",
       "default": false
@@ -29,6 +29,6 @@
       }
     }
   },
-  "required": ["install"]
+  "required": ["enabled"]
 }
 

@@ -46,6 +46,9 @@ zenWatcher:
   # Observation CRD installation (suite-managed)
   observationsCrd:
     enabled: false  # Default: CRD-free unless explicitly enabled
+  # CRD installation toggle (passes through to zen-watcher.crds.enabled)
+  crds:
+    enabled: false  # Default: CRDs not installed by chart (manage separately)
 
 zenLead:
   enabled: false
@@ -70,7 +73,3 @@ integrations:
       batchSize: 200
       maxDeletionsPerSecond: 5
       propagationPolicy: Background
-
-  # CRD installation toggle (passes through to zen-watcher.crds.enabled)
-  crds:
-    enabled: false  # Default: CRDs not installed by chart (manage separately)

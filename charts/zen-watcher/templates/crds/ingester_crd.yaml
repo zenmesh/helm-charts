@@ -1,6 +1,6 @@
 {{- if .Values.crds.enabled }}
 {{- $files := .Files }}
-{{- $crdPath := "crds/ingester_crd.yaml" }}
+{{- $crdPath := "files/crds/ingester_crd.yaml" }}
 {{- if $files.Get $crdPath }}
 {{- $files.Get $crdPath | nindent 0 }}
 {{- else }}
