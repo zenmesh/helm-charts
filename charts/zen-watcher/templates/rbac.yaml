@@ -14,10 +14,14 @@ rules:
   - apiGroups: ["zen.kube-zen.io"]
     resources: ["observations"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
-  # Read access to Ingester CRD
+  # Read access to Ingester CRD (spec only)
   - apiGroups: ["zen.kube-zen.io"]
     resources: ["ingesters"]
     verbs: ["get", "list", "watch"]
+  # Status subresource access for Ingester (controller-only, D027: status integrity)
+  - apiGroups: ["zen.kube-zen.io"]
+    resources: ["ingesters/status"]
+    verbs: ["get", "update", "patch"]
   # Leader election (required by controller-runtime for HA)
   - apiGroups: ["coordination.k8s.io"]
     resources: ["leases"]
