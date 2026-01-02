@@ -90,6 +90,7 @@ The following table lists the configurable parameters and their default values:
 | `serviceAccount.name` | Service account name | `""` |
 | `leaderElectionID` | Leader election ID (must be unique per instance) | `""` (defaults to release-name-based) |
 | `controller.maxCacheSizePerNamespace` | Maximum cached Services per namespace (LRU eviction) | `1000` |
+| `controller.maxConcurrentReconciles` | Maximum concurrent reconciliations | `10` |
 | `rbac.clusterScoped` | Use ClusterRole/ClusterRoleBinding | `true` |
 | `namespace.create` | Create namespace | `true` |
 | `namespace.name` | Namespace name | `zen-lead-system` |

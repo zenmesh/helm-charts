@@ -46,6 +46,9 @@ spec:
             {{- if .Values.controller.maxCacheSizePerNamespace }}
             - --max-cache-size-per-namespace={{ .Values.controller.maxCacheSizePerNamespace }}
             {{- end }}
+            {{- if .Values.controller.maxConcurrentReconciles }}
+            - --max-concurrent-reconciles={{ .Values.controller.maxConcurrentReconciles }}
+            {{- end }}
           ports:
             - name: metrics
               containerPort: {{ .Values.metrics.port }}

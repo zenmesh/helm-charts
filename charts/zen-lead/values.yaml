@@ -78,6 +78,30 @@ controller:
   # Target: >80% hit ratio indicates good cache efficiency
   maxCacheSizePerNamespace: 1000
 
+  # Maximum number of concurrent reconciliations
+  # Controls how many Services can be reconciled simultaneously.
+  # Higher values increase throughput but consume more resources (CPU, memory, API server load).
+  # 
+  # Default: 10 concurrent reconciles
+  # Set to 0 for unlimited (not recommended for production)
+  # 
+  # Tuning guidance:
+  # - Small clusters (<100 Services): Default (10) is sufficient
+  # - Medium clusters (100-1000 Services): 10-20 works well
+  # - Large clusters (>1000 Services): 20-50 may be needed
+  # - Very large clusters (>5000 Services): Consider 50-100
+  # 
+  # Monitor these metrics to tune:
+  # - zen_lead_reconciliation_duration_seconds: Reconciliation latency
+  # - zen_lead_reconciliations_total: Reconciliation rate
+  # - API server QPS/Burst limits: Watch for rate limiting
+  # 
+  # Warning: Too high values can:
+  # - Overwhelm the API server (rate limiting)
+  # - Cause memory pressure (many goroutines)
+  # - Lead to controller starvation (one namespace consuming all capacity)
+  maxConcurrentReconciles: 10
+
 # Metrics configuration
 metrics:
   enabled: true
