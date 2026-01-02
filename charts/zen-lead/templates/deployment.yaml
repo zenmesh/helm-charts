@@ -43,6 +43,9 @@ spec:
             {{- if .Values.leadergroups.enabled }}
             - --enable-leader-groups=true
             {{- end }}
+            {{- if .Values.controller.maxCacheSizePerNamespace }}
+            - --max-cache-size-per-namespace={{ .Values.controller.maxCacheSizePerNamespace }}
+            {{- end }}
           ports:
             - name: metrics
               containerPort: {{ .Values.metrics.port }}

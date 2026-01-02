@@ -50,6 +50,34 @@ leaderElectionID: ""  # If empty, defaults to "<release-name>-zen-lead-controlle
 leadergroups:
   enabled: false  # Enable LeaderGroup CRD support (requires CRD installation)
 
+# Controller configuration
+controller:
+  # Maximum number of cached opted-in Services per namespace
+  # The controller maintains an in-memory cache of Services with zen-lead.io/enabled annotation
+  # to optimize pod-to-service mapping. This limit prevents unbounded memory growth in large clusters.
+  # 
+  # When the limit is exceeded, the controller uses LRU (Least Recently Used) eviction:
+  # - Oldest accessed Services are evicted first
+  # - Cache hit/miss metrics are available for monitoring
+  # 
+  # Default: 1000 services per namespace
+  # Set to 0 for unlimited (not recommended for production)
+  # 
+  # Tuning guidance:
+  # - Small clusters (<100 Services per namespace): Default (1000) is sufficient
+  # - Medium clusters (100-1000 Services): Default (1000) works well
+  # - Large clusters (>1000 Services per namespace): Increase to 2000-5000
+  # - Very large clusters (>5000 Services): Consider namespace sharding or increase to 10000
+  # 
+  # Monitor these metrics to tune:
+  # - zen_lead_cache_size: Current cache size per namespace
+  # - zen_lead_cache_hits_total: Cache hit rate
+  # - zen_lead_cache_misses_total: Cache miss rate
+  # 
+  # Cache hit ratio = hits / (hits + misses)
+  # Target: >80% hit ratio indicates good cache efficiency
+  maxCacheSizePerNamespace: 1000
+
 # Metrics configuration
 metrics:
   enabled: true
