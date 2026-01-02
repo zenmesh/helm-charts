@@ -49,6 +49,25 @@ helm install zen-lead zen-lead/zen-lead \
   --set replicaCount=2
 ```
 
+### Install with Custom Cache Size
+
+For large clusters with many Services per namespace, increase the cache size:
+
+```bash
+helm install zen-lead zen-lead/zen-lead \
+  --namespace zen-lead-system \
+  --create-namespace \
+  --set controller.maxCacheSizePerNamespace=5000
+```
+
+**Tuning guidance:**
+- Small clusters (<100 Services/namespace): Default (1000) is sufficient
+- Medium clusters (100-1000 Services): Default (1000) works well
+- Large clusters (>1000 Services): Increase to 2000-5000
+- Very large clusters (>5000 Services): Consider 10000
+
+Monitor `zen_lead_cache_size`, `zen_lead_cache_hits_total`, and `zen_lead_cache_misses_total` metrics to tune.
+
 ### Install from Local Chart
 
 ```bash
