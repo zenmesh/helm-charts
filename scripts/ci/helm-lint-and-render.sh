@@ -79,7 +79,11 @@ for chart in "${CHARTS[@]}"; do
     # zen-suite requires dependencies to be built first
     if [[ "$chart" == *"zen-suite"* ]]; then
         echo "  Building dependencies for zen-suite..."
-        helm dependency build "$chart" > /dev/null 2>&1 || true
+        if ! helm dependency build "$chart" > /dev/null 2>&1; then
+            echo "  ❌ Failed to build dependencies for zen-suite"
+            FAILED=$((FAILED + 1))
+            continue
+        fi
     fi
     
     if helm lint "$chart"; then
@@ -93,8 +97,14 @@ for chart in "${CHARTS[@]}"; do
     # Template render (matrix tests)
     echo "[2/2] Running helm template (matrix tests)..."
     
-    # zen-suite: test with multiple scenarios
+    # zen-suite requires dependencies to be built before template rendering
     if [[ "$chart" == *"zen-suite"* ]]; then
+        echo "  Building dependencies for zen-suite..."
+        if ! helm dependency build "$chart" > /dev/null 2>&1; then
+            echo "  ❌ Failed to build dependencies for zen-suite"
+            FAILED=$((FAILED + 1))
+            continue
+        fi
         echo "  Testing zen-suite scenarios..."
         
         # Scenario 1: Default (all core enabled, integrations off)

@@ -67,7 +67,11 @@ for chart in "${CHARTS[@]}"; do
     # Build dependencies for zen-suite
     if [[ "$chart" == *"zen-suite"* ]]; then
         echo "  Building dependencies..."
-        helm dependency build "$chart" > /dev/null 2>&1 || true
+        if ! helm dependency build "$chart" > /dev/null 2>&1; then
+            echo "❌ Failed to build dependencies for $chart"
+            FAILED=$((FAILED + 1))
+            continue
+        fi
     fi
 
     # Render chart templates

@@ -48,6 +48,12 @@ echo "✅ PASS: No runtime metadata found in CRDs"
 echo
 echo "Test 2: zen-suite pass-through"
 echo "----------------------------------------"
+# Build dependencies for zen-suite before templating
+echo "Building dependencies for zen-suite..."
+if ! helm dependency build zen-suite > /dev/null 2>&1; then
+    echo "❌ FAIL: Failed to build dependencies for zen-suite"
+    exit 1
+fi
 OUTPUT_SUITE=$(helm template zen-suite zen-suite --set zenWatcher.crds.enabled=true 2>&1)
 if echo "$OUTPUT_SUITE" | grep -q "kind: CustomResourceDefinition"; then
     echo "✅ PASS: zen-suite passes through crds.enabled to zen-watcher"

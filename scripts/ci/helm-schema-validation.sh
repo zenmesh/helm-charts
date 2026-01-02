@@ -57,6 +57,16 @@ for chart in "${CHARTS[@]}"; do
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
 
+    # Build dependencies for zen-suite before validation
+    if [[ "$chart" == *"zen-suite"* ]]; then
+        echo "  Building dependencies..."
+        if ! helm dependency build "$chart" > /dev/null 2>&1; then
+            echo "❌ Failed to build dependencies for $chart"
+            FAILED=$((FAILED + 1))
+            continue
+        fi
+    fi
+
     # Validate schema file syntax
     if ! python3 -m json.tool "$schema_file" > /dev/null 2>&1; then
         echo "❌ Schema file is not valid JSON: $schema_file"

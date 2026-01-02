@@ -96,6 +96,14 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.privateKey.secretName }}
                   key: {{ .Values.privateKey.secretKey }}
+            {{- if .Values.config.webhookTimeout }}
+            - name: ZEN_LOCK_WEBHOOK_TIMEOUT
+              value: {{ .Values.config.webhookTimeout | quote }}
+            {{- end }}
+            {{- if .Values.config.cacheTTL }}
+            - name: ZEN_LOCK_CACHE_TTL
+              value: {{ .Values.config.cacheTTL | quote }}
+            {{- end }}
             {{- with .Values.env }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
