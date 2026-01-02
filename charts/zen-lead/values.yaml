@@ -161,6 +161,65 @@ controller:
   # - Very large clusters: Consider 500-1000
   burst: 100
 
+  # Fast retry configuration for failover operations
+  # These settings control retry behavior for failover-critical API calls (Get EndpointSlice, Get Pod, Patch EndpointSlice).
+  # Fast retry reduces failover time by using shorter delays and fewer attempts compared to standard retry config.
+  # 
+  # Initial delay before first retry (in milliseconds)
+  # Default: 20ms (vs 100ms for standard retry)
+  # Lower values reduce failover time but may increase API server load during transient failures
+  # Increase if you experience API server rate limiting during failovers
+  fastRetryInitialDelayMs: 20
+
+  # Maximum delay between retries (in milliseconds)
+  # Default: 500ms (vs 5s for standard retry)
+  # Lower values reduce failover time but may not allow enough time for transient issues to resolve
+  # Increase if you have slow API server responses
+  fastRetryMaxDelayMs: 500
+
+  # Maximum retry attempts for failover operations
+  # Default: 2 attempts (vs 3 for standard retry)
+  # Fewer attempts reduce failover time but may fail faster on persistent issues
+  # Increase if you experience transient API server issues during failovers
+  fastRetryMaxAttempts: 2
+
+  # Enable leader pod cache
+  # Caches the current leader pod per service to avoid redundant API calls during reconciliation.
+  # Reduces failover time by eliminating Get EndpointSlice + Get Pod calls when cache hits.
+  # 
+  # Default: true (enabled)
+  # Disable if you want to always fetch fresh pod state (may increase failover time)
+  # 
+  # Monitor these metrics to validate cache effectiveness:
+  # - Cache hit rate: Should be >80% for optimal performance
+  # - Failover latency: Should decrease with cache enabled
+  enableLeaderPodCache: true
+
+  # Leader pod cache TTL (time-to-live) in seconds
+  # How long cached leader pod information remains valid before being refreshed.
+  # 
+  # Default: 30 seconds
+  # Lower values ensure fresher data but increase API calls
+  # Higher values reduce API calls but may serve stale data if pods change quickly
+  # 
+  # Tuning guidance:
+  # - Stable deployments (rare pod changes): 30-60s works well
+  # - Dynamic deployments (frequent pod changes): 10-30s may be better
+  # - Very dynamic (rapid scaling): 5-15s
+  # 
+  # Note: Cache is automatically invalidated on leader changes and pod deletions
+  leaderPodCacheTTLSeconds: 30
+
+  # Enable parallel API calls
+  # When enabled, the controller attempts to parallelize independent API operations where possible.
+  # This can reduce failover time by executing multiple API calls concurrently.
+  # 
+  # Default: true (enabled)
+  # Disable if you want strictly sequential API calls (may increase failover time but simpler debugging)
+  # 
+  # Note: Some operations must remain sequential due to dependencies (e.g., Get Service before List Pods)
+  enableParallelAPICalls: true
+
 # Metrics configuration
 metrics:
   enabled: true

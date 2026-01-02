@@ -61,6 +61,24 @@ spec:
             {{- if .Values.controller.burst }}
             - --burst={{ .Values.controller.burst }}
             {{- end }}
+            {{- if .Values.controller.fastRetryInitialDelayMs }}
+            - --fast-retry-initial-delay-ms={{ .Values.controller.fastRetryInitialDelayMs }}
+            {{- end }}
+            {{- if .Values.controller.fastRetryMaxDelayMs }}
+            - --fast-retry-max-delay-ms={{ .Values.controller.fastRetryMaxDelayMs }}
+            {{- end }}
+            {{- if .Values.controller.fastRetryMaxAttempts }}
+            - --fast-retry-max-attempts={{ .Values.controller.fastRetryMaxAttempts }}
+            {{- end }}
+            {{- if ne .Values.controller.enableLeaderPodCache nil }}
+            - --enable-leader-pod-cache={{ .Values.controller.enableLeaderPodCache }}
+            {{- end }}
+            {{- if .Values.controller.leaderPodCacheTTLSeconds }}
+            - --leader-pod-cache-ttl-seconds={{ .Values.controller.leaderPodCacheTTLSeconds }}
+            {{- end }}
+            {{- if ne .Values.controller.enableParallelAPICalls nil }}
+            - --enable-parallel-api-calls={{ .Values.controller.enableParallelAPICalls }}
+            {{- end }}
           ports:
             - name: metrics
               containerPort: {{ .Values.metrics.port }}
