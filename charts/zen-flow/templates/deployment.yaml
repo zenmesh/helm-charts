@@ -87,6 +87,68 @@ spec:
                   fieldPath: metadata.namespace
             - name: REPLICA_COUNT
               value: "{{ .Values.replicaCount }}"
+            # Configuration environment variables
+            # See values.yaml config section and docs/CONFIGURATION.md for details
+            {{- if .Values.config.defaultTTLSeconds }}
+            - name: ZEN_FLOW_DEFAULT_TTL_SECONDS
+              value: "{{ .Values.config.defaultTTLSeconds }}"
+            {{- end }}
+            {{- if .Values.config.configMapSizeLimit }}
+            - name: ZEN_FLOW_CONFIGMAP_SIZE_LIMIT
+              value: "{{ .Values.config.configMapSizeLimit }}"
+            {{- end }}
+            {{- if .Values.config.uidTruncateLength }}
+            - name: ZEN_FLOW_UID_TRUNCATE_LENGTH
+              value: "{{ .Values.config.uidTruncateLength }}"
+            {{- end }}
+            {{- if .Values.config.defaultBackoffLimit }}
+            - name: ZEN_FLOW_DEFAULT_BACKOFF_LIMIT
+              value: "{{ .Values.config.defaultBackoffLimit }}"
+            {{- end }}
+            {{- if .Values.config.defaultRetryLimit }}
+            - name: ZEN_FLOW_DEFAULT_RETRY_LIMIT
+              value: "{{ .Values.config.defaultRetryLimit }}"
+            {{- end }}
+            {{- if .Values.config.defaultBackoffBase }}
+            - name: ZEN_FLOW_DEFAULT_BACKOFF_BASE
+              value: "{{ .Values.config.defaultBackoffBase }}"
+            {{- end }}
+            {{- if .Values.config.defaultBackoffFactor }}
+            - name: ZEN_FLOW_DEFAULT_BACKOFF_FACTOR
+              value: "{{ .Values.config.defaultBackoffFactor }}"
+            {{- end }}
+            {{- if .Values.config.defaultDirPerm }}
+            - name: ZEN_FLOW_DEFAULT_DIR_PERM
+              value: "{{ .Values.config.defaultDirPerm }}"
+            {{- end }}
+            {{- if .Values.config.defaultFilePerm }}
+            - name: ZEN_FLOW_DEFAULT_FILE_PERM
+              value: "{{ .Values.config.defaultFilePerm }}"
+            {{- end }}
+            {{- if .Values.config.defaultConfigMapKey }}
+            - name: ZEN_FLOW_DEFAULT_CONFIGMAP_KEY
+              value: "{{ .Values.config.defaultConfigMapKey }}"
+            {{- end }}
+            {{- if .Values.config.defaultContainerName }}
+            - name: ZEN_FLOW_DEFAULT_CONTAINER_NAME
+              value: "{{ .Values.config.defaultContainerName }}"
+            {{- end }}
+            {{- if .Values.config.defaultConcurrencyPolicy }}
+            - name: ZEN_FLOW_DEFAULT_CONCURRENCY_POLICY
+              value: "{{ .Values.config.defaultConcurrencyPolicy }}"
+            {{- end }}
+            {{- if .Values.config.defaultContentType }}
+            - name: ZEN_FLOW_DEFAULT_CONTENT_TYPE
+              value: "{{ .Values.config.defaultContentType }}"
+            {{- end }}
+            {{- if .Values.config.defaultArchiveFormat }}
+            - name: ZEN_FLOW_DEFAULT_ARCHIVE_FORMAT
+              value: "{{ .Values.config.defaultArchiveFormat }}"
+            {{- end }}
+            {{- if .Values.config.defaultCompression }}
+            - name: ZEN_FLOW_DEFAULT_COMPRESSION
+              value: "{{ .Values.config.defaultCompression }}"
+            {{- end }}
             {{- with .Values.env }}
             {{- toYaml . | nindent 12 }}
             {{- end }}

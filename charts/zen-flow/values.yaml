@@ -129,3 +129,44 @@ readinessProbe:
 controller:
   maxConcurrentReconciles: 10
   resyncPeriod: "10m"
+# Configuration for zen-flow controller behavior
+# All values are optional and have sensible defaults
+# See docs/CONFIGURATION.md for detailed documentation
+config:
+  # Resource Limits
+  # Default TTL for completed JobFlows (24 hours in seconds)
+  # Set to 0 to disable automatic cleanup
+  defaultTTLSeconds: 86400
+  # Maximum size for ConfigMap artifacts (1MB in bytes)
+  # ConfigMaps have a 1MB limit in Kubernetes
+  configMapSizeLimit: 1048576
+  # Length to truncate UIDs in resource names
+  # Kubernetes resource names have length limits
+  uidTruncateLength: 8
+  # Retry and Backoff Configuration
+  # Default backoff limit for Jobs (number of retries)
+  defaultBackoffLimit: 6
+  # Default retry limit for operations
+  defaultRetryLimit: 3
+  # Base duration for exponential backoff (e.g., "1s", "500ms")
+  defaultBackoffBase: "1s"
+  # Multiplier for exponential backoff (e.g., 2.0 means double each retry)
+  defaultBackoffFactor: 2.0
+  # File Permissions
+  # Default directory permissions (octal, e.g., 0755)
+  defaultDirPerm: "0755"
+  # Default file permissions (octal, e.g., 0644)
+  defaultFilePerm: "0644"
+  # Default Values
+  # Default key name for ConfigMap values
+  defaultConfigMapKey: "value"
+  # Default container name in Job templates
+  defaultContainerName: "main"
+  # Default concurrency policy (Forbid, Allow, Replace)
+  defaultConcurrencyPolicy: "Forbid"
+  # Default content type for artifacts
+  defaultContentType: "application/octet-stream"
+  # Default archive format (tar or zip)
+  defaultArchiveFormat: "tar"
+  # Default compression (none or gzip)
+  defaultCompression: "none"

@@ -54,9 +54,11 @@ helm install zen-flow ./charts/zen-flow \
 
 The following table lists the configurable parameters and their default values:
 
+### Basic Configuration
+
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `replicaCount` | Number of controller replicas | `1` |
+| `replicaCount` | Number of controller replicas | `2` |
 | `image.repository` | Controller image repository | `kubezen/zen-flow-controller` |
 | `image.tag` | Controller image tag | `0.0.1-alpha` |
 | `image.pullPolicy` | Image pull policy | `IfNotPresent` |
@@ -64,8 +66,48 @@ The following table lists the configurable parameters and their default values:
 | `serviceAccount.name` | Service account name | `""` |
 | `webhook.enabled` | Enable webhooks | `false` |
 | `webhook.certManager.enabled` | Use cert-manager for certificates | `false` |
-| `leaderElection.enabled` | Enable leader election | `true` |
-| `leaderElection.namespace` | Leader election namespace | `""` (uses release namespace) |
+| `leaderElection.mode` | Leader election mode | `builtin` |
+| `leaderElection.electionID` | Leader election ID | `""` (auto-generated) |
+| `controller.maxConcurrentReconciles` | Max concurrent reconciles | `10` |
+
+### Controller Configuration
+
+All configuration values are optional and have sensible defaults. See `docs/CONFIGURATION.md` for detailed documentation.
+
+#### Resource Limits
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `config.defaultTTLSeconds` | Default TTL for completed JobFlows (seconds) | `86400` (24 hours) |
+| `config.configMapSizeLimit` | Maximum size for ConfigMap artifacts (bytes) | `1048576` (1MB) |
+| `config.uidTruncateLength` | Length to truncate UIDs in resource names | `8` |
+
+#### Retry and Backoff
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `config.defaultBackoffLimit` | Default backoff limit for Jobs | `6` |
+| `config.defaultRetryLimit` | Default retry limit | `3` |
+| `config.defaultBackoffBase` | Base duration for exponential backoff | `"1s"` |
+| `config.defaultBackoffFactor` | Multiplier for exponential backoff | `2.0` |
+
+#### File Permissions
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `config.defaultDirPerm` | Default directory permissions (octal) | `"0755"` |
+| `config.defaultFilePerm` | Default file permissions (octal) | `"0644"` |
+
+#### Default Values
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `config.defaultConfigMapKey` | Default key name for ConfigMap values | `"value"` |
+| `config.defaultContainerName` | Default container name in Job templates | `"main"` |
+| `config.defaultConcurrencyPolicy` | Default concurrency policy | `"Forbid"` |
+| `config.defaultContentType` | Default content type for artifacts | `"application/octet-stream"` |
+| `config.defaultArchiveFormat` | Default archive format (tar or zip) | `"tar"` |
+| `config.defaultCompression` | Default compression (none or gzip) | `"none"` |
 | `metrics.enabled` | Enable metrics | `true` |
 | `metrics.serviceMonitor.enabled` | Create ServiceMonitor for Prometheus | `false` |
 | `prometheus.rules.enabled` | Install Prometheus rules | `false` |
