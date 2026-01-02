@@ -102,6 +102,65 @@ controller:
   # - Lead to controller starvation (one namespace consuming all capacity)
   maxConcurrentReconciles: 10
 
+  # Timeout for cache update operations (in seconds)
+  # The controller maintains an in-memory cache of opted-in Services for efficient pod-to-service mapping.
+  # This timeout prevents cache updates from hanging indefinitely on slow API server responses.
+  # 
+  # Default: 10 seconds
+  # Increase if you have many Services per namespace (>1000) and experience timeout errors
+  # Decrease if you want faster failure detection on API server issues
+  # 
+  # Monitor these metrics to tune:
+  # - zen_lead_timeout_occurrences_total: Number of timeout errors
+  # - zen_lead_cache_update_duration_seconds: Cache update latency
+  cacheUpdateTimeoutSeconds: 10
+
+  # Timeout for metrics collection operations (in seconds)
+  # The controller periodically collects metrics about leader Services and EndpointSlices.
+  # This timeout prevents metrics collection from blocking reconciliation.
+  # 
+  # Default: 5 seconds
+  # Increase if you have many resources and metrics collection times out
+  # Decrease if you want faster failure detection on API server issues
+  # 
+  # Monitor these metrics to tune:
+  # - zen_lead_timeout_occurrences_total: Number of timeout errors
+  metricsCollectionTimeoutSeconds: 5
+
+  # Kubernetes API client QPS (queries per second)
+  # Controls the rate at which the controller can make API requests to the Kubernetes API server.
+  # Higher values increase throughput but may overwhelm the API server.
+  # 
+  # Default: 50 QPS
+  # Increase if you have many Services and need faster reconciliation
+  # Decrease if you experience API server rate limiting
+  # 
+  # Tuning guidance:
+  # - Small clusters (<100 Services): Default (50) is sufficient
+  # - Medium clusters (100-1000 Services): 50-100 works well
+  # - Large clusters (>1000 Services): 100-200 may be needed
+  # - Very large clusters (>5000 Services): Consider 200-500
+  # 
+  # Monitor API server metrics to tune:
+  # - apiserver_request_duration_seconds: API server latency
+  # - apiserver_request_total: Request rate
+  # - Watch for 429 (Too Many Requests) errors in controller logs
+  qps: 50
+
+  # Kubernetes API client Burst limit
+  # Controls the maximum number of concurrent API requests allowed in a burst.
+  # Should be at least 2x QPS to handle traffic spikes.
+  # 
+  # Default: 100
+  # Increase proportionally with QPS
+  # 
+  # Tuning guidance:
+  # - Small clusters: Default (100) is sufficient
+  # - Medium clusters: 100-200 works well
+  # - Large clusters: 200-500 may be needed
+  # - Very large clusters: Consider 500-1000
+  burst: 100
+
 # Metrics configuration
 metrics:
   enabled: true

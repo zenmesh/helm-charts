@@ -49,6 +49,18 @@ spec:
             {{- if .Values.controller.maxConcurrentReconciles }}
             - --max-concurrent-reconciles={{ .Values.controller.maxConcurrentReconciles }}
             {{- end }}
+            {{- if .Values.controller.cacheUpdateTimeoutSeconds }}
+            - --cache-update-timeout-seconds={{ .Values.controller.cacheUpdateTimeoutSeconds }}
+            {{- end }}
+            {{- if .Values.controller.metricsCollectionTimeoutSeconds }}
+            - --metrics-collection-timeout-seconds={{ .Values.controller.metricsCollectionTimeoutSeconds }}
+            {{- end }}
+            {{- if .Values.controller.qps }}
+            - --qps={{ .Values.controller.qps }}
+            {{- end }}
+            {{- if .Values.controller.burst }}
+            - --burst={{ .Values.controller.burst }}
+            {{- end }}
           ports:
             - name: metrics
               containerPort: {{ .Values.metrics.port }}

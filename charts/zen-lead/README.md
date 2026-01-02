@@ -91,6 +91,10 @@ The following table lists the configurable parameters and their default values:
 | `leaderElectionID` | Leader election ID (must be unique per instance) | `""` (defaults to release-name-based) |
 | `controller.maxCacheSizePerNamespace` | Maximum cached Services per namespace (LRU eviction) | `1000` |
 | `controller.maxConcurrentReconciles` | Maximum concurrent reconciliations | `10` |
+| `controller.cacheUpdateTimeoutSeconds` | Timeout for cache update operations (seconds) | `10` |
+| `controller.metricsCollectionTimeoutSeconds` | Timeout for metrics collection operations (seconds) | `5` |
+| `controller.qps` | Kubernetes API client QPS (queries per second) | `50` |
+| `controller.burst` | Kubernetes API client burst limit | `100` |
 | `rbac.clusterScoped` | Use ClusterRole/ClusterRoleBinding | `true` |
 | `namespace.create` | Create namespace | `true` |
 | `namespace.name` | Namespace name | `zen-lead-system` |
