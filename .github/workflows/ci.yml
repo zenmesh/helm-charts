@@ -23,8 +23,15 @@ jobs:
       
       - name: Lint charts
         run: |
+          # Update dependencies for umbrella charts (zen-suite uses file:// paths)
+          if [ -d "charts/zen-suite" ]; then
+            echo "Updating dependencies for zen-suite..."
+            helm dependency update charts/zen-suite > /dev/null 2>&1 || true
+          fi
+          
           for chart in charts/*/; do
-            echo "Linting $(basename $chart)..."
+            chart_name=$(basename "$chart")
+            echo "Linting $chart_name..."
             helm lint "$chart"
           done
   
@@ -44,8 +51,15 @@ jobs:
       
       - name: Validate schemas
         run: |
+          # Update dependencies for umbrella charts (zen-suite uses file:// paths)
+          if [ -d "charts/zen-suite" ]; then
+            echo "Updating dependencies for zen-suite..."
+            helm dependency update charts/zen-suite > /dev/null 2>&1 || true
+          fi
+          
           for chart in charts/*/; do
-            echo "Validating $(basename $chart)..."
+            chart_name=$(basename "$chart")
+            echo "Validating $chart_name..."
             helm template test "$chart" > /dev/null
           done
   
@@ -65,8 +79,14 @@ jobs:
       
       - name: Test rendering
         run: |
+          # Update dependencies for umbrella charts (zen-suite uses file:// paths)
+          if [ -d "charts/zen-suite" ]; then
+            echo "Updating dependencies for zen-suite..."
+            helm dependency update charts/zen-suite > /dev/null 2>&1 || true
+          fi
+          
           for chart in charts/*/; do
-            chart_name=$(basename $chart)
+            chart_name=$(basename "$chart")
             echo "Testing $chart_name..."
             helm template test "$chart" --debug
           done

@@ -52,26 +52,26 @@ annotations:
 dependencies:
   - name: zen-lock
     version: "0.0.2-alpha"
-    repository: "@"
+    repository: "file://../zen-lock"
     condition: zenLock.enabled
   - name: zen-flow
     version: "0.0.2-alpha"
-    repository: "@"
+    repository: "file://../zen-flow"
     condition: zenFlow.enabled
   - name: zen-gc
     version: "0.0.2-alpha"
-    repository: "@"
+    repository: "file://../zen-gc"
     condition: zenGc.enabled
   - name: zen-watcher
     version: "1.0.1"
-    repository: "@"
+    repository: "file://../zen-watcher"
     condition: zenWatcher.enabled
   - name: zen-lead
     version: "0.1.0"
-    repository: "@"
+    repository: "file://../zen-lead"
     condition: zenLead.enabled
   - name: zen-observations-crds
     version: "0.0.1-alpha"
-    repository: "@"
+    repository: "file://../zen-observations-crds"
     condition: zenWatcher.observationsCrd.enabled
 
