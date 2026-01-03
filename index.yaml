@@ -23,40 +23,44 @@ entries:
     version: 1.0.5
   zen-watcher:
   - annotations:
-      artifacthub.io/containsSecurityUpdates: "true"
+      artifacthub.io/changes: |
+        - Universal Kubernetes Event Aggregator
+        - Secure, Extensible Event Collection
+        - Supports multiple sources (Trivy, Kyverno, Falco, Audit logs, Kube-bench)
       artifacthub.io/imagesWhitelist: |
-        - zubezen/zen-watcher
-      artifacthub.io/prerelease: "false"
-      artifacthub.io/recommendations: |
-        - url: https://github.com/your-org/zen-watcher/blob/main/docs/security-best-practices.md
-      artifacthub.io/securityReportCreatedAt: "2024-11-04T00:00:00Z"
-      artifacthub.io/signKey: |
-        fingerprint: <your-gpg-fingerprint>
-        url: https://keybase.io/your-keybase
+        - kubezen/zen-watcher
+      artifacthub.io/links: |
+        - name: Documentation
+          url: https://github.com/kube-zen/zen-watcher/blob/main/README.md
+        - name: Source
+          url: https://github.com/kube-zen/zen-watcher
+        - name: Support
+          url: https://github.com/kube-zen/zen-watcher/issues
+      category: Observability
     apiVersion: v2
     appVersion: 1.0.19
-    created: "2025-12-08T18:27:37.556965469-05:00"
-    description: Universal Kubernetes Event Aggregator - Secure, Extensible Event
-      Collection
-    digest: 3b518725cd672973f4fd122744646abbd01348d5cbbf1c7f034eb94d14ba6c23
+    created: "2026-01-03T16:30:58.448138508-05:00"
+    description: A Helm chart for zen-watcher - Universal Kubernetes Event Aggregator
+    digest: 4ad18a88ec00c349ed246f1ae28d9cdbb3612eed3f91865d42a2b67f43222499
     home: https://github.com/kube-zen/zen-watcher
-    icon: https://raw.githubusercontent.com/your-org/zen-watcher/main/docs/logo.png
     keywords:
-    - security
-    - compliance
+    - kubernetes
+    - kube-zen
     - observability
     - events
     - monitoring
-    - kubernetes
+    - security
+    - compliance
+    - operator
     maintainers:
-    - email: maintainers@kube-zen.com
-      name: Zen Watcher Team
+    - email: team@kube-zen.io
+      name: Kube-ZEN Team
     name: zen-watcher
     sources:
     - https://github.com/kube-zen/zen-watcher
     type: application
     urls:
-    - https://kube-zen.github.io/helm-charts/zen-watcher-1.0.1.tgz
+    - zen-watcher-1.0.1.tgz
     version: 1.0.1
   - annotations:
       artifacthub.io/containsSecurityUpdates: "true"
@@ -94,4 +98,4 @@ entries:
     urls:
     - https://kube-zen.github.io/helm-charts/zen-watcher-1.0.0.tgz
     version: 1.0.0
-generated: "2025-12-08T18:27:37.54607966-05:00"
+generated: "2026-01-03T16:30:58.447539631-05:00"
