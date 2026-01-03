@@ -30,7 +30,21 @@ spec:
         - name: controller
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          {{- $baseTag := .Values.image.tag | default .Chart.AppVersion }}
+          {{- $variant := .Values.image.variant | default "ga-only" }}
+          {{- if eq $variant "experimental" }}
+          {{- if eq $baseTag "latest" }}
+          image: "{{ .Values.image.repository }}:latest-experimental"
+          {{- else }}
+          image: "{{ .Values.image.repository }}:{{ $baseTag }}-experimental"
+          {{- end }}
+          {{- else }}
+          {{- if eq $baseTag "latest" }}
+          image: "{{ .Values.image.repository }}:latest"
+          {{- else }}
+          image: "{{ .Values.image.repository }}:{{ $baseTag }}-ga-only"
+          {{- end }}
+          {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - --metrics-bind-address=:{{ .Values.metrics.port }}
@@ -106,6 +120,17 @@ spec:
             {{- if not .Values.rbac.clusterScoped }}
             - name: WATCH_NAMESPACE
               value: {{ include "zen-lead.namespace" . }}
+            {{- end }}
+            # Experimental Go 1.25 features info
+            # Reflects image.variant setting (ga-only default, or experimental)
+            # This env var is informational - actual features are compiled into the binary
+            {{- $variant := .Values.image.variant | default "ga-only" }}
+            {{- if eq $variant "experimental" }}
+            - name: GOEXPERIMENT_INFO
+              value: "jsonv2,greenteagc"
+            {{- else }}
+            - name: GOEXPERIMENT_INFO
+              value: ""
             {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

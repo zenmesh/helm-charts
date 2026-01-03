@@ -1,7 +1,7 @@
 projectType: charts
 projectName: helm-charts
 projectDescription: "Kube-ZEN component"
-goVersion: "1.24"
+goVersion: "1.25"
 imageName: ""
 hasHelmChart: false
 runsRace: false
