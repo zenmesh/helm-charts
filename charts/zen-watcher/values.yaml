@@ -36,6 +36,11 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
+  # Automount service account token
+  # zen-watcher requires a service account token to communicate with the Kubernetes API
+  # (for informers, CRD operations, leader election)
+  # Set to false only if using projected service account tokens (advanced)
+  automountServiceAccountToken: true
 
 podAnnotations: {}
 
@@ -121,3 +126,42 @@ ingester:
   # This provides immediate value after installation - you'll see Observations created from k8s events
   # Set to false for production deployments where you want explicit control over Ingester configuration
   createDefaultK8sEvents: false
+
+# NetworkPolicy configuration
+networkPolicy:
+  # Enable NetworkPolicy resource creation
+  # NetworkPolicy restricts network traffic to/from zen-watcher pods for defense in depth
+  enabled: true
+  ingress:
+    enabled: true
+    # Allow metrics scraping from Prometheus/VictoriaMetrics namespaces
+    allowMetrics: true
+    # Namespace selectors for metrics scraping (defaults to kube-system if empty)
+    metricsNamespaces:
+      name: kube-system
+    # Ingress rules (appended to default metrics rule)
+    # Example:
+    # from:
+    #   - namespaceSelector:
+    #       matchLabels:
+    #         name: falco
+    #     ports:
+    #       - protocol: TCP
+    #         port: 8080
+    from: []
+  egress:
+    enabled: true
+    # Allow DNS queries (required for Kubernetes service discovery)
+    allowDNS: true
+    # Allow Kubernetes API access (required for informers and CRD operations)
+    allowKubernetesAPI: true
+    # Additional egress rules (appended to default DNS/Kubernetes API rules)
+    # Example:
+    # to:
+    #   - namespaceSelector:
+    #       matchLabels:
+    #         name: external-service
+    #     ports:
+    #       - protocol: TCP
+    #         port: 443
+    to: []
