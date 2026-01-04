@@ -3,7 +3,7 @@
 # See: https://artifacthub.io/docs/topics/repositories/#artifacthub-repoyml-file
 
 # Repository ID (must match the repository name on Artifact Hub)
-repositoryID: kube-zen
+repositoryID: 55f38f71-a6fa-4705-ade1-1e27d82e21c4
 
 # Repository owners (users/organizations that own this repository)
 owners:
