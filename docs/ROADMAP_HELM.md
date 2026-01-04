@@ -166,8 +166,7 @@ helm install zen-agent charts/zen-agent/ -f docs/examples/values-aws.yaml \
 **Implementation:**
 - `charts/zen-watcher/CRD_SYNC.md` - CRD synchronization documentation
 - `charts/zen-watcher/templates/observation_crd.yaml` - Observation CRD
-- `charts/zen-watcher/templates/observationfilter_crd.yaml` - Filter CRD
-- `charts/zen-watcher/templates/observationmapping_crd.yaml` - Mapping CRD
+- `charts/zen-watcher/templates/ingester_crd.yaml` - Ingester CRD
 
 **Outstanding:**
 - Automated CRD version migration
@@ -204,7 +203,7 @@ helm install zen-agent charts/zen-agent/ -f docs/examples/values-aws.yaml \
 **Current Version:** 1.0.1  
 **Key Features:**
 - Kubernetes resource observation
-- CRD-based configuration (ObservationFilter, ObservationMapping)
+- CRD-based configuration (Ingester CRD)
 - Prometheus metrics (ServiceMonitor, VMServiceScrape)
 - Network policies
 - Pod disruption budgets

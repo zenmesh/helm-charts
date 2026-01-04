@@ -61,9 +61,6 @@ spec:
             - name: metrics
               containerPort: {{ .Values.service.port }}
               protocol: TCP
-            - name: health
-              containerPort: 8081
-              protocol: TCP
           env:
             - name: POD_NAME
               valueFrom:
@@ -86,7 +83,7 @@ spec:
           livenessProbe:
             httpGet:
               path: /healthz
-              port: health
+              port: metrics
             initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
@@ -94,7 +91,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /readyz
-              port: health
+              port: metrics
             initialDelaySeconds: 5
             periodSeconds: 5
             timeoutSeconds: 3

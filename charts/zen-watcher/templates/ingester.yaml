@@ -23,12 +23,12 @@ spec:
       resource: "events"
     namespace: ""  # Empty = watch all namespaces
     resyncPeriod: "0"  # Watch-only, no periodic resync (events are ephemeral)
-  normalization:
-    domain: operations
-    type: kubernetes_event
   destinations:
     - type: crd
       value: observations
+      mapping:
+        domain: operations
+        type: kubernetes_event
 {{- end }}
 {{- end }}
 
