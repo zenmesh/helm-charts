@@ -16,8 +16,8 @@ apiVersion: v2
 name: zen-suite
 description: Umbrella chart for Kube-Zen platform components - Complete security and observability suite
 type: application
-version: 0.0.1-alpha
-appVersion: "0.0.1-alpha"
+version: 0.0.2-alpha
+appVersion: "0.0.2-alpha"
 
 keywords:
   - kubernetes
@@ -67,11 +67,7 @@ dependencies:
     repository: "file://../zen-watcher"
     condition: zenWatcher.enabled
   - name: zen-lead
-    version: "0.1.0"
+    version: "0.0.2-alpha"
     repository: "file://../zen-lead"
     condition: zenLead.enabled
-  - name: zen-observations-crds
-    version: "0.0.1-alpha"
-    repository: "file://../zen-observations-crds"
-    condition: zenWatcher.observationsCrd.enabled
 

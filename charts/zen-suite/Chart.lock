@@ -13,9 +13,6 @@ dependencies:
   version: 1.0.1
 - name: zen-lead
   repository: file://../zen-lead
-  version: 0.1.0
-- name: zen-observations-crds
-  repository: file://../zen-observations-crds
-  version: 0.0.1-alpha
-digest: sha256:fe844bec4c1a44aef19f2fa356cc6a63c8020884dea0ab7e57a9ad8d95b8e570
-generated: "2026-01-03T16:37:22.850778496-05:00"
+  version: 0.0.2-alpha
+digest: sha256:db7cc08b666749a251ef143768ae01d5e205b2c52ddcfb15fca482911089c6e6
+generated: "2026-01-04T09:56:05.139888875-05:00"
