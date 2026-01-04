@@ -18,9 +18,9 @@ entries:
       category: Observability
     apiVersion: v2
     appVersion: 1.0.19
-    created: "2026-01-04T03:01:23.344128249-05:00"
+    created: "2026-01-04T03:05:41.667393564-05:00"
     description: A Helm chart for zen-watcher - Universal Kubernetes Event Aggregator
-    digest: 73ee9d7fba5df9d5ca19b9d32adf577d98d67f226fcf2239f992f57e77682028
+    digest: 62fd13915e96902c69d4d495aaaa250691bd9fd13c7a77eeaf67801ae7f267dc
     home: https://github.com/kube-zen/zen-watcher
     keywords:
     - kubernetes
@@ -41,4 +41,4 @@ entries:
     urls:
     - https://kube-zen.github.io/helm-charts/zen-watcher-1.0.1.tgz
     version: 1.0.1
-generated: "2026-01-04T03:01:23.343255759-05:00"
+generated: "2026-01-04T03:05:41.666395077-05:00"
