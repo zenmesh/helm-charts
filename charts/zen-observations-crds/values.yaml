@@ -1,6 +1,0 @@
-# Default values for zen-observations-crds
-# This chart installs the Observation CRD
-
-# Enable CRD installation
-enabled: true
-

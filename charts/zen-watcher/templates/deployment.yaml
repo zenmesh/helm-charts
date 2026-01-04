@@ -75,6 +75,14 @@ spec:
                   fieldPath: metadata.namespace
             - name: REPLICA_COUNT
               value: "{{ .Values.replicaCount }}"
+            {{- if .Values.server.trustedProxyCIDRs }}
+            - name: SERVER_TRUSTED_PROXY_CIDRS
+              value: "{{ join "," .Values.server.trustedProxyCIDRs }}"
+            {{- end }}
+            {{- if .Values.server.maxRequestBytes }}
+            - name: SERVER_MAX_REQUEST_BYTES
+              value: "{{ .Values.server.maxRequestBytes }}"
+            {{- end }}
           livenessProbe:
             httpGet:
               path: /healthz

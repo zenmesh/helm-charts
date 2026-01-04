@@ -1,0 +1,24 @@
+# Project Classification: helm-charts
+CLASS: oss
+SCOPE: oss-helm-chart-repository
+BOUNDARIES:
+  - TYPE: open-source
+  - DECOUPLED: true
+  - NO_PRIVATE_IMPORTS: true
+
+FORBIDDEN:
+  - zen-platform/* references in chart docs
+  - Private API endpoints
+  - PM/admin documentation
+  - Completion reports
+
+ALLOWED:
+  - Helm chart definitions
+  - OSS component charts
+  - User-facing chart documentation
+  - Chart metadata
+
+DOCUMENTATION_RULES:
+  - Chart documentation only
+  - NO PM/admin docs
+

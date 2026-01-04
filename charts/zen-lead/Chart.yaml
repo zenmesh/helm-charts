@@ -2,7 +2,7 @@ apiVersion: v2
 name: zen-lead
 description: A Helm chart for zen-lead - Non-invasive leader election for Kubernetes workloads
 type: application
-version: 0.1.0
+version: 0.0.2-alpha
 appVersion: "0.1.0"
 keywords:
   - kubernetes

@@ -45,17 +45,6 @@
           "description": "Enable zen-watcher component",
           "default": true
         },
-        "observationsCrd": {
-          "type": "object",
-          "description": "Observation CRD installation",
-          "properties": {
-            "enabled": {
-              "type": "boolean",
-              "description": "Install Observation CRD",
-              "default": false
-            }
-          }
-        },
         "crds": {
           "type": "object",
           "description": "CRD installation toggle (passes through to zen-watcher.crds.enabled)",

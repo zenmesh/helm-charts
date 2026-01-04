@@ -11,13 +11,69 @@ zen-watcher is a Kubernetes operator that aggregates structured signals from sec
 - Kubernetes 1.26+
 - Helm 3.8+
 
+## Quick Start
+
+After installing zen-watcher, you need to create an Ingester resource to start collecting events. Here's the fastest way to get started:
+
+### Option 1: Enable Default Ingester (Automatic)
+
+Install with the default Kubernetes Events Ingester enabled:
+
+```bash
+helm install zen-watcher kube-zen/zen-watcher \
+  --namespace zen-system \
+  --create-namespace \
+  --set ingester.createDefaultK8sEvents=true
+```
+
+This automatically creates a minimal Ingester that watches Kubernetes Events across all namespaces.
+
+### Option 2: Manual Ingester (Recommended for Production)
+
+Install the chart, then manually create an Ingester:
+
+```bash
+# 1. Install zen-watcher (CRDs are installed by default)
+helm install zen-watcher kube-zen/zen-watcher \
+  --namespace zen-system \
+  --create-namespace
+
+# 2. Apply a minimal Kubernetes Events Ingester
+cat <<EOF | kubectl apply -f -
+apiVersion: zen.kube-zen.io/v1alpha1
+kind: Ingester
+metadata:
+  name: k8s-events-demo
+  namespace: zen-system
+spec:
+  source: kubernetes-events
+  ingester: informer
+  informer:
+    gvr:
+      group: ""
+      version: "v1"
+      resource: "events"
+    namespace: ""  # Empty = watch all namespaces
+  destinations:
+    - type: crd
+      value: observations
+EOF
+
+# 3. Generate a test event to verify it's working
+kubectl run test-pod --image=nginx --restart=Never
+kubectl delete pod test-pod
+
+# 4. Check for Observations (should appear within a few seconds)
+kubectl get observations -n zen-system
+```
+
 ## Installing the Chart
 
 To install the chart with the release name `zen-watcher`:
 
 ```bash
 helm install zen-watcher kube-zen/zen-watcher \
-  --namespace zen-watcher-system \
+  --namespace zen-system \
   --create-namespace
 ```
 
@@ -31,28 +87,34 @@ helm uninstall zen-watcher --namespace zen-watcher-system
 
 ## CRD Installation and Lifecycle
 
-### CRD Installation Toggle
+### CRD Installation (Default Behavior)
 
-By default, CRDs are **not installed** by the Helm chart (`crds.enabled=false`). This allows CRDs to be managed separately via GitOps or other tooling.
+By default, CRDs are **installed automatically** with the chart (`crds.enabled=true`). This chart includes both:
+- **Observation CRD** (`observations.zen.kube-zen.io`) - stores aggregated events
+- **Ingester CRD** (`ingesters.zen.kube-zen.io`) - configures event sources
 
-To install CRDs with the chart:
+This provides the fastest path to a working installation - no manual CRD installation required.
+
+### GitOps Exception (Advanced)
+
+For GitOps workflows (ArgoCD, Flux, etc.) where you want to manage CRDs separately:
 
 ```bash
+# Disable CRD installation in the chart
 helm install zen-watcher kube-zen/zen-watcher \
-  --namespace zen-watcher-system \
+  --namespace zen-system \
   --create-namespace \
-  --set crds.enabled=true
+  --set crds.enabled=false
+
+# Apply CRDs separately via GitOps or manually
+kubectl apply -f https://raw.githubusercontent.com/kube-zen/zen-watcher/main/deployments/crds/observation_crd.yaml
+kubectl apply -f https://raw.githubusercontent.com/kube-zen/zen-watcher/main/deployments/crds/ingester_crd.yaml
 ```
 
-### Recommended Workflow
-
-**For Production (GitOps):**
-1. Install CRDs once via `crds.enabled=true` or apply manually
-2. Set `crds.enabled=false` for subsequent upgrades
-3. Manage CRD updates separately via GitOps (ArgoCD, Flux, etc.)
-
-**For Development:**
-- Keep `crds.enabled=true` for convenience
+**When to disable:**
+- GitOps workflows where CRDs are managed in a separate Git repository
+- Multi-cluster deployments where CRDs are installed once globally
+- Enterprise environments with strict CRD lifecycle management policies
 
 ### CRD Upgrade Notes
 
@@ -76,7 +138,7 @@ The following table lists the configurable parameters and their default values.
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `replicaCount` | Number of replicas | `1` |
+| `replicaCount` | Number of replicas | `2` |
 | `image.repository` | Image repository | `kubezen/zen-watcher` |
 | `image.tag` | Image tag (defaults to appVersion) | `""` |
 | `image.pullPolicy` | Image pull policy | `IfNotPresent` |
@@ -87,6 +149,10 @@ The following table lists the configurable parameters and their default values.
 | `resources.limits.memory` | Memory limit | `512Mi` |
 | `resources.requests.cpu` | CPU request | `100m` |
 | `resources.requests.memory` | Memory request | `128Mi` |
+| `crds.enabled` | Install CRDs with chart (Observation + Ingester) | `true` |
+| `rbac.create` | Create RBAC resources | `true` |
+| `rbac.namespaceOnlyMode` | Use namespace-scoped RBAC (Role/RoleBinding) | `false` |
+| `ingester.createDefaultK8sEvents` | Create default Kubernetes Events Ingester | `false` |
 
 ## More Information
 

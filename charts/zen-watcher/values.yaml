@@ -84,5 +84,40 @@ topologySpreadConstraints: []
 # CRDs configuration
 crds:
   # Controls whether CRDs are installed with this chart
+  # Default: true (CRDs are installed automatically)
   # Set to false if CRDs are managed separately (e.g., via ArgoCD, Flux, or manual install)
-  enabled: false
+  # Note: This chart includes both Observation and Ingester CRDs
+  enabled: true
+
+# RBAC configuration
+rbac:
+  # Controls whether RBAC resources are created
+  create: true
+  # Namespace-only mode: restricts zen-watcher to a single namespace
+  # When false (default): Uses ClusterRole/ClusterRoleBinding for cluster-wide permissions
+  #   - Required for watching Events("") across all namespaces
+  #   - Required for writing Observations to multiple namespaces
+  # When true: Uses Role/RoleBinding with namespace-scoped permissions only
+  #   - Only watches events and writes observations in the deployment namespace
+  #   - Disables cluster-wide event sources (e.g., Events("") with empty namespace)
+  namespaceOnlyMode: false
+
+# Server configuration
+server:
+  # Trusted proxy CIDRs for X-Forwarded-For/X-Real-IP header validation
+  # Only proxy headers from IPs in these CIDRs will be trusted
+  # Empty list (default) means proxy headers are never trusted (use RemoteAddr only)
+  # Example: ["10.0.0.0/8", "172.16.0.0/12"] to trust private network proxies
+  trustedProxyCIDRs: []
+  # Maximum request body size in bytes (default: 1048576 = 1MiB)
+  # Prevents DoS attacks via large request bodies
+  # Webhooks exceeding this limit will receive HTTP 413 (Request Entity Too Large)
+  maxRequestBytes: 1048576
+
+# Ingester configuration
+ingester:
+  # Create a default Kubernetes Events Ingester on install
+  # When enabled, creates a minimal Ingester that watches Kubernetes Events across all namespaces
+  # This provides immediate value after installation - you'll see Observations created from k8s events
+  # Set to false for production deployments where you want explicit control over Ingester configuration
+  createDefaultK8sEvents: false

@@ -119,7 +119,6 @@ integrations:
   - If `integrations.observationsGc.enabled=true` then:
     - `zenGc.enabled` must be `true`
     - `zenWatcher.enabled` must be `true`
-- ✅ Validates `zenWatcher.observationsCrd.enabled` boolean
 - ✅ Validates `zenLead.enabled` boolean
 
 ### Runtime Guard
@@ -146,7 +145,6 @@ integrations:
 
 ### Option A Implemented: Suite-Owned CRD Chart
 
-**Created**: `helm-charts/charts/zen-observations-crds/`
 
 **Structure**:
 - `Chart.yaml` - CRD chart definition
@@ -154,8 +152,6 @@ integrations:
 - `templates/observation_crd.yaml` - Gated CRD template
 
 **Integration**:
-- ✅ Added to zen-suite dependencies with condition: `zenWatcher.observationsCrd.enabled`
-- ✅ Default: `zenWatcher.observationsCrd.enabled: false` (CRD-free unless explicitly enabled)
 
 **Documentation**:
 - ✅ Updated `zen-suite/README.md` with CRD install toggle
@@ -214,12 +210,11 @@ helm template test-release charts/zen-suite --set zenLead.enabled=true
 
 ### Charts
 - ✅ `helm-charts/charts/zen-suite/Chart.yaml` - Deterministic versions, zen-lead dependency
-- ✅ `helm-charts/charts/zen-suite/values.yaml` - Integration config, zenLead, observationsCrd
+- ✅ `helm-charts/charts/zen-suite/values.yaml` - Integration config, zenLead
 - ✅ `helm-charts/charts/zen-suite/templates/gc-policy-observations.yaml` - GC policy template
 - ✅ `helm-charts/charts/zen-suite/templates/_helpers.tpl` - Helper templates
 - ✅ `helm-charts/charts/zen-suite/templates/_validations.yaml` - Runtime validation guards
 - ✅ `helm-charts/charts/zen-suite/values.schema.json` - Schema validation
-- ✅ `helm-charts/charts/zen-observations-crds/` - New CRD chart (Option A)
 
 ### CI Scripts
 - ✅ `helm-charts/scripts/ci/helm-lint-and-render.sh` - Updated with zen-suite test matrix
@@ -250,7 +245,6 @@ helm template test-release charts/zen-suite --set zenLead.enabled=true
 
 ### H127: Observation CRD Path ✅
 - ✅ Suite-owned CRD chart created (Option A)
-- ✅ Explicit toggle: `zenWatcher.observationsCrd.enabled`
 - ✅ Default: CRD-free unless enabled
 
 ### H128: Docs + CI Matrix ✅
@@ -294,7 +288,6 @@ helm install zen-suite ./helm-charts/charts/zen-suite \
 helm install zen-suite ./helm-charts/charts/zen-suite \
   --namespace zen-system \
   --create-namespace \
-  --set zenWatcher.observationsCrd.enabled=true
 ```
 
 ---

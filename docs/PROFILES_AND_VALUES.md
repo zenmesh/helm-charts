@@ -270,7 +270,7 @@ Start Here
 
 | Platform Environment | Helm Profile | Example Values | Constraints |
 |---------------------|--------------|----------------|-------------|
-| **sandbox** (k3d-zen-saas) | Local MVP | values-local.yaml | tlsInsecure allowed, minimal resources |
+| **sandbox** (local k3d) | Local MVP | values-local.yaml | tlsInsecure allowed, minimal resources |
 | **demo** (k3d-ec2 or EKS) | GitOps-Driven or AWS | values-gitops.yaml or values-aws.yaml | TLS required, external secrets |
 | **pilot** (customer cluster) | AWS or GitOps-Driven | values-aws.yaml (customize) | TLS required, production RBAC |
 | **prod-like** (staging) | AWS | values-aws.yaml (production settings) | Identical to production |

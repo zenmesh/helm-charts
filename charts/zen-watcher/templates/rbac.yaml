@@ -1,3 +1,7 @@
+{{- if .Values.rbac.create }}
+{{- if .Values.rbac.namespaceOnlyMode }}
+---
+# Namespace-scoped RBAC (Role + RoleBinding)
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -6,23 +10,27 @@ metadata:
   labels:
     {{- include "zen-watcher.labels" . | nindent 4 }}
 rules:
-  # Read access to ConfigMaps (for filter config)
+  # Read access to ConfigMaps (for filter config) - namespace-scoped
   - apiGroups: [""]
     resources: ["configmaps"]
     verbs: ["get", "list", "watch"]
-  # Read/write access to Observations CRD
+  # Read/write access to Observations CRD - namespace-scoped
   - apiGroups: ["zen.kube-zen.io"]
     resources: ["observations"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
-  # Read access to Ingester CRD (spec only)
+  # Read access to Ingester CRD (spec only) - namespace-scoped
   - apiGroups: ["zen.kube-zen.io"]
     resources: ["ingesters"]
     verbs: ["get", "list", "watch"]
-  # Status subresource access for Ingester (controller-only, D027: status integrity)
+  # Status subresource access for Ingester (controller-only) - namespace-scoped
   - apiGroups: ["zen.kube-zen.io"]
     resources: ["ingesters/status"]
     verbs: ["get", "update", "patch"]
-  # Leader election (required by controller-runtime for HA)
+  # Read access to Events - namespace-scoped only (cluster-wide sources disabled)
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["get", "list", "watch"]
+  # Leader election (required by controller-runtime for HA) - namespace-scoped
   - apiGroups: ["coordination.k8s.io"]
     resources: ["leases"]
     verbs: ["get", "list", "watch", "create", "update", "patch"]
@@ -42,4 +50,57 @@ roleRef:
   kind: Role
   name: {{ include "zen-watcher.fullname" . }}
   apiGroup: rbac.authorization.k8s.io
-
+{{- else }}
+---
+# Cluster-scoped RBAC (ClusterRole + ClusterRoleBinding) - DEFAULT
+# Required for:
+# - Watching Events("") across all namespaces
+# - Writing Observations to multiple namespaces (extracted from incoming observations)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "zen-watcher.fullname" . }}
+  labels:
+    {{- include "zen-watcher.labels" . | nindent 4 }}
+rules:
+  # Read access to Events - cluster-wide (required for Events("") watching all namespaces)
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["get", "list", "watch"]
+  # Read/write access to Observations CRD - cluster-wide (writes to namespaces extracted from observations)
+  - apiGroups: ["zen.kube-zen.io"]
+    resources: ["observations"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # Read access to Ingester CRD (spec only) - cluster-wide
+  - apiGroups: ["zen.kube-zen.io"]
+    resources: ["ingesters"]
+    verbs: ["get", "list", "watch"]
+  # Status subresource access for Ingester (controller-only, D027: status integrity) - cluster-wide
+  - apiGroups: ["zen.kube-zen.io"]
+    resources: ["ingesters/status"]
+    verbs: ["get", "update", "patch"]
+  # Read access to ConfigMaps - cluster-wide (for filter config)
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch"]
+  # Leader election (required by controller-runtime for HA) - cluster-wide
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "zen-watcher.fullname" . }}
+  labels:
+    {{- include "zen-watcher.labels" . | nindent 4 }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "zen-watcher.serviceAccountName" . }}
+    namespace: {{ include "zen-watcher.namespace" . }}
+roleRef:
+  kind: ClusterRole
+  name: {{ include "zen-watcher.fullname" . }}
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}
+{{- end }}

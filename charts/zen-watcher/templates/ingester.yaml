@@ -1,0 +1,34 @@
+{{- if .Values.ingester.createDefaultK8sEvents }}
+{{- if .Values.crds.enabled }}
+---
+# Default Kubernetes Events Ingester
+# This is a minimal Ingester that watches Kubernetes Events across all namespaces
+# It provides immediate value after installation - you'll see Observations created from k8s events
+# For more advanced configuration, see: https://github.com/kube-zen/zen-watcher/tree/main/examples/ingesters
+apiVersion: zen.kube-zen.io/v1alpha1
+kind: Ingester
+metadata:
+  name: {{ include "zen-watcher.fullname" . }}-default-k8s-events
+  namespace: {{ include "zen-watcher.namespace" . }}
+  labels:
+    {{- include "zen-watcher.labels" . | nindent 4 }}
+    app.kubernetes.io/component: default-ingester
+spec:
+  source: kubernetes-events
+  ingester: informer
+  informer:
+    gvr:
+      group: ""
+      version: "v1"
+      resource: "events"
+    namespace: ""  # Empty = watch all namespaces
+    resyncPeriod: "0"  # Watch-only, no periodic resync (events are ephemeral)
+  normalization:
+    domain: operations
+    type: kubernetes_event
+  destinations:
+    - type: crd
+      value: observations
+{{- end }}
+{{- end }}
+
