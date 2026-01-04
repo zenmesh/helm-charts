@@ -131,14 +131,18 @@ ingester:
 networkPolicy:
   # Enable NetworkPolicy resource creation
   # NetworkPolicy restricts network traffic to/from zen-watcher pods for defense in depth
-  enabled: true
+  # WARNING: NetworkPolicy is enabled by default. If you haven't validated it on your CNI,
+  # it may block controller access to the Kubernetes API, causing failures.
+  # For first launch, consider setting enabled: false until validated.
+  enabled: true  # Set to false for first launch if not validated on your CNI
   ingress:
     enabled: true
     # Allow metrics scraping from Prometheus/VictoriaMetrics namespaces
     allowMetrics: true
-    # Namespace selectors for metrics scraping (defaults to kube-system if empty)
+    # Namespace selectors for metrics scraping (defaults to monitoring namespace if empty)
+    # Use kubernetes.io/metadata.name label (standard Kubernetes namespace label)
     metricsNamespaces:
-      name: kube-system
+      kubernetes.io/metadata.name: monitoring
     # Ingress rules (appended to default metrics rule)
     # Example:
     # from:
@@ -154,7 +158,14 @@ networkPolicy:
     # Allow DNS queries (required for Kubernetes service discovery)
     allowDNS: true
     # Allow Kubernetes API access (required for informers and CRD operations)
+    # WARNING: Configure kubernetesAPICIDR to match your cluster's API server CIDR.
+    # Default (10.0.0.0/8) may be too broad for production. Use a specific CIDR if known.
     allowKubernetesAPI: true
+    # CIDR block for Kubernetes API server (e.g., cluster CIDR or API server IP range)
+    # Adjust based on your cluster configuration. Common values:
+    # - EKS/GKE: Cluster CIDR (e.g., 10.100.0.0/16)
+    # - On-prem: API server IP range (check with: kubectl get endpoints kubernetes)
+    kubernetesAPICIDR: "10.0.0.0/8"  # Default: broad range (adjust for production)
     # Additional egress rules (appended to default DNS/Kubernetes API rules)
     # Example:
     # to:

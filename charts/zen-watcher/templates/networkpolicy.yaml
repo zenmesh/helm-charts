@@ -47,10 +47,10 @@ spec:
             matchLabels:
               {{- toYaml .Values.networkPolicy.ingress.metricsNamespaces | nindent 14 }}
         {{- else }}
-        # Default: allow from kube-system (common Prometheus location)
+        # Default: allow from monitoring namespace (common Prometheus location)
         - namespaceSelector:
             matchLabels:
-              name: kube-system
+              kubernetes.io/metadata.name: monitoring
         {{- end }}
       ports:
         - protocol: TCP
@@ -69,10 +69,12 @@ spec:
     {{- end }}
     {{- if .Values.networkPolicy.egress.allowKubernetesAPI }}
     # Allow Kubernetes API access (required for informers and CRD operations)
+    # Note: Kubernetes API server is typically not reachable via namespaceSelector.
+    # This uses ipBlock with a configurable CIDR (defaults to 10.0.0.0/8 for typical clusters).
+    # Adjust kubernetesAPICIDR in values.yaml to match your cluster's API server CIDR.
     - to:
-        - namespaceSelector:
-            matchLabels:
-              name: kube-system
+        - ipBlock:
+            cidr: {{ .Values.networkPolicy.egress.kubernetesAPICIDR | default "10.0.0.0/8" }}
       ports:
         - protocol: TCP
           port: 443
