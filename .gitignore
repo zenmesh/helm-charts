@@ -1,8 +1,9 @@
-# Helm chart packages (should be built, not committed)
-*.tgz
+# Helm chart packages
+# Note: Chart packages (*.tgz) in the root directory ARE committed for Helm repo/Artifact Hub
+# Only ignore chart packages in subdirectories (dependencies, build artifacts)
 *.tar.gz
 
-# Chart dependencies
+# Chart dependencies (in charts/ subdirectories)
 charts/*.tgz
 charts/**/*.tgz
 
