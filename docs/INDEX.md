@@ -1,6 +1,6 @@
-# {{ .projectName }} Documentation
+# Helm Charts Documentation
 
-Welcome to the {{ .projectName }} documentation.
+Welcome to the Kube-Zen Helm Charts documentation.
 
 ## Getting Started
 
@@ -15,7 +15,7 @@ Welcome to the {{ .projectName }} documentation.
 
 ## Resources
 
-- [GitHub Repository](https://github.com/kube-zen/{{ .projectName }})
+- [GitHub Repository](https://github.com/kube-zen/helm-charts)
 - [Security Policy](../SECURITY.md)
 - [Code of Conduct](../CODE_OF_CONDUCT.md)
 - [Changelog](../CHANGELOG.md)

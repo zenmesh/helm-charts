@@ -15,6 +15,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial release
 
-[Unreleased]: https://github.com/kube-zen/{{ .projectName }}/compare/v0.0.1-alpha...HEAD
-[0.0.1-alpha]: https://github.com/kube-zen/{{ .projectName }}/releases/tag/v0.0.1-alpha
+[Unreleased]: https://github.com/kube-zen/helm-charts/compare/v0.0.1-alpha...HEAD
+[0.0.1-alpha]: https://github.com/kube-zen/helm-charts/releases/tag/v0.0.1-alpha
 

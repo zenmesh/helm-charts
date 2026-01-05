@@ -161,7 +161,7 @@ Components use **independent versioning** - each chart has its own version that 
 - zen-lock: `0.0.1-alpha`
 - zen-flow: `0.0.1-alpha`
 - zen-gc: `0.0.1-alpha`
-- zen-watcher: `1.0.1`
+- zen-watcher: `1.2.1`
 - zen-suite: `0.0.1-alpha`
 
 ## Artifact Hub

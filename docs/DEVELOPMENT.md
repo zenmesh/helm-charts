@@ -1,10 +1,10 @@
 # Development Guide
 
-This guide covers development setup, workflows, and best practices for {{ .projectName }}.
+This guide covers development setup, workflows, and best practices for Kube-Zen Helm Charts.
 
 ## Prerequisites
 
-- Go 1.24 (see [Go Toolchain](#go-toolchain) section)
+- Helm 3.8+
 - kubectl configured to access a Kubernetes cluster
 - Docker (for building images)
 - Make
@@ -12,22 +12,21 @@ This guide covers development setup, workflows, and best practices for {{ .proje
 ## Installation
 
 ```bash
-git clone https://github.com/kube-zen/{{ .projectName }}.git
-cd {{ .projectName }}
-go mod download
+git clone https://github.com/kube-zen/helm-charts.git
+cd helm-charts
 ```
 
 ## Quick Start
 
 ```bash
-# Run all checks
-make check
+# Lint charts
+make lint
 
-# Run tests
-go test ./...
+# Package charts
+make package
 
-# Build
-go build ./cmd/{{ .projectName }}
+# Test charts
+make test
 ```
 
 ## Development Workflow
