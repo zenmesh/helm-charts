@@ -35,7 +35,7 @@ Each component chart follows independent versioning. This allows components to b
 | Chart Version | App Version | Kubernetes | Notes |
 |---------------|-------------|------------|-------|
 | 1.2.0         | 1.2.0       | 1.26+      | Current stable |
-| 1.0.1         | 1.0.19      | 1.26+      | Previous stable |
+| 1.2.1         | 1.2.1       | 1.26+      | Current stable |
 | 1.0.0         | 1.0.0       | 1.26+      | Initial release |
 
 ## Versioning Strategy

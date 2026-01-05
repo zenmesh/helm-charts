@@ -1,6 +1,6 @@
 # Release Version Matrix
 
-**Last Updated**: 2015-12-31  
+**Last Updated**: 2025-01-05  
 **Purpose**: Single source of truth for chart versions, component versions, and zen-sdk dependency versions
 
 ## Version Mapping
@@ -9,7 +9,7 @@
 |-------|--------------|-------------|-------------------|-------------|-------|
 | zen-flow | 0.0.2-alpha | 0.0.1-alpha | v0.0.1-alpha | v0.1.0-alpha | Schema added in 0.0.2-alpha |
 | zen-gc | 0.0.2-alpha | 0.0.1-alpha | v0.0.1-alpha | v0.1.1-alpha | Schema added in 0.0.2-alpha; GC primitives migrated (H115) |
-| zen-watcher | 1.2.0 | 1.2.0 | v1.2.0 | v0.1.1-alpha | Version aligned (G010) - git tag v1.2.0 ↔ image 1.2.0 ↔ chart 1.2.0 ↔ app 1.2.0 |
+| zen-watcher | 1.2.1 | 1.2.1 | v1.2.1 | v0.2.9-alpha | Version aligned (G010) - git tag v1.2.1 ↔ image 1.2.1 ↔ chart 1.2.1 ↔ app 1.2.1 |
 | zen-lock | 0.0.2-alpha | 0.0.1-alpha | v0.0.1-alpha | v0.1.0-alpha | Schema added in 0.0.2-alpha |
 | zen-lead | 0.1.0 | 0.1.0 | v0.1.0 | N/A | Network-only (Profile A) |
 
@@ -29,12 +29,15 @@
 
 ### zen-sdk Dependency
 
-- **zen-gc, zen-watcher**: Pin to `zen-sdk v0.1.1-alpha` (H115: GC primitives migration)
+- **zen-watcher**: Pin to `zen-sdk v0.2.9-alpha` (RWMutex fix, deduplication improvements)
+- **zen-gc**: Pin to `zen-sdk v0.1.1-alpha` (H115: GC primitives migration)
 - **Other components**: Pin to `zen-sdk v0.1.0-alpha` (H104)
 - No pseudo-versions allowed in production
 - Components must update go.mod to reference tagged version
 
-**Migration Note (v0.1.1-alpha)**: GC backoff/ratelimiter now sourced from zen-sdk. See [VERSION_MATRIX.md](../../docs/VERSION_MATRIX.md) for details.
+**Migration Notes**:
+- **v0.2.9-alpha**: Fixed RWMutex unlock bug in deduplication (zen-watcher v1.2.1)
+- **v0.1.1-alpha**: GC backoff/ratelimiter now sourced from zen-sdk. See [VERSION_MATRIX.md](../../docs/VERSION_MATRIX.md) for details.
 
 ## Upgrade Path
 
@@ -76,16 +79,19 @@ helm list | grep zen-flow
 - **Latest**: `v0.0.1-alpha`
 
 ### zen-watcher
-- **v1.2.0**: Current release (G010 - version alignment)
-- **Latest**: `v1.2.0`
+- **v1.2.1**: Current release (RWMutex fix, dependency updates)
+- **v1.2.0**: Previous release (G010 - version alignment)
+- **Latest**: `v1.2.1`
 
 ### zen-lock
 - **v0.0.1-alpha**: Initial release
 - **Latest**: `v0.0.1-alpha`
 
 ### zen-sdk
+- **v0.2.9-alpha**: RWMutex fix in deduplication (zen-watcher v1.2.1)
+- **v0.1.1-alpha**: GC primitives migration (H115)
 - **v0.1.0-alpha**: Leadership contract v1.0.0, Model A denylist (H104)
-- **Latest**: `v0.1.0-alpha`
+- **Latest**: `v0.2.9-alpha`
 
 ## Schema Addition (H091)
 
