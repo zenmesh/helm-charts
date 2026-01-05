@@ -4,7 +4,7 @@
 
 image:
   repository: kubezen/zen-agent
-  tag: "1.0.2"  # Pin to specific version
+  tag: "latest"  # Pin to specific version (update to actual version when available)
   pullPolicy: IfNotPresent
 
 saas:
