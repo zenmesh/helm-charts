@@ -69,6 +69,8 @@ kubectl get observations -n zen-system
 
 ## Installing the Chart
 
+**CRDs are installed automatically by default** (`crds.enabled=true`). For production/GitOps deployments, you may want to manage CRDs separately by setting `crds.enabled=false` and applying CRDs manually.
+
 To install the chart with the release name `zen-watcher`:
 
 ```bash
@@ -197,34 +199,93 @@ helm install zen-watcher kube-zen/zen-watcher \
 - ✅ Multi-cluster deployments where CRDs are installed once globally
 - ✅ Enterprise environments with strict CRD lifecycle management policies
 
-### 2. NetworkPolicy Validation Required
+### 2. NetworkPolicy Configuration
 
-**⚠️ WARNING**: NetworkPolicy is enabled by default (`networkPolicy.enabled=true`), but it may block controller access to the Kubernetes API if not properly configured for your CNI.
+**Default Posture**: NetworkPolicy ingress is enabled (safest baseline), egress is disabled by default to avoid API block-by-default surprises.
 
-**Before production deployment:**
+**Two Supported Patterns:**
 
-1. **Validate NetworkPolicy on your CNI**: Test that the NetworkPolicy doesn't block zen-watcher from accessing the Kubernetes API server
-2. **Configure Kubernetes API CIDR**: Update `networkPolicy.egress.kubernetesAPICIDR` to match your cluster's API server CIDR range
-3. **Adjust metrics namespace**: Update `networkPolicy.ingress.metricsNamespaces` if Prometheus is in a different namespace than `monitoring`
+#### Pattern 1: Ingress-Only NetworkPolicy (Default - Recommended)
 
-**For first launch (if not validated):**
+**Safest baseline** - Only restricts incoming traffic, allows all egress:
 
 ```yaml
 networkPolicy:
-  enabled: false  # Disable until validated on your CNI
+  enabled: true
+  ingress:
+    enabled: true
+  egress:
+    enabled: false  # Default: no egress restrictions
 ```
 
-**Finding your Kubernetes API CIDR:**
+**Use when:**
+- You want network isolation for ingress only
+- Egress restrictions are handled at cluster/namespace level
+- You haven't validated egress rules yet
+
+#### Pattern 2: Restricted Egress (Requires Explicit Configuration)
+
+**Restricts egress** - Requires explicit Kubernetes API destinations:
+
+```yaml
+networkPolicy:
+  enabled: true
+  ingress:
+    enabled: true
+  egress:
+    enabled: true
+    allowDNS: true
+    allowKubernetesAPI: true
+    # REQUIRED: At least one of the following must be set
+    kubernetesServiceIP: "10.96.0.1/32"  # For on-prem: ClusterIP of kubernetes service
+    # OR
+    kubernetesAPICIDRs:                  # For managed control planes: API server CIDRs
+      - "10.100.0.0/16"                  # EKS/GKE/AKS API server IP ranges
+```
+
+**Finding Kubernetes API Destinations:**
+
+**For on-prem clusters (use `kubernetesServiceIP`):**
+```bash
+# Get Kubernetes service ClusterIP
+kubectl get svc kubernetes -n default -o jsonpath='{.spec.clusterIP}/32'
+# Example output: 10.96.0.1/32
+```
+
+**For managed control planes (use `kubernetesAPICIDRs`):**
+```bash
+# Get API server endpoint IPs
+kubectl get endpoints kubernetes -n default -o jsonpath='{.subsets[0].addresses[*].ip}'
+
+# EKS: Check API server endpoint in AWS Console
+# GKE: Check cluster endpoint in GCP Console  
+# AKS: Check API server FQDN in Azure Portal
+```
+
+**Validation Commands:**
+
+After deployment, verify Kubernetes API connectivity:
 
 ```bash
-# Method 1: Check API server endpoint
-kubectl get endpoints kubernetes -o jsonpath='{.subsets[0].addresses[0].ip}'
+# 1. Check pod readiness (should be Ready if API is accessible)
+kubectl get pods -n zen-system -l app.kubernetes.io/name=zen-watcher
 
-# Method 2: Check cluster CIDR (varies by provider)
-# EKS: Check VPC CIDR
-# GKE: Check cluster CIDR in GCP Console
-# On-prem: Check cluster network configuration
+# 2. Check readiness endpoint (should return 200)
+kubectl exec -n zen-system <pod-name> -- wget -qO- http://localhost:8080/readyz
+
+# 3. Test Kubernetes API access from pod
+kubectl exec -n zen-system <pod-name> -- wget -qO- --no-check-certificate https://kubernetes.default.svc:443/healthz
+
+# 4. Verify Observations can be created (smoke test)
+kubectl apply -f examples/observations/test-observation.yaml -n zen-system
+kubectl get observations -n zen-system
 ```
+
+**If API is unreachable:**
+- Pod will be `NotReady`
+- Readiness endpoint returns: `{"status":"kubernetes_api_unreachable","message":"Kubernetes API unreachable — check NetworkPolicy egress for watcher namespace"}`
+- Check pod logs: `kubectl logs -n zen-system <pod-name> | grep "API_UNREACHABLE"`
+- Fix NetworkPolicy egress configuration and redeploy
 
 ### 3. RBAC Extension Required for Informer-Based Sources
 
@@ -258,7 +319,64 @@ kubectl patch clusterrole zen-watcher --type='json' \
 - [RBAC Security Documentation](https://github.com/kube-zen/zen-watcher/blob/main/docs/SECURITY_RBAC.md)
 - Example Ingesters: [Trivy](https://github.com/kube-zen/zen-watcher/blob/main/examples/ingesters/trivy-informer.yaml), [Kyverno](https://github.com/kube-zen/zen-watcher/blob/main/examples/ingesters/kyverno-informer.yaml)
 
-### 4. Webhook Reachability & Authentication
+### 4. Webhook Security Configuration
+
+**⚠️ SECURITY RECOMMENDATION**: For production deployments, enable webhook authentication to prevent unauthorized submissions.
+
+zen-watcher supports two webhook security controls:
+
+1. **Token Authentication** (Recommended): Require `Authorization: Bearer <token>` header
+2. **IP Allowlist**: Restrict webhook access to specific IPs/CIDRs
+
+**Enable webhook authentication:**
+
+```yaml
+server:
+  webhook:
+    # Option 1: Set token directly (for testing/development)
+    authToken: "your-secure-token-here"
+    
+    # Option 2: Use Secret reference (recommended for production)
+    authTokenSecret:
+      name: zen-watcher-webhook-auth
+      key: token
+    
+    # Optional: IP allowlist (works with NetworkPolicy for defense in depth)
+    allowedIPs:
+      - "10.0.0.0/8"        # Private network
+      - "192.168.1.100"     # Specific IP
+```
+
+**Create Secret for production:**
+
+```bash
+# Generate a secure token
+WEBHOOK_TOKEN=$(openssl rand -hex 32)
+
+# Create Secret
+kubectl create secret generic zen-watcher-webhook-auth \
+  --from-literal=token="$WEBHOOK_TOKEN" \
+  -n zen-system
+
+# Install with Secret reference
+helm install zen-watcher kube-zen/zen-watcher \
+  --namespace zen-system \
+  --create-namespace \
+  --set server.webhook.authTokenSecret.name=zen-watcher-webhook-auth \
+  --set server.webhook.authTokenSecret.key=token
+```
+
+**Configure webhook sources to use authentication:**
+
+```bash
+# Falco example
+curl -X POST https://zen-watcher.example.com/falco/webhook \
+  -H "Authorization: Bearer your-secure-token-here" \
+  -H "Content-Type: application/json" \
+  -d '{"output": "test alert"}'
+```
+
+### 5. Webhook Reachability & Authentication
 
 **Default service type**: `ClusterIP` (internal cluster access only)
 
@@ -293,7 +411,66 @@ service:
 - [Webhook Authentication](https://github.com/kube-zen/zen-watcher/blob/main/docs/SOURCE_ADAPTERS.md#authentication-configuration)
 - [Ingester API](https://github.com/kube-zen/zen-watcher/blob/main/docs/INGESTER_API.md#webhook-ingester)
 
-### 5. Ensure Ingestion is Enabled
+### 6. Known Limitations
+
+#### Informer Failover Gap
+
+**⚠️ Important**: Informer-based sources (Trivy, Kyverno, ConfigMap-based) have a processing gap during leader failover.
+
+**What This Means:**
+- **Webhook sources** (Falco, Audit): **Not affected** - load-balanced across all pods, no gap
+- **Informer sources** (Trivy, Kyverno): **Affected** - only leader processes these, 10-15 second gap during failover
+
+**During Leader Failover:**
+- Informer-based watchers stop processing when the leader pod crashes or is evicted
+- New leader is elected within 10-15 seconds (typical observed range)
+- During this window, events from informer-based sources are not processed
+
+**Recoverability:**
+- ✅ **State-like sources** (Trivy VulnerabilityReports, Kyverno PolicyReports): Recoverable - new leader can re-list objects
+- ❌ **Event-like sources** (Kubernetes Events): Not recoverable - missed events may be gone
+
+**Operational Mitigation:**
+1. **Dedicated deployment** for critical namespaces (isolates failover impact)
+2. **Namespace sharding** by risk tier (each shard has its own leader)
+3. **Monitoring and alerting** for source staleness and leader transitions
+
+**For detailed mitigation strategies, see:**
+- [Informer Failover Gap Documentation](https://github.com/kube-zen/zen-watcher/blob/main/docs/OPERATIONAL_EXCELLENCE.md#informer-failover-gap)
+- [Leader Election Documentation](https://github.com/kube-zen/zen-watcher/blob/main/docs/LEADER_ELECTION.md#informer-failover-gap)
+- [Architecture Limitations](https://github.com/kube-zen/zen-watcher/blob/main/docs/ARCHITECTURE.md#known-limitations-and-trade-offs)
+
+**Future Improvements:**
+See [ROADMAP.md](https://github.com/kube-zen/zen-watcher/blob/main/ROADMAP.md) for planned improvements including leader takeover catch-up scan and optional active-active processing.
+
+### 8. PrometheusRule and Alerting (Informer Failover Gap Detection)
+
+**⚠️ IMPORTANT**: Enable PrometheusRule to detect the informer failover gap and leader election issues.
+
+**Installation:**
+
+```yaml
+prometheusRule:
+  enabled: true  # Requires Prometheus Operator
+```
+
+**If Prometheus Operator is not available**, apply alerts manually:
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/kube-zen/zen-watcher/main/config/prometheus/rules/leader-election-alerts.yml
+```
+
+**Key Alerts:**
+- **Source Staleness**: Detects when informer sources stop processing events (indicates failover gap)
+- **Leader Flapping**: Detects frequent leader transitions (indicates network/API issues)
+- **Ingestion Drop**: Detects when Observations stop being created while sources are active
+- **Failover Duration**: Monitors leader transition time (should be < 20s p95)
+
+**For complete alert documentation, see:**
+- [config/prometheus/rules/README.md](https://github.com/kube-zen/zen-watcher/blob/main/config/prometheus/rules/README.md)
+- [HIGH_AVAILABILITY_AND_SCALING.md](https://github.com/kube-zen/zen-watcher/blob/main/docs/HIGH_AVAILABILITY_AND_SCALING.md#monitoring--alerting)
+
+### 7. Ensure Ingestion is Enabled
 
 **⚠️ WARNING**: Without an Ingester, zen-watcher will run but produce zero Observations.
 
@@ -328,12 +505,12 @@ Before deploying to production with real traffic, complete these hardening steps
 **Pin image tags** (never use `latest`):
 ```yaml
 image:
-  tag: "1.0.19"  # Use specific version tag
+  tag: "1.2.0"  # Use specific version tag
 ```
 
 **Vulnerability scanning and SBOM**:
-- Run Trivy scan: `trivy image kubezen/zen-watcher:1.0.19`
-- Generate SBOM: `syft kubezen/zen-watcher:1.0.19 -o spdx-json`
+- Run Trivy scan: `trivy image kubezen/zen-watcher:1.2.0`
+- Generate SBOM: `syft kubezen/zen-watcher:1.2.0 -o spdx-json`
 - Review scan results before deployment
 
 **Image signing and verification**:
@@ -358,13 +535,30 @@ Default values:
 
 ```yaml
 # values.yaml
-extraEnv:
-  - name: OBSERVATION_TTL_SECONDS
-    value: "2592000"  # 30 days (adjust based on retention requirements)
-  - name: GC_INTERVAL
-    value: "30m"      # More frequent GC for high volume
-  - name: GC_TIMEOUT
-    value: "10m"      # Longer timeout for large cleanup operations
+retention:
+  defaultTTLDays: 3    # Shorter retention for high volume (3 days)
+  gcInterval: "30m"    # More frequent GC for high volume
+  gcTimeout: "10m"     # Longer timeout for large cleanup operations
+```
+
+**For standard deployments**, use defaults:
+
+```yaml
+# values.yaml
+retention:
+  defaultTTLDays: 7    # Default: 7 days
+  gcInterval: "1h"      # Default: 1 hour
+  gcTimeout: "5m"       # Default: 5 minutes
+```
+
+**For compliance/audit deployments**, use longer retention:
+
+```yaml
+# values.yaml
+retention:
+  defaultTTLDays: 30   # 30 days retention
+  gcInterval: "2h"      # Less frequent GC (2 hours)
+  gcTimeout: "10m"      # Longer timeout
 ```
 
 **Capacity planning:**
@@ -396,7 +590,17 @@ networkPolicy:
 - Verify all panels show data after deployment
 
 **Wire alert rules:**
-- Prometheus alert rules: `config/monitoring/prometheus-rules.yaml`
+
+Option 1: Enable PrometheusRule via Helm (recommended):
+```yaml
+# values.yaml
+prometheusRule:
+  enabled: true
+```
+
+Option 2: Manual installation:
+- Prometheus alert rules: `config/prometheus/rules/leader-election-alerts.yml`
+- Apply manually: `kubectl apply -f config/prometheus/rules/leader-election-alerts.yml`
 - AlertManager configuration: `config/alertmanager/alertmanager.yml`
 - Review alert thresholds with production data (adjust as needed)
 

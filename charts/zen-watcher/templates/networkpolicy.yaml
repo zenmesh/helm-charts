@@ -68,16 +68,33 @@ spec:
           port: 53
     {{- end }}
     {{- if .Values.networkPolicy.egress.allowKubernetesAPI }}
+    {{- $hasServiceIP := and .Values.networkPolicy.egress.kubernetesServiceIP (ne .Values.networkPolicy.egress.kubernetesServiceIP "") }}
+    {{- $hasCIDRs := and .Values.networkPolicy.egress.kubernetesAPICIDRs (gt (len .Values.networkPolicy.egress.kubernetesAPICIDRs) 0) }}
+    {{- if not (or $hasServiceIP $hasCIDRs) }}
+    {{- fail "NetworkPolicy egress.allowKubernetesAPI=true requires at least one of: egress.kubernetesServiceIP or egress.kubernetesAPICIDRs. Set kubernetesServiceIP (for on-prem) or kubernetesAPICIDRs (for managed control planes)." }}
+    {{- end }}
     # Allow Kubernetes API access (required for informers and CRD operations)
-    # Note: Kubernetes API server is typically not reachable via namespaceSelector.
-    # This uses ipBlock with a configurable CIDR (defaults to 10.0.0.0/8 for typical clusters).
-    # Adjust kubernetesAPICIDR in values.yaml to match your cluster's API server CIDR.
+    # Explicit destinations required - no broad defaults to prevent silent failures
+    {{- if $hasServiceIP }}
+    # Kubernetes API service IP (on-prem clusters)
     - to:
         - ipBlock:
-            cidr: {{ .Values.networkPolicy.egress.kubernetesAPICIDR | default "10.0.0.0/8" }}
+            cidr: {{ .Values.networkPolicy.egress.kubernetesServiceIP }}
       ports:
         - protocol: TCP
           port: 443
+    {{- end }}
+    {{- if $hasCIDRs }}
+    # Kubernetes API server CIDR blocks (managed control planes: EKS/GKE/AKS)
+    {{- range .Values.networkPolicy.egress.kubernetesAPICIDRs }}
+    - to:
+        - ipBlock:
+            cidr: {{ . }}
+      ports:
+        - protocol: TCP
+          port: 443
+    {{- end }}
+    {{- end }}
     {{- end }}
     {{- range .Values.networkPolicy.egress.to }}
     - to:

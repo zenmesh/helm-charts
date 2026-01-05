@@ -2,7 +2,7 @@
 
 **Repository:** ~/letsgo/helm-charts  
 **Parent Roadmap:** [zen-alpha/docs/ROADMAP.md](../../../zen-alpha/docs/ROADMAP.md)  
-**Charts:** zen-agent, zen-watcher  
+**Charts:** zen-watcher  
 **Architecture Context:** [COMPREHENSIVE_ARCHITECTURE.md](../../../zen-alpha/docs/01-architecture/COMPREHENSIVE_ARCHITECTURE.md) (see "Helm Charts & Deployment" section for system integration)  
 **Security Incident Flow:** [SECURITY_INCIDENT_FLOW.md](../../../zen-alpha/docs/01-architecture/SECURITY_INCIDENT_FLOW.md) - How charts support incident handling (current)  
 **Production Architecture:** [SECURITY_INCIDENT_FLOW_PRODUCTION.md](../../../zen-alpha/docs/01-architecture/SECURITY_INCIDENT_FLOW_PRODUCTION.md) - Production architecture  
@@ -23,19 +23,13 @@ This document extracts helm/infrastructure roadmap items from the platform roadm
 **Usage:**
 ```bash
 # Local dev
-helm install zen-agent charts/zen-agent/ -f docs/examples/values-local.yaml \
-  --set saas.clusterToken=YOUR_TOKEN \
-  --set tenant.id=TENANT_ID \
-  --set cluster.id=CLUSTER_ID
+helm install zen-watcher charts/zen-watcher/ -f docs/examples/values-local.yaml
 
 # GitOps (via FluxCD/ArgoCD)
 # Reference values-gitops.yaml in your GitOps repo
 
 # AWS EKS
-helm install zen-agent charts/zen-agent/ -f docs/examples/values-aws.yaml \
-  --set saas.clusterToken=YOUR_TOKEN \
-  --set tenant.id=TENANT_ID \
-  --set cluster.id=CLUSTER_ID
+helm install zen-watcher charts/zen-watcher/ -f docs/examples/values-aws.yaml
 ```
 
 ---
@@ -88,7 +82,7 @@ helm install zen-agent charts/zen-agent/ -f docs/examples/values-aws.yaml \
 1. zen-gitops creates PR in customer repo
 2. Customer reviews and merges
 3. FluxCD/ArgoCD syncs to cluster
-4. zen-agent validates via webhook
+4. zen-watcher processes events via webhook
 
 **Status:** Design complete (not yet wired to /clusters/new)
 
@@ -138,12 +132,12 @@ helm install zen-agent charts/zen-agent/ -f docs/examples/values-aws.yaml \
 
 ## Security & TLS
 
-### RM-HELM-001: Agent chart TLS hardening
+### RM-HELM-001: Watcher chart TLS hardening
 **Status:** 🔄 In Progress  
 **Priority:** High  
 **Implementation:**
-- `charts/zen-agent/TLS_HARDENING.md` - TLS hardening documentation
-- `charts/zen-agent/values.yaml` - TLS configuration options
+- `charts/zen-watcher/README.md` - Security documentation
+- `charts/zen-watcher/values.yaml` - Security configuration options
 
 **Current TLS Features:**
 - mTLS support (agent ↔ SaaS)
@@ -176,31 +170,9 @@ helm install zen-agent charts/zen-agent/ -f docs/examples/values-aws.yaml \
 
 ## Chart Features
 
-### zen-agent Chart
-
-**Current Version:** 1.0.2  
-**Key Features:**
-- SSA-based remediation execution
-- HMAC authentication to SaaS
-- mTLS support
-- Leader election (multi-replica)
-- Prometheus metrics endpoint
-- Pod security standards (restricted profile)
-- Network policies
-
-**Configuration:**
-- `saas.endpoint` - SaaS API endpoint (FQDN only, no .svc.cluster.local)
-- `saas.clusterToken` - Bootstrap token (required)
-- `tenant.id`, `cluster.id` - Tenant/cluster identification
-- `tls.enabled` - Enable mTLS
-- `caMount.enabled` - Custom CA certificate
-
-**Dependencies:**
-- zen-watcher (embedded as subchart)
-
 ### zen-watcher Chart
 
-**Current Version:** 1.0.1  
+**Current Version:** 1.2.0  
 **Key Features:**
 - Kubernetes resource observation
 - CRD-based configuration (Ingester CRD)
@@ -308,9 +280,8 @@ helm install zen-agent charts/zen-agent/ -f docs/examples/values-aws.yaml \
 **Script:** `zen-alpha/scripts/demo/run-local-real-pipeline.sh`
 
 **Chart Usage:**
-- zen-agent: Installed in customer cluster (Cluster B)
-- zen-watcher: Installed as dependency of zen-agent
-- Values: Configured with sandbox SaaS endpoints
+- zen-watcher: Installed in customer cluster (Cluster B)
+- Values: Configured with sandbox endpoints
 
 **Requirements:**
 - TLS enabled
@@ -339,8 +310,8 @@ helm install zen-agent charts/zen-agent/ -f docs/examples/values-aws.yaml \
 **Status:** Planned (MAIN AI responsibility)
 
 **Expected Chart Usage:**
-- Deploy zen-agent + zen-watcher to demo AWS clusters
-- Validate against public SaaS instance
+- Deploy zen-watcher to demo AWS clusters
+- Validate against public endpoints
 - Demo golden scenarios to partners
 
 **Requirements:**
@@ -360,7 +331,6 @@ helm install zen-agent charts/zen-agent/ -f docs/examples/values-aws.yaml \
 ### Allowed Registries (from GUARDRAILS.md)
 
 **Current:**
-- zen-agent: `kubezen/zen-agent` ✅
 - zen-watcher: `kubezen/zen-watcher` ✅
 
 **Policy:**

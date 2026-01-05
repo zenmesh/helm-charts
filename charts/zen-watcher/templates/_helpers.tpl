@@ -71,15 +71,10 @@ Validate leader election configuration (H074.2 safety rules)
 */}}
 {{- define "zen-watcher.validateLeaderElection" -}}
 {{- if and (gt (int .Values.replicaCount) 1) (eq .Values.leaderElection.mode "disabled") }}
-{{- fail "Unsafe HA configuration: replicaCount > 1 but leaderElection.mode is disabled. Either set replicaCount=1 or enable leader election (mode: builtin or zenlead)" }}
+{{- fail "Unsafe HA configuration: replicaCount > 1 but leaderElection.mode is disabled. Either set replicaCount=1 or enable leader election (mode: builtin)" }}
 {{- end }}
-{{- if eq .Values.leaderElection.mode "zenlead" }}
-{{- if not .Values.leaderElection.leaseName }}
-{{- fail "leaderElection.leaseName is required when leaderElection.mode=zenlead" }}
-{{- end }}
-{{- end }}
-{{- if not (has .Values.leaderElection.mode (list "builtin" "zenlead" "disabled")) }}
-{{- fail (printf "Invalid leaderElection.mode: %q (must be builtin, zenlead, or disabled)" .Values.leaderElection.mode) }}
+{{- if not (has .Values.leaderElection.mode (list "builtin" "disabled")) }}
+{{- fail (printf "Invalid leaderElection.mode: %q (must be builtin or disabled)" .Values.leaderElection.mode) }}
 {{- end }}
 {{- end }}
 

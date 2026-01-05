@@ -54,11 +54,8 @@ spec:
             {{- if .Values.leaderElection.electionID }}
             - --leader-election-id={{ .Values.leaderElection.electionID }}
             {{- end }}
-            {{- if eq .Values.leaderElection.mode "zenlead" }}
-            - --leader-election-lease-name={{ .Values.leaderElection.leaseName }}
-            {{- end }}
           ports:
-            - name: metrics
+            - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
           env:
@@ -80,10 +77,47 @@ spec:
             - name: SERVER_MAX_REQUEST_BYTES
               value: "{{ .Values.server.maxRequestBytes }}"
             {{- end }}
+            {{- if .Values.server.webhook.authDisabled }}
+            - name: WEBHOOK_AUTH_DISABLED
+              value: "true"
+            {{- end }}
+            {{- if or .Values.server.webhook.authToken (and .Values.server.webhook.authTokenSecret.name .Values.server.webhook.authTokenSecret.key) }}
+            - name: WEBHOOK_AUTH_TOKEN
+              {{- if and .Values.server.webhook.authTokenSecret.name .Values.server.webhook.authTokenSecret.key }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.server.webhook.authTokenSecret.name }}
+                  key: {{ .Values.server.webhook.authTokenSecret.key }}
+              {{- else }}
+              value: {{ .Values.server.webhook.authToken | quote }}
+              {{- end }}
+            {{- end }}
+            {{- if .Values.server.webhook.allowedIPs }}
+            - name: WEBHOOK_ALLOWED_IPS
+              value: "{{ join "," .Values.server.webhook.allowedIPs }}"
+            {{- end }}
+            {{- if .Values.retention.defaultTTLSeconds }}
+            - name: OBSERVATION_TTL_SECONDS
+              value: "{{ .Values.retention.defaultTTLSeconds }}"
+            {{- else if .Values.retention.defaultTTLDays }}
+            - name: OBSERVATION_TTL_DAYS
+              value: "{{ .Values.retention.defaultTTLDays }}"
+            {{- end }}
+            {{- if .Values.retention.gcInterval }}
+            - name: GC_INTERVAL
+              value: "{{ .Values.retention.gcInterval }}"
+            {{- end }}
+            {{- if .Values.extraEnv }}
+            {{- toYaml .Values.extraEnv | nindent 12 }}
+            {{- end }}
+            {{- if .Values.retention.gcTimeout }}
+            - name: GC_TIMEOUT
+              value: "{{ .Values.retention.gcTimeout }}"
+            {{- end }}
           livenessProbe:
             httpGet:
               path: /healthz
-              port: metrics
+              port: http
             initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
@@ -91,7 +125,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /readyz
-              port: metrics
+              port: http
             initialDelaySeconds: 5
             periodSeconds: 5
             timeoutSeconds: 3

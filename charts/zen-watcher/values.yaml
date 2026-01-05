@@ -256,12 +256,19 @@ extraEnv: []
 # PrometheusRule configuration
 # Enable PrometheusRule resource creation for zen-watcher alerts
 # Requires Prometheus Operator to be installed in the cluster
+# 
+# IMPORTANT: These alerts detect the "informer failover gap" and leader election issues.
+# Recommended for production to ensure operators can detect HA blind spots.
 prometheusRule:
   # Enable PrometheusRule resource creation
   # When enabled, creates a PrometheusRule with alerts for:
   # - Leader election flapping
-  # - Source staleness (critical and standard)
-  # - Ingestion drop
-  # - Failover duration
-  # - Watch restart rate
+  # - Source staleness (critical and standard) - detects informer failover gap
+  # - Ingestion drop - detects when observations stop being created
+  # - Failover duration - monitors leader transition time
+  # - Watch restart rate - detects informer connectivity issues
+  # 
+  # Default: false (opt-in) - Set to true if Prometheus Operator is installed
+  # If Prometheus Operator is not available, apply alerts manually:
+  #   kubectl apply -f https://raw.githubusercontent.com/kube-zen/zen-watcher/main/config/prometheus/rules/leader-election-alerts.yml
   enabled: false

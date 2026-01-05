@@ -15,47 +15,19 @@
           "type": "string",
           "enum": [
             "builtin",
-            "zenlead",
             "disabled"
           ],
           "default": "builtin",
-          "description": "Leader election mode: builtin (Profile B), zenlead (Profile C), or disabled"
+          "description": "Leader election mode: builtin (default) or disabled. Use disabled only for single-replica deployments. For zen-lead integration, use disabled mode and configure zen-lead separately."
         },
         "electionID": {
           "type": "string",
           "default": "",
           "description": "Leader election ID (defaults to component-leader-election if empty)"
-        },
-        "leaseName": {
-          "type": "string",
-          "default": "",
-          "description": "Lease name (required if mode=zenlead)"
         }
       },
       "required": [
         "mode"
-      ],
-      "allOf": [
-        {
-          "if": {
-            "properties": {
-              "mode": {
-                "const": "zenlead"
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "leaseName": {
-                "minLength": 1,
-                "description": "leaseName is required when mode=zenlead"
-              }
-            },
-            "required": [
-              "leaseName"
-            ]
-          }
-        }
       ]
     },
     "crds": {
@@ -71,6 +43,124 @@
       "required": [
         "enabled"
       ]
+    },
+    "server": {
+      "type": "object",
+      "description": "Server configuration",
+      "properties": {
+        "trustedProxyCIDRs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Trusted proxy CIDRs for X-Forwarded-For/X-Real-IP header validation. Empty list means proxy headers are never trusted."
+        },
+        "maxRequestBytes": {
+          "type": "integer",
+          "default": 1048576,
+          "description": "Maximum request body size in bytes (default: 1MiB). Prevents DoS attacks."
+        },
+        "webhook": {
+          "type": "object",
+          "description": "Webhook security controls",
+          "properties": {
+            "authToken": {
+              "type": "string",
+              "default": "",
+              "description": "Token-based authentication for webhook endpoints. When set, requests must include Authorization: Bearer <token>. Use authTokenSecret for production (recommended)."
+            },
+            "authTokenSecret": {
+              "type": "object",
+              "description": "Secret reference for authToken (recommended for production)",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Secret name containing the webhook auth token"
+                },
+                "key": {
+                  "type": "string",
+                  "description": "Key within the secret containing the webhook auth token"
+                }
+              }
+            },
+            "allowedIPs": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "IP allowlist for webhook endpoints. Can be used as an alternative to token authentication, or in combination with it."
+            },
+            "authDisabled": {
+              "type": "boolean",
+              "default": false,
+              "description": "SECURITY WARNING: Disable authentication (NOT RECOMMENDED for production). Set to true only if you explicitly want to disable webhook authentication. This should only be used in development/testing environments. Default: false (authentication required by default)."
+            }
+          }
+        }
+      }
+    },
+    "extraEnv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "description": "Additional environment variable (escape hatch for custom configuration)",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Environment variable name"
+          },
+          "value": {
+            "type": "string",
+            "description": "Environment variable value (use valueFrom for secrets)"
+          },
+          "valueFrom": {
+            "type": "object",
+            "description": "Environment variable source (secretKeyRef, configMapKeyRef, etc.)"
+          }
+        },
+        "required": ["name"]
+      },
+      "default": [],
+      "description": "Additional environment variables (escape hatch for custom configuration). Example: [{\"name\": \"CUSTOM_VAR\", \"value\": \"custom-value\"}]"
+    },
+    "retention": {
+      "type": "object",
+      "description": "Retention and garbage collection configuration",
+      "properties": {
+        "defaultTTLDays": {
+          "type": "integer",
+          "default": 7,
+          "minimum": 1,
+          "description": "Default TTL for observations in days. Observations older than this will be automatically deleted."
+        },
+        "defaultTTLSeconds": {
+          "type": "string",
+          "description": "Alternative: specify TTL in seconds (takes precedence over defaultTTLDays if both are set)"
+        },
+        "gcInterval": {
+          "type": "string",
+          "default": "1h",
+          "description": "Garbage collection interval (how often GC runs). Format: Go duration (e.g., '30m', '1h', '2h')"
+        },
+        "gcTimeout": {
+          "type": "string",
+          "default": "5m",
+          "description": "Garbage collection timeout (maximum time for a single GC run). Format: Go duration (e.g., '5m', '10m')"
+        }
+      }
+    },
+    "prometheusRule": {
+      "type": "object",
+      "description": "PrometheusRule resource configuration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable PrometheusRule resource creation for zen-watcher alerts"
+        }
+      }
     }
   },
   "required": [
