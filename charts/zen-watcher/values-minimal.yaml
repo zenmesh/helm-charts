@@ -1,0 +1,110 @@
+# Minimal Values for zen-watcher (Laptop/Development Cluster)
+#
+# This file provides minimal resource settings for local development,
+# laptop clusters (k3d, kind, minikube), and resource-constrained environments.
+#
+# Usage:
+#   helm install zen-watcher kube-zen/zen-watcher \
+#     --namespace zen-system \
+#     --create-namespace \
+#     -f values-minimal.yaml
+#
+# Or override specific values:
+#   helm install zen-watcher kube-zen/zen-watcher \
+#     --namespace zen-system \
+#     --create-namespace \
+#     -f values-minimal.yaml \
+#     --set replicaCount=1
+
+# Replicas: 1 for minimal resource usage
+replicaCount: 1
+
+image:
+  repository: kubezen/zen-watcher
+  pullPolicy: IfNotPresent
+  tag: "1.2.1"
+
+# Resources: Minimal (actual baseline ~2-3m CPU, ~9-10MB memory)
+# These values provide minimal headroom for basic functionality
+resources:
+  requests:
+    cpu: 10m       # Minimal (actual baseline ~2-3m)
+    memory: 32Mi   # Minimal (actual baseline ~9-10MB)
+  limits:
+    cpu: 50m       # Minimal limit (enough for basic event processing)
+    memory: 64Mi   # Minimal limit (enough for basic deduplication)
+
+# Pod Disruption Budget: Disabled for single replica
+podDisruptionBudget:
+  enabled: false
+
+# Leader Election: Enabled (required for informer sources)
+leaderElection:
+  enabled: true
+  mode: builtin
+  leaseDuration: 15s
+  renewDeadline: 10s
+  retryPeriod: 2s
+
+# NetworkPolicy: Disabled for local development (optional)
+networkPolicy:
+  enabled: false  # Local clusters may not support NetworkPolicy
+
+# Webhook Security: Disabled for local development (optional)
+server:
+  webhook:
+    authDisabled: true  # Local: Authentication optional
+    # For local development, you can skip authentication
+    # For production, set authDisabled: false and configure authToken/allowedIPs
+
+# Retention: Shorter TTL for local development
+retention:
+  defaultTTLSeconds: 3600  # 1 hour (local dev doesn't need long retention)
+
+# Observability: Minimal (disable if Prometheus not available)
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: false  # Disable if Prometheus Operator not installed
+
+# CRDs: Install via chart (simpler for local)
+crds:
+  enabled: true  # Local: Install CRDs via chart
+
+# Default Ingester: Enable Kubernetes Events ingester
+ingester:
+  createDefaultK8sEvents: true
+
+# Extra Environment Variables: For local development
+extraEnv: []
+  # Example for local development:
+  # - name: LOG_LEVEL
+  #   value: "debug"
+  # - name: WATCH_NAMESPACE
+  #   value: "default"
+
+# Service Account: Use default service account
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}
+
+# Security Context: Relaxed for local development
+securityContext: {}
+podSecurityContext: {}
+
+# Node Selector: None (allow scheduling anywhere)
+nodeSelector: {}
+
+# Tolerations: None
+tolerations: []
+
+# Affinity: None (single replica)
+affinity: {}
+
+# Annotations: Minimal
+podAnnotations: {}
+
+# Labels: Minimal
+podLabels: {}
+

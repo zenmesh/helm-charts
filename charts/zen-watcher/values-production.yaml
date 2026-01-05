@@ -1,0 +1,166 @@
+# Production-Recommended Values for zen-watcher
+# 
+# This file provides recommended production settings for zen-watcher.
+# These values prioritize stability, security, and observability.
+#
+# Usage:
+#   helm install zen-watcher kube-zen/zen-watcher \
+#     --namespace zen-system \
+#     --create-namespace \
+#     -f values-production.yaml
+#
+# Or override specific values:
+#   helm install zen-watcher kube-zen/zen-watcher \
+#     --namespace zen-system \
+#     --create-namespace \
+#     -f values-production.yaml \
+#     --set replicaCount=3
+
+# Replicas: 2+ for HA (webhook traffic load-balances)
+replicaCount: 2
+
+image:
+  repository: kubezen/zen-watcher
+  pullPolicy: IfNotPresent
+  tag: "1.2.1"  # Pin to specific version for production
+
+# Resources: Conservative requests, generous limits
+# Baseline: ~2-3m CPU, ~9-10MB memory
+# These values provide headroom for event processing spikes
+resources:
+  requests:
+    cpu: 100m      # Conservative (actual baseline ~2-3m)
+    memory: 128Mi  # Conservative (actual baseline ~9-10MB)
+  limits:
+    cpu: 1000m     # Generous limit for event processing spikes
+    memory: 512Mi  # Generous limit for deduplication cache
+
+# Pod Disruption Budget: Ensure availability during updates
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1  # At least 1 pod available during updates
+
+# Leader Election: Always enabled for HA
+leaderElection:
+  enabled: true
+  mode: builtin
+  leaseDuration: 15s
+  renewDeadline: 10s
+  retryPeriod: 2s
+
+# NetworkPolicy: Secure by default
+networkPolicy:
+  enabled: true
+  # Ingress: Allow webhook traffic
+  ingress:
+    enabled: true
+  # Egress: Disabled by default (requires explicit API destinations)
+  egress:
+    enabled: false  # Production: Explicitly configure if needed
+    allowKubernetesAPI: true
+    # If egress enabled, configure one of:
+    # kubernetesServiceIP: ""  # ClusterIP of kubernetes service
+    # kubernetesAPICIDRs: []   # CIDR blocks for API server
+
+# Webhook Security: Enabled by default (secure by default)
+server:
+  webhook:
+    authDisabled: false  # Production: Authentication required
+    # Configure one of:
+    # authToken: ""              # Direct token (not recommended for production)
+    # authTokenSecret:          # Secret reference (recommended)
+    #   name: "zen-watcher-webhook-token"
+    #   key: "token"
+    # allowedIPs: []            # IP allowlist (optional, additional security)
+
+# Retention: Configure TTL to prevent etcd bloat
+retention:
+  # Global TTL (default for all Observations)
+  defaultTTLSeconds: 86400  # 24 hours (adjust based on retention needs)
+  
+  # Per-observation TTL can override this in Ingester spec
+  # See docs/CRD.md for details
+
+# Observability: Enable all metrics and logging
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true  # If Prometheus Operator is installed
+
+# CRDs: Manage separately in production (recommended)
+crds:
+  enabled: false  # Install CRDs separately via kubectl apply
+
+# Default Ingester: Enable Kubernetes Events ingester
+ingester:
+  createDefaultK8sEvents: true
+
+# Extra Environment Variables: For production-specific config
+extraEnv: []
+  # Example:
+  # - name: LOG_LEVEL
+  #   value: "info"
+  # - name: WATCH_NAMESPACE
+  #   value: "production,staging"
+
+# Service Account: Use dedicated service account
+serviceAccount:
+  create: true
+  name: ""  # Auto-generated if empty
+  annotations: {}
+    # Example for IRSA (AWS):
+    # eks.amazonaws.com/role-arn: arn:aws:iam::ACCOUNT:role/zen-watcher-role
+
+# Security Context: Run as non-root (if image supports it)
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 65534  # nobody
+  fsGroup: 65534
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65534
+  fsGroup: 65534
+
+# Node Selector: Optional (pin to specific nodes)
+nodeSelector: {}
+  # Example:
+  # kubernetes.io/arch: amd64
+  # node-role.kubernetes.io/worker: ""
+
+# Tolerations: Optional (allow scheduling on tainted nodes)
+tolerations: []
+  # Example:
+  # - key: "dedicated"
+  #   operator: "Equal"
+  #   value: "zen-watcher"
+  #   effect: "NoSchedule"
+
+# Affinity: Optional (spread pods across nodes)
+affinity: {}
+  # Example (pod anti-affinity):
+  # podAntiAffinity:
+  #   preferredDuringSchedulingIgnoredDuringExecution:
+  #   - weight: 100
+  #     podAffinityTerm:
+  #       labelSelector:
+  #         matchExpressions:
+  #         - key: app.kubernetes.io/name
+  #           operator: In
+  #           values:
+  #           - zen-watcher
+  #       topologyKey: kubernetes.io/hostname
+
+# Annotations: Add production-specific annotations
+podAnnotations: {}
+  # Example:
+  # prometheus.io/scrape: "true"
+  # prometheus.io/port: "8080"
+  # prometheus.io/path: "/metrics"
+
+# Labels: Add production-specific labels
+podLabels: {}
+  # Example:
+  # environment: "production"
+  # team: "platform"
+
