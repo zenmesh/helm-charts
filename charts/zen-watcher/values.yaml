@@ -22,8 +22,8 @@ image:
   repository: kubezen/zen-watcher
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  # Default: 1.2.0 (matches appVersion)
-  tag: "1.2.0"
+  # Default: 1.2.1 (matches appVersion)
+  tag: "1.2.1"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -119,6 +119,37 @@ server:
   # Prevents DoS attacks via large request bodies
   # Webhooks exceeding this limit will receive HTTP 413 (Request Entity Too Large)
   maxRequestBytes: 1048576
+  # Webhook security controls (secure by default posture)
+  webhook:
+    # SECURITY: Authentication is REQUIRED by default (secure by default).
+    # You must either:
+    #   1. Set authToken or authTokenSecret (recommended for production)
+    #   2. Set allowedIPs (alternative authentication method)
+    #   3. Set authDisabled: true (NOT RECOMMENDED - only for development/testing)
+    #
+    # Token-based authentication for webhook endpoints
+    # When set, webhook requests must include: Authorization: Bearer <token>
+    # Recommended for production deployments to prevent unauthorized webhook submissions
+    # Can be set directly or via secretRef (recommended for production)
+    authToken: ""
+    # Secret reference for authToken (alternative to setting authToken directly)
+    # If both authToken and authTokenSecret are set, authTokenSecret takes precedence
+    # Example:
+    #   authTokenSecret:
+    #     name: zen-watcher-webhook-auth
+    #     key: token
+    authTokenSecret: {}
+    # IP allowlist for webhook endpoints
+    # Only requests from these IPs/CIDRs will be accepted
+    # Can be used as an alternative to token authentication, or in combination with it
+    # Example: ["10.0.0.0/8", "192.168.1.100"] to restrict to private network or specific IPs
+    # Note: Works with trustedProxyCIDRs - if proxy headers are trusted, client IP is extracted from X-Forwarded-For/X-Real-IP
+    allowedIPs: []
+    # SECURITY WARNING: Disable authentication (NOT RECOMMENDED for production)
+    # Set to true only if you explicitly want to disable webhook authentication
+    # This should only be used in development/testing environments where security is not a concern
+    # Default: false (authentication required)
+    authDisabled: false
 
 # Ingester configuration
 ingester:
@@ -132,10 +163,9 @@ ingester:
 networkPolicy:
   # Enable NetworkPolicy resource creation
   # NetworkPolicy restricts network traffic to/from zen-watcher pods for defense in depth
-  # WARNING: NetworkPolicy is enabled by default. If you haven't validated it on your CNI,
-  # it may block controller access to the Kubernetes API, causing failures.
-  # For first launch, consider setting enabled: false until validated.
-  enabled: true  # Set to false for first launch if not validated on your CNI
+  # NetworkPolicy defaults: Ingress enabled (safest baseline), egress disabled (avoids API block surprises)
+  # Enable egress only when you've explicitly configured Kubernetes API destinations.
+  enabled: true
   ingress:
     enabled: true
     # Allow metrics scraping from Prometheus/VictoriaMetrics namespaces
@@ -155,18 +185,24 @@ networkPolicy:
     #         port: 8080
     from: []
   egress:
-    enabled: true
+    # Default: egress disabled to avoid API block-by-default surprises
+    # Enable only when you've explicitly configured Kubernetes API destinations
+    enabled: false
     # Allow DNS queries (required for Kubernetes service discovery)
     allowDNS: true
     # Allow Kubernetes API access (required for informers and CRD operations)
-    # WARNING: Configure kubernetesAPICIDR to match your cluster's API server CIDR.
-    # Default (10.0.0.0/8) may be too broad for production. Use a specific CIDR if known.
+    # Effective only when egress.enabled=true
+    # REQUIRES: At least one of kubernetesServiceIP or kubernetesAPICIDRs must be set
     allowKubernetesAPI: true
-    # CIDR block for Kubernetes API server (e.g., cluster CIDR or API server IP range)
-    # Adjust based on your cluster configuration. Common values:
-    # - EKS/GKE: Cluster CIDR (e.g., 10.100.0.0/16)
-    # - On-prem: API server IP range (check with: kubectl get endpoints kubernetes)
-    kubernetesAPICIDR: "10.0.0.0/8"  # Default: broad range (adjust for production)
+    # Kubernetes API server service IP (ClusterIP) - /32 CIDR format
+    # Get with: kubectl get svc kubernetes -n default -o jsonpath='{.spec.clusterIP}/32'
+    # Use this for on-prem clusters where API server is in-cluster
+    kubernetesServiceIP: ""
+    # Kubernetes API server CIDR blocks (for managed control planes)
+    # Array of CIDR strings, e.g., ["10.100.0.0/16", "192.168.1.0/24"]
+    # Use this for EKS/GKE/AKS where API server is external
+    # Get API server IPs: kubectl get endpoints kubernetes -n default
+    kubernetesAPICIDRs: []
     # Additional egress rules (appended to default DNS/Kubernetes API rules)
     # Example:
     # to:
@@ -177,3 +213,55 @@ networkPolicy:
     #       - protocol: TCP
     #         port: 443
     to: []
+
+# Retention and Garbage Collection Configuration
+# TTL and GC settings control how long Observations are retained and how frequently expired ones are cleaned up
+# These settings help prevent etcd bloat and manage API server pressure
+retention:
+  # Default TTL for observations (in days)
+  # Observations older than this will be automatically deleted by the garbage collector
+  # Can be overridden per-observation or per-Ingester
+  # Default: 7 days
+  # Recommended values:
+  #   - High-volume deployments: 3-7 days
+  #   - Standard deployments: 7-14 days
+  #   - Compliance/audit deployments: 30-90 days
+  defaultTTLDays: 7
+  # Alternative: specify TTL in seconds (takes precedence over defaultTTLDays if both are set)
+  # defaultTTLSeconds: ""
+  # Garbage collection interval (how often GC runs)
+  # Default: 1h (1 hour)
+  # Recommended values:
+  #   - High-volume deployments: 30m (30 minutes)
+  #   - Standard deployments: 1h (1 hour)
+  #   - Low-volume deployments: 2h (2 hours)
+  gcInterval: "1h"
+  # Garbage collection timeout (maximum time for a single GC run)
+  # Default: 5m (5 minutes)
+  # Increase if you have a very large number of Observations
+  gcTimeout: "5m"
+
+# Additional environment variables (escape hatch for custom configuration)
+# Example:
+# extraEnv:
+#   - name: CUSTOM_VAR
+#     value: "custom-value"
+#   - name: SECRET_VAR
+#     valueFrom:
+#       secretKeyRef:
+#         name: my-secret
+#         key: my-key
+extraEnv: []
+
+# PrometheusRule configuration
+# Enable PrometheusRule resource creation for zen-watcher alerts
+# Requires Prometheus Operator to be installed in the cluster
+prometheusRule:
+  # Enable PrometheusRule resource creation
+  # When enabled, creates a PrometheusRule with alerts for:
+  # - Leader election flapping
+  # - Source staleness (critical and standard)
+  # - Ingestion drop
+  # - Failover duration
+  # - Watch restart rate
+  enabled: false
