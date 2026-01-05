@@ -9,7 +9,7 @@
 |-------|--------------|-------------|-------------------|-------------|-------|
 | zen-flow | 0.0.2-alpha | 0.0.1-alpha | v0.0.1-alpha | v0.1.0-alpha | Schema added in 0.0.2-alpha |
 | zen-gc | 0.0.2-alpha | 0.0.1-alpha | v0.0.1-alpha | v0.1.1-alpha | Schema added in 0.0.2-alpha; GC primitives migrated (H115) |
-| zen-watcher | 1.0.1 | 1.0.19 | v1.0.19 | v0.1.1-alpha | Schema added in 1.0.1; Rate limiting migrated (H115) |
+| zen-watcher | 1.2.0 | 1.2.0 | v1.2.0 | v0.1.1-alpha | Version aligned (G010) - git tag v1.2.0 ↔ image 1.2.0 ↔ chart 1.2.0 ↔ app 1.2.0 |
 | zen-lock | 0.0.2-alpha | 0.0.1-alpha | v0.0.1-alpha | v0.1.0-alpha | Schema added in 0.0.2-alpha |
 | zen-lead | 0.1.0 | 0.1.0 | v0.1.0 | N/A | Network-only (Profile A) |
 
@@ -76,8 +76,8 @@ helm list | grep zen-flow
 - **Latest**: `v0.0.1-alpha`
 
 ### zen-watcher
-- **v1.0.19**: Current release
-- **Latest**: `v1.0.19`
+- **v1.2.0**: Current release (G010 - version alignment)
+- **Latest**: `v1.2.0`
 
 ### zen-lock
 - **v0.0.1-alpha**: Initial release

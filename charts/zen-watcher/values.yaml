@@ -22,7 +22,8 @@ image:
   repository: kubezen/zen-watcher
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  # Default: 1.2.0 (matches appVersion)
+  tag: "1.2.0"
 
 imagePullSecrets: []
 nameOverride: ""
