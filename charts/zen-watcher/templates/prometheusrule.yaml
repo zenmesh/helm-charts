@@ -12,13 +12,13 @@ spec:
   - name: zen-watcher.leader-election
     interval: 30s
     rules:
-    # NOTE: Leader election metrics (zenwatcher_leader_election_*, zenwatcher_is_leader, zenwatcher_failover_duration_seconds_bucket)
-    # are not currently exposed by zen-watcher. These alerts are disabled until metrics are implemented.
+    # NOTE: Leader election metrics are not currently exposed by zen-watcher.
+    # These alerts are disabled until metrics are implemented.
     # Uncomment when leader election metrics are available:
     #
     # - alert: ZenWatcherLeaderFlapping
     #   expr: |
-    #     rate(zenwatcher_leader_election_transitions_total[5m]) > 0.1
+    #     rate(zen_watcher_leader_election_transitions_total[5m]) > 0.1
     #   for: 2m
     #   labels:
     #     severity: warning
@@ -81,7 +81,7 @@ spec:
     # - alert: ZenWatcherFailoverDurationHigh
     #   expr: |
     #     histogram_quantile(0.95, 
-    #       sum(rate(zenwatcher_failover_duration_seconds_bucket[10m])) by (le)
+    #       sum(rate(zen_watcher_failover_duration_seconds_bucket[10m])) by (le)
     #     ) > 20
     #   for: 5m
     #   labels:
@@ -95,7 +95,7 @@ spec:
     #
     # - alert: ZenWatcherWatchRestartsHigh
     #   expr: |
-    #     rate(zenwatcher_source_watch_restarts_total[10m]) > 0.05
+    #     rate(zen_watcher_source_watch_restarts_total[10m]) > 0.05
     #   for: 5m
     #   labels:
     #     severity: warning
