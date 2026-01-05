@@ -272,3 +272,25 @@ prometheusRule:
   # If Prometheus Operator is not available, apply alerts manually:
   #   kubectl apply -f https://raw.githubusercontent.com/kube-zen/zen-watcher/main/config/prometheus/rules/leader-election-alerts.yml
   enabled: false
+
+# ServiceMonitor configuration (Prometheus Operator)
+# Enable ServiceMonitor resource creation for Prometheus Operator
+# Requires Prometheus Operator to be installed in the cluster
+#
+# For vanilla Prometheus (without Prometheus Operator), configure scraping manually:
+#   - Add scrape config to Prometheus server configuration
+#   - Target: <service-name>.<namespace>.svc.cluster.local:8080/metrics
+serviceMonitor:
+  # Enable ServiceMonitor resource creation
+  # Default: false (opt-in) - Set to true if Prometheus Operator is installed
+  enabled: false
+  # Scrape interval (how often Prometheus scrapes metrics)
+  interval: "30s"
+  # Scrape timeout (maximum time for a single scrape)
+  scrapeTimeout: "10s"
+  # Additional annotations for ServiceMonitor
+  annotations: {}
+  # Relabelings for service discovery
+  relabelings: []
+  # Metric relabelings (filter/transform metrics)
+  metricRelabelings: []
