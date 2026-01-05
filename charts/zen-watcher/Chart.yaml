@@ -50,6 +50,9 @@ annotations:
       url: https://github.com/kube-zen/zen-watcher
     - name: Support
       url: https://github.com/kube-zen/zen-watcher/issues
+  artifacthub.io/images: |
+    - name: zen-watcher
+      image: kubezen/zen-watcher:1.2.1
   artifacthub.io/imagesWhitelist: |
     - kubezen/zen-watcher
 
