@@ -23,15 +23,25 @@ jobs:
       
       - name: Lint charts
         run: |
-          # Update dependencies for umbrella charts (zen-suite uses file:// paths)
+          # Build dependencies for umbrella charts (zen-suite uses file:// paths)
           if [ -d "charts/zen-suite" ]; then
-            echo "Updating dependencies for zen-suite..."
-            helm dependency update charts/zen-suite > /dev/null 2>&1 || true
+            echo "Building dependencies for zen-suite..."
+            helm dependency build charts/zen-suite || {
+              echo "❌ Failed to build dependencies for zen-suite"
+              exit 1
+            }
           fi
           
           for chart in charts/*/; do
             chart_name=$(basename "$chart")
             echo "Linting $chart_name..."
+            # Build dependencies for zen-suite before linting
+            if [[ "$chart_name" == "zen-suite" ]]; then
+              helm dependency build "$chart" || {
+                echo "❌ Failed to build dependencies for $chart_name"
+                exit 1
+              }
+            fi
             helm lint "$chart"
           done
   
@@ -51,15 +61,25 @@ jobs:
       
       - name: Validate schemas
         run: |
-          # Update dependencies for umbrella charts (zen-suite uses file:// paths)
+          # Build dependencies for umbrella charts (zen-suite uses file:// paths)
           if [ -d "charts/zen-suite" ]; then
-            echo "Updating dependencies for zen-suite..."
-            helm dependency update charts/zen-suite > /dev/null 2>&1 || true
+            echo "Building dependencies for zen-suite..."
+            helm dependency build charts/zen-suite || {
+              echo "❌ Failed to build dependencies for zen-suite"
+              exit 1
+            }
           fi
           
           for chart in charts/*/; do
             chart_name=$(basename "$chart")
             echo "Validating $chart_name..."
+            # Build dependencies for zen-suite before templating
+            if [[ "$chart_name" == "zen-suite" ]]; then
+              helm dependency build "$chart" || {
+                echo "❌ Failed to build dependencies for $chart_name"
+                exit 1
+              }
+            fi
             helm template test "$chart" > /dev/null
           done
   
@@ -79,14 +99,24 @@ jobs:
       
       - name: Test rendering
         run: |
-          # Update dependencies for umbrella charts (zen-suite uses file:// paths)
+          # Build dependencies for umbrella charts (zen-suite uses file:// paths)
           if [ -d "charts/zen-suite" ]; then
-            echo "Updating dependencies for zen-suite..."
-            helm dependency update charts/zen-suite > /dev/null 2>&1 || true
+            echo "Building dependencies for zen-suite..."
+            helm dependency build charts/zen-suite || {
+              echo "❌ Failed to build dependencies for zen-suite"
+              exit 1
+            }
           fi
           
           for chart in charts/*/; do
             chart_name=$(basename "$chart")
             echo "Testing $chart_name..."
+            # Build dependencies for zen-suite before templating
+            if [[ "$chart_name" == "zen-suite" ]]; then
+              helm dependency build "$chart" || {
+                echo "❌ Failed to build dependencies for $chart_name"
+                exit 1
+              }
+            fi
             helm template test "$chart" --debug
           done

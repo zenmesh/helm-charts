@@ -62,8 +62,17 @@ for chart in "${CHARTS[@]}"; do
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
 
-    # Update dependencies if needed
-    if [ -f "$chart/Chart.lock" ]; then
+    # Build dependencies for zen-suite (uses local file:// paths)
+    if [[ "$chart" == *"zen-suite"* ]]; then
+        echo "[0/2] Building dependencies for zen-suite..."
+        if ! helm dependency build "$chart"; then
+            echo "  ❌ Failed to build dependencies for zen-suite"
+            FAILED=$((FAILED + 1))
+            continue
+        fi
+        echo "✅ Dependencies built for zen-suite"
+        echo ""
+    elif [ -f "$chart/Chart.lock" ]; then
         echo "[0/2] Updating chart dependencies..."
         if helm dependency update "$chart" > /dev/null 2>&1; then
             echo "✅ Dependencies updated"
@@ -75,16 +84,6 @@ for chart in "${CHARTS[@]}"; do
 
     # Lint chart
     echo "[1/2] Running helm lint..."
-    
-    # zen-suite requires dependencies to be built first
-    if [[ "$chart" == *"zen-suite"* ]]; then
-        echo "  Building dependencies for zen-suite..."
-        if ! helm dependency build "$chart" > /dev/null 2>&1; then
-            echo "  ❌ Failed to build dependencies for zen-suite"
-            FAILED=$((FAILED + 1))
-            continue
-        fi
-    fi
     
     if helm lint "$chart"; then
         echo "✅ Lint passed for $chart"
