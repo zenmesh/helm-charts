@@ -1,5 +1,7 @@
 # Production-Recommended Values for zen-watcher
 # 
+# ⭐ RECOMMENDED: If you don't know what to choose, use this. This is what we run.
+#
 # This file provides recommended production settings for zen-watcher.
 # These values prioritize stability, security, and observability.
 #

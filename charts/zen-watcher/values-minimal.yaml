@@ -1,5 +1,7 @@
 # Minimal Values for zen-watcher (Laptop/Development Cluster)
 #
+# ⭐ MINIMAL: For local development, laptop clusters, and resource-constrained environments.
+#
 # This file provides minimal resource settings for local development,
 # laptop clusters (k3d, kind, minikube), and resource-constrained environments.
 #
