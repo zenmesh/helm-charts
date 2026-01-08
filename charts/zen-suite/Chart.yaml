@@ -63,7 +63,7 @@ dependencies:
     repository: "file://../zen-gc"
     condition: zenGc.enabled
   - name: zen-watcher
-    version: "1.0.3"
+    version: "1.2.2"
     repository: "file://../zen-watcher"
     condition: zenWatcher.enabled
   - name: zen-lead

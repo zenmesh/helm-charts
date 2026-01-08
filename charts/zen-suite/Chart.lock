@@ -10,9 +10,9 @@ dependencies:
   version: 0.0.2-alpha
 - name: zen-watcher
   repository: file://../zen-watcher
-  version: 1.0.3
+  version: 1.2.2
 - name: zen-lead
   repository: file://../zen-lead
   version: 0.0.2-alpha
-digest: sha256:b0e2a292d16b0f2706d7323457ad4543c8ffba4fd437a3ad78216a7106feca2d
-generated: "2026-01-08T06:41:25.29119813-05:00"
+digest: sha256:e94d34c67c787f5fbce1a1d2c464dbe384c291f2fecf83e338ec3c0b1aeba819
+generated: "2026-01-08T06:45:27.491670448-05:00"
