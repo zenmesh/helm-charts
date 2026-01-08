@@ -34,6 +34,18 @@ rules:
   - apiGroups: ["coordination.k8s.io"]
     resources: ["leases"]
     verbs: ["get", "list", "watch", "create", "update", "patch"]
+  # Trivy VulnerabilityReports (and other security scanners) - namespace-scoped
+  - apiGroups: ["aquasecurity.github.io"]
+    resources: ["vulnerabilityreports", "exposurereports", "configauditreports", "clusterconfigauditreports"]
+    verbs: ["get", "list", "watch"]
+  # Kyverno PolicyReports - namespace-scoped
+  - apiGroups: ["wgpolicyk8s.io"]
+    resources: ["policyreports", "clusterpolicyreports"]
+    verbs: ["get", "list", "watch"]
+  # Cert-Manager resources - namespace-scoped
+  - apiGroups: ["cert-manager.io"]
+    resources: ["certificates", "certificaterequests", "challenges", "orders"]
+    verbs: ["get", "list", "watch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -87,6 +99,18 @@ rules:
   - apiGroups: ["coordination.k8s.io"]
     resources: ["leases"]
     verbs: ["get", "list", "watch", "create", "update", "patch"]
+  # Trivy VulnerabilityReports (and other security scanners) - cluster-wide
+  - apiGroups: ["aquasecurity.github.io"]
+    resources: ["vulnerabilityreports", "exposurereports", "configauditreports", "clusterconfigauditreports"]
+    verbs: ["get", "list", "watch"]
+  # Kyverno PolicyReports - cluster-wide
+  - apiGroups: ["wgpolicyk8s.io"]
+    resources: ["policyreports", "clusterpolicyreports"]
+    verbs: ["get", "list", "watch"]
+  # Cert-Manager resources - cluster-wide
+  - apiGroups: ["cert-manager.io"]
+    resources: ["certificates", "certificaterequests", "challenges", "orders"]
+    verbs: ["get", "list", "watch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
