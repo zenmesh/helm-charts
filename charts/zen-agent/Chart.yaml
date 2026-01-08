@@ -1,0 +1,51 @@
+# Copyright 2025 Kube-ZEN Contributors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: v2
+name: zen-agent
+description: A Helm chart for zen-agent - Kube-ZEN Cluster Agent
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+
+keywords:
+  - kubernetes
+  - kube-zen
+  - agent
+  - cluster
+  - saas
+
+home: https://github.com/kube-zen/zen-platform
+sources:
+  - https://github.com/kube-zen/zen-platform
+
+maintainers:
+  - name: Kube-ZEN Team
+    email: team@kube-zen.io
+
+annotations:
+  category: Management
+  artifacthub.io/changes: |
+    - Kube-ZEN Cluster Agent for SaaS connectivity
+    - Bootstrap token support for cluster enrollment
+    - Secret management for cluster credentials
+  artifacthub.io/links: |
+    - name: Documentation
+      url: https://github.com/kube-zen/zen-platform
+  artifacthub.io/images: |
+    - name: zen-agent
+      image: kubezen/zen-agent:0.1.0
+  artifacthub.io/imagesWhitelist: |
+    - kubezen/zen-agent
+
