@@ -9,7 +9,7 @@
 |-------|--------------|-------------|-------------------|-------------|-------|
 | zen-flow | 0.0.2-alpha | 0.0.1-alpha | v0.0.1-alpha | v0.1.0-alpha | Schema added in 0.0.2-alpha |
 | zen-gc | 0.0.2-alpha | 0.0.1-alpha | v0.0.1-alpha | v0.1.1-alpha | Schema added in 0.0.2-alpha; GC primitives migrated (H115) |
-| zen-watcher | 1.2.1 | 1.2.1 | v1.2.1 | v0.2.9-alpha | Version aligned (G010) - git tag v1.2.1 ↔ image 1.2.1 ↔ chart 1.2.1 ↔ app 1.2.1 |
+| zen-watcher | 1.0.3 | 1.0.3 | v1.0.3 | v0.2.9-alpha | Version aligned (G010) - git tag v1.0.3 ↔ image 1.0.3 ↔ chart 1.0.3 ↔ app 1.0.3 |
 | zen-lock | 0.0.2-alpha | 0.0.1-alpha | v0.0.1-alpha | v0.1.0-alpha | Schema added in 0.0.2-alpha |
 | zen-lead | 0.1.0 | 0.1.0 | v0.1.0 | N/A | Network-only (Profile A) |
 
