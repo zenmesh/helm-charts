@@ -114,29 +114,29 @@ spec:
             failureThreshold: 3
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- if or .Values.tls.caCertConfigMap.enabled .Values.tls.caCertSecret.enabled }}
+          {{- if or (and .Values.tls .Values.tls.caCertConfigMap .Values.tls.caCertConfigMap.enabled) (and .Values.tls .Values.tls.caCertSecret .Values.tls.caCertSecret.enabled) }}
           volumeMounts:
-            {{- if .Values.tls.caCertConfigMap.enabled }}
+            {{- if and .Values.tls .Values.tls.caCertConfigMap .Values.tls.caCertConfigMap.enabled }}
             - name: ca-cert
               mountPath: {{ .Values.tls.caCertConfigMap.mountPath }}
-              subPath: {{ .Values.tls.caCertConfigMap.key }}
+              subPath: {{ .Values.tls.caCertConfigMap.key | default "ca.crt" }}
               readOnly: true
             {{- end }}
-            {{- if .Values.tls.caCertSecret.enabled }}
+            {{- if and .Values.tls .Values.tls.caCertSecret .Values.tls.caCertSecret.enabled }}
             - name: ca-cert
               mountPath: {{ .Values.tls.caCertSecret.mountPath }}
-              subPath: {{ .Values.tls.caCertSecret.key }}
+              subPath: {{ .Values.tls.caCertSecret.key | default "ca.crt" }}
               readOnly: true
             {{- end }}
           {{- end }}
-      {{- if or .Values.tls.caCertConfigMap.enabled .Values.tls.caCertSecret.enabled }}
+      {{- if or (and .Values.tls .Values.tls.caCertConfigMap .Values.tls.caCertConfigMap.enabled) (and .Values.tls .Values.tls.caCertSecret .Values.tls.caCertSecret.enabled) }}
       volumes:
-        {{- if .Values.tls.caCertConfigMap.enabled }}
+        {{- if and .Values.tls .Values.tls.caCertConfigMap .Values.tls.caCertConfigMap.enabled }}
         - name: ca-cert
           configMap:
             name: {{ .Values.tls.caCertConfigMap.name }}
         {{- end }}
-        {{- if .Values.tls.caCertSecret.enabled }}
+        {{- if and .Values.tls .Values.tls.caCertSecret .Values.tls.caCertSecret.enabled }}
         - name: ca-cert
           secret:
             secretName: {{ .Values.tls.caCertSecret.name }}
