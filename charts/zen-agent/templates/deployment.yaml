@@ -83,6 +83,16 @@ spec:
             - name: SHUTDOWN_TIMEOUT
               value: {{ .Values.server.shutdownTimeout | quote }}
             {{- end }}
+            {{- if .Values.tls.caCertFile }}
+            - name: TLS_CA_CERT_FILE
+              value: {{ .Values.tls.caCertFile | quote }}
+            {{- else if .Values.tls.caCertConfigMap.enabled }}
+            - name: TLS_CA_CERT_FILE
+              value: {{ .Values.tls.caCertConfigMap.mountPath | quote }}
+            {{- else if .Values.tls.caCertSecret.enabled }}
+            - name: TLS_CA_CERT_FILE
+              value: {{ .Values.tls.caCertSecret.mountPath | quote }}
+            {{- end }}
             {{- with .Values.extraEnv }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -104,6 +114,34 @@ spec:
             failureThreshold: 3
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          {{- if or .Values.tls.caCertConfigMap.enabled .Values.tls.caCertSecret.enabled }}
+          volumeMounts:
+            {{- if .Values.tls.caCertConfigMap.enabled }}
+            - name: ca-cert
+              mountPath: {{ .Values.tls.caCertConfigMap.mountPath }}
+              subPath: {{ .Values.tls.caCertConfigMap.key }}
+              readOnly: true
+            {{- end }}
+            {{- if .Values.tls.caCertSecret.enabled }}
+            - name: ca-cert
+              mountPath: {{ .Values.tls.caCertSecret.mountPath }}
+              subPath: {{ .Values.tls.caCertSecret.key }}
+              readOnly: true
+            {{- end }}
+          {{- end }}
+      {{- if or .Values.tls.caCertConfigMap.enabled .Values.tls.caCertSecret.enabled }}
+      volumes:
+        {{- if .Values.tls.caCertConfigMap.enabled }}
+        - name: ca-cert
+          configMap:
+            name: {{ .Values.tls.caCertConfigMap.name }}
+        {{- end }}
+        {{- if .Values.tls.caCertSecret.enabled }}
+        - name: ca-cert
+          secret:
+            secretName: {{ .Values.tls.caCertSecret.name }}
+        {{- end }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
