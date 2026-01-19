@@ -1,0 +1,24 @@
+apiVersion: v2
+name: zen-observability
+description: Zen Platform Observability Stack (VictoriaMetrics + Grafana)
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - monitoring
+  - observability
+  - victoriametrics
+  - grafana
+  - prometheus
+maintainers:
+  - name: Zen Platform Team
+dependencies:
+  - name: victoria-metrics-k8s-stack
+    version: 0.19.0
+    repository: https://victoriametrics.github.io/helm-charts/
+    condition: victoriametrics.enabled
+    alias: vm-stack
+  - name: grafana
+    version: 7.0.0
+    repository: https://grafana.github.io/helm-charts
+    condition: grafana.enabled

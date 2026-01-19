@@ -1,0 +1,23 @@
+{{- if .Values.serviceMonitors.enabled }}
+{{- $namespace := include "zen-observability.namespace" . }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "zen-observability.fullname" . }}-discovery
+  namespace: {{ $namespace }}
+  labels:
+    {{- include "zen-observability.labels" . | nindent 4 }}
+    {{- with .Values.serviceMonitors.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      # Services should have these labels to be discovered
+      monitoring: enabled
+  endpoints:
+    - port: metrics
+      interval: 30s
+      path: /metrics
+      scrapeTimeout: 10s
+{{- end }}
