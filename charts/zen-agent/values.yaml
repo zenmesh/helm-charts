@@ -112,12 +112,18 @@ tls:
   # Example: /etc/ssl/certs/ca-certificates.crt or /usr/local/share/ca-certificates/mkcert-root-ca.pem
   # For production, use proper CA certificates in system certificate store
   caCertFile: ""
+  # Base64-encoded CA certificate (alternative to file path)
+  # Frontend can generate this and pass via helm --set tls.caCertBase64="..."
+  # Chart will create ConfigMap from base64 automatically
+  caCertBase64: ""
   # Mount a ConfigMap containing CA certificate
   caCertConfigMap:
     enabled: false
     name: ""
     key: "ca.crt"
     mountPath: "/etc/ssl/certs/custom-ca.crt"
+    # If caCertBase64 is set, this ConfigMap will be auto-created from base64
+    # If enabled=true and name is set, use existing ConfigMap
   # Mount a Secret containing CA certificate
   caCertSecret:
     enabled: false

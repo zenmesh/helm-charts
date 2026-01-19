@@ -1,0 +1,14 @@
+{{- if and .Values.tls.caCertBase64 (not (and .Values.tls.caCertConfigMap.enabled .Values.tls.caCertConfigMap.name)) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "zen-agent.fullname" . }}-ca-cert
+  namespace: {{ include "zen-agent.namespace" . }}
+  labels:
+    {{- include "zen-agent.labels" . | nindent 4 }}
+    app.kubernetes.io/component: ca-certificate
+data:
+  {{ .Values.tls.caCertConfigMap.key | default "ca.crt" }}: |
+{{ .Values.tls.caCertBase64 | b64dec | indent 4 }}
+{{- end }}
+
