@@ -86,7 +86,7 @@ spec:
             {{- if .Values.tls.caCertFile }}
             - name: TLS_CA_CERT_FILE
               value: {{ .Values.tls.caCertFile | quote }}
-            {{- else if or .Values.tls.caCertBase64 (and .Values.tls.caCertConfigMap.enabled .Values.tls.caCertConfigMap.name) }}
+            {{- else if .Values.tls.caCertConfigMap.enabled }}
             - name: TLS_CA_CERT_FILE
               value: {{ .Values.tls.caCertConfigMap.mountPath | quote }}
             {{- else if .Values.tls.caCertSecret.enabled }}
@@ -114,9 +114,9 @@ spec:
             failureThreshold: 3
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- if or .Values.tls.caCertBase64 (and .Values.tls .Values.tls.caCertConfigMap .Values.tls.caCertConfigMap.enabled) (and .Values.tls .Values.tls.caCertSecret .Values.tls.caCertSecret.enabled) }}
+          {{- if or (and .Values.tls .Values.tls.caCertConfigMap .Values.tls.caCertConfigMap.enabled) (and .Values.tls .Values.tls.caCertSecret .Values.tls.caCertSecret.enabled) }}
           volumeMounts:
-            {{- if or .Values.tls.caCertBase64 (and .Values.tls .Values.tls.caCertConfigMap .Values.tls.caCertConfigMap.enabled) }}
+            {{- if and .Values.tls .Values.tls.caCertConfigMap .Values.tls.caCertConfigMap.enabled }}
             - name: ca-cert
               mountPath: {{ .Values.tls.caCertConfigMap.mountPath }}
               subPath: {{ .Values.tls.caCertConfigMap.key | default "ca.crt" }}
@@ -129,12 +129,12 @@ spec:
               readOnly: true
             {{- end }}
           {{- end }}
-      {{- if or .Values.tls.caCertBase64 (and .Values.tls .Values.tls.caCertConfigMap .Values.tls.caCertConfigMap.enabled) (and .Values.tls .Values.tls.caCertSecret .Values.tls.caCertSecret.enabled) }}
+      {{- if or (and .Values.tls .Values.tls.caCertConfigMap .Values.tls.caCertConfigMap.enabled) (and .Values.tls .Values.tls.caCertSecret .Values.tls.caCertSecret.enabled) }}
       volumes:
-        {{- if or .Values.tls.caCertBase64 (and .Values.tls .Values.tls.caCertConfigMap .Values.tls.caCertConfigMap.enabled) }}
+        {{- if and .Values.tls .Values.tls.caCertConfigMap .Values.tls.caCertConfigMap.enabled }}
         - name: ca-cert
           configMap:
-            name: {{ if .Values.tls.caCertBase64 }}{{ include "zen-agent.fullname" . }}-ca-cert{{ else }}{{ .Values.tls.caCertConfigMap.name }}{{ end }}
+            name: {{ .Values.tls.caCertConfigMap.name }}
         {{- end }}
         {{- if and .Values.tls .Values.tls.caCertSecret .Values.tls.caCertSecret.enabled }}
         - name: ca-cert
