@@ -23,8 +23,8 @@ spec:
             severity: critical
             component: availability
           annotations:
-            summary: "Platform service {{ $labels.job }} is down"
-            description: "Service {{ $labels.job }} has been down for more than 5 minutes."
+            summary: "Platform service {{`{{ $labels.job }}`}} is down"
+            description: "Service {{`{{ $labels.job }}`}} has been down for more than 5 minutes."
         
         - alert: PlatformServiceUnhealthy
           expr: |
@@ -38,8 +38,8 @@ spec:
             severity: warning
             component: availability
           annotations:
-            summary: "Platform service {{ $labels.job }} is unhealthy"
-            description: "Service {{ $labels.job }} is running but health checks are failing."
+            summary: "Platform service {{`{{ $labels.job }}`}} is unhealthy"
+            description: "Service {{`{{ $labels.job }}`}} is running but health checks are failing."
 
     # HTTP Service Metrics
     - name: http_services
@@ -57,8 +57,8 @@ spec:
             severity: warning
             component: http
           annotations:
-            summary: "High HTTP error rate for {{ $labels.component }}"
-            description: "Error rate is {{ $value | humanizePercentage }} for endpoint {{ $labels.endpoint }}"
+            summary: "High HTTP error rate for {{`{{ $labels.component }}`}}"
+            description: "Error rate is {{`{{ $value | humanizePercentage }}`}} for endpoint {{`{{ $labels.endpoint }}`}}"
         
         - alert: CriticalHTTPErrorRate
           expr: |
@@ -72,8 +72,8 @@ spec:
             severity: critical
             component: http
           annotations:
-            summary: "Critical HTTP error rate for {{ $labels.component }}"
-            description: "Error rate is {{ $value | humanizePercentage }} for endpoint {{ $labels.endpoint }}"
+            summary: "Critical HTTP error rate for {{`{{ $labels.component }}`}}"
+            description: "Error rate is {{`{{ $value | humanizePercentage }}`}} for endpoint {{`{{ $labels.endpoint }}`}}"
         
         - alert: HighHTTPLatency
           expr: |
@@ -85,8 +85,8 @@ spec:
             severity: warning
             component: http
           annotations:
-            summary: "High HTTP latency for {{ $labels.component }}"
-            description: "P95 latency is {{ $value }}s for endpoint {{ $labels.endpoint }}"
+            summary: "High HTTP latency for {{`{{ $labels.component }}`}}"
+            description: "P95 latency is {{`{{ $value }}`}}s for endpoint {{`{{ $labels.endpoint }}`}}"
 
     # Controller Reconciliation Metrics
     - name: controller_reconciliation
@@ -104,8 +104,8 @@ spec:
             severity: warning
             component: controller
           annotations:
-            summary: "High reconciliation error rate for {{ $labels.component }}"
-            description: "Error rate is {{ $value | humanizePercentage }}"
+            summary: "High reconciliation error rate for {{`{{ $labels.component }}`}}"
+            description: "Error rate is {{`{{ $value | humanizePercentage }}`}}"
         
         - alert: SlowReconciliation
           expr: |
@@ -117,8 +117,8 @@ spec:
             severity: warning
             component: controller
           annotations:
-            summary: "Slow reconciliation for {{ $labels.component }}"
-            description: "P95 reconciliation duration is {{ $value }}s"
+            summary: "Slow reconciliation for {{`{{ $labels.component }}`}}"
+            description: "P95 reconciliation duration is {{`{{ $value }}`}}s"
 
     # Path/Delivery Flow Metrics
     - name: delivery_flows
@@ -136,8 +136,8 @@ spec:
             severity: warning
             component: delivery_flow
           annotations:
-            summary: "High delivery failure rate for flow {{ $labels.flow_name }}"
-            description: "Failure rate is {{ $value | humanizePercentage }} for tenant {{ $labels.tenant_id }}"
+            summary: "High delivery failure rate for flow {{`{{ $labels.flow_name }}`}}"
+            description: "Failure rate is {{`{{ $value | humanizePercentage }}`}} for tenant {{`{{ $labels.tenant_id }}`}}"
         
         - alert: DeliveryFlowLatencyHigh
           expr: |
@@ -149,8 +149,8 @@ spec:
             severity: warning
             component: delivery_flow
           annotations:
-            summary: "High delivery latency for flow {{ $labels.flow_name }}"
-            description: "P95 latency is {{ $value }}s"
+            summary: "High delivery latency for flow {{`{{ $labels.flow_name }}`}}"
+            description: "P95 latency is {{`{{ $value }}`}}s"
 
     # Ingester Metrics
     - name: ingesters
@@ -163,7 +163,7 @@ spec:
             severity: critical
             component: ingester
           annotations:
-            summary: "Ingester {{ $labels.name }} is down"
+            summary: "Ingester {{`{{ $labels.name }}`}} is down"
             description: "Ingester has been down for more than 5 minutes"
         
         - alert: IngesterHighErrorRate
@@ -174,8 +174,8 @@ spec:
             severity: warning
             component: ingester
           annotations:
-            summary: "High error rate for ingester {{ $labels.ingester_name }}"
-            description: "Error rate is {{ $value }} errors/sec"
+            summary: "High error rate for ingester {{`{{ $labels.ingester_name }}`}}"
+            description: "Error rate is {{`{{ $value }}`}} errors/sec"
 
     # Database Metrics
     - name: database
@@ -192,7 +192,7 @@ spec:
             component: database
           annotations:
             summary: "Slow database queries detected"
-            description: "P95 query latency is {{ $value }}s for operation {{ $labels.operation }}"
+            description: "P95 query latency is {{`{{ $value }}`}}s for operation {{`{{ $labels.operation }}`}}"
         
         - alert: DatabaseConnectionPoolExhausted
           expr: |
@@ -203,7 +203,7 @@ spec:
             component: database
           annotations:
             summary: "Database connection pool nearly exhausted"
-            description: "Pool usage is {{ $value | humanizePercentage }}"
+            description: "Pool usage is {{`{{ $value | humanizePercentage }}`}}"
 
     # Resource Usage
     - name: resource_usage
@@ -217,8 +217,8 @@ spec:
             severity: warning
             component: resources
           annotations:
-            summary: "High memory usage for {{ $labels.pod }}"
-            description: "Memory usage is {{ $value | humanizePercentage }}"
+            summary: "High memory usage for {{`{{ $labels.pod }}`}}"
+            description: "Memory usage is {{`{{ $value | humanizePercentage }}`}}"
         
         - alert: HighCPUUsage
           expr: |
@@ -228,8 +228,8 @@ spec:
             severity: warning
             component: resources
           annotations:
-            summary: "High CPU usage for {{ $labels.pod }}"
-            description: "CPU usage is {{ $value | humanizePercentage }}"
+            summary: "High CPU usage for {{`{{ $labels.pod }}`}}"
+            description: "CPU usage is {{`{{ $value | humanizePercentage }}`}}"
 
     # VictoriaMetrics Self-Monitoring
     - name: victoriametrics
@@ -254,7 +254,7 @@ spec:
             component: observability
           annotations:
             summary: "High metrics ingestion rate"
-            description: "Ingestion rate is {{ $value }} rows/sec"
+            description: "Ingestion rate is {{`{{ $value }}`}} rows/sec"
         
         - alert: VictoriaMetricsHighMemoryUsage
           expr: |
@@ -265,5 +265,5 @@ spec:
             component: observability
           annotations:
             summary: "High VictoriaMetrics memory usage"
-            description: "Memory usage is {{ $value | humanizePercentage }}"
+            description: "Memory usage is {{`{{ $value | humanizePercentage }}`}}"
 {{- end }}
