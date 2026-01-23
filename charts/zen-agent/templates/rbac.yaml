@@ -1,5 +1,12 @@
 {{- if .Values.rbac.create }}
 ---
+# Namespace-scoped Role for zen-agent
+# Note: This Role is namespace-scoped (least-privilege). If cluster-wide observation
+# is required, consider:
+# 1. Using ClusterRole with resource/namespace scoping per tenant
+# 2. Limiting to specific resource types needed for observation
+# 3. Using namespace selectors to restrict scope
+# See: helm-charts/docs/SECURITY_POSTURE.md for production RBAC recommendations
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -8,7 +15,7 @@ metadata:
   labels:
     {{- include "zen-agent.labels" . | nindent 4 }}
 rules:
-  # Read/write access to Secrets in namespace (for storing cluster credentials)
+  # Read/write access to Secrets in namespace (for storing cluster credentials after bootstrap)
   - apiGroups: [""]
     resources: ["secrets"]
     verbs: ["get", "list", "watch", "create", "update", "patch"]
@@ -16,6 +23,10 @@ rules:
   - apiGroups: [""]
     resources: ["configmaps"]
     verbs: ["get", "list", "watch"]
+  # Events for observability (optional - for agent event recording)
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "patch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding

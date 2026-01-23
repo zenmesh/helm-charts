@@ -104,6 +104,47 @@ rbac:
   create: true
   # zen-agent needs permissions to manage secrets in its namespace
   # for storing cluster credentials after bootstrap
+  # Note: Current RBAC is namespace-scoped (Role). If cluster-wide observation
+  # is required, consider scoping to specific namespaces/resources per tenant
+  # for production deployments (least-privilege principle).
+
+# Pod Disruption Budget (HA protection)
+pdb:
+  enabled: true
+  # Minimum number of pods that must be available during disruptions
+  # For single replica: set to 0 or use maxUnavailable: 1
+  # For multi-replica: set minAvailable (e.g., 1) or maxUnavailable (e.g., 1)
+  minAvailable: 0
+  # Maximum number of pods that can be unavailable during disruptions
+  # Alternative to minAvailable (use one or the other, not both)
+  # maxUnavailable: 1
+
+# Network Policy (security isolation)
+networkPolicy:
+  enabled: false  # Set to true to enable network isolation
+  egress:
+    # Allow DNS queries (required for name resolution)
+    allowDNS: true
+    # Allow Kubernetes API access (required for informers, CRD operations, secret management)
+    allowKubernetesAPI: true
+    # Kubernetes API service IP (for on-prem clusters)
+    # Example: "10.96.0.1/32" (get via: kubectl get svc kubernetes -o jsonpath='{.spec.clusterIP}')
+    kubernetesServiceIP: ""
+    # Kubernetes API server CIDR blocks (for managed control planes: EKS/GKE/AKS)
+    # Example for EKS: ["172.20.0.0/16"]
+    # Example for GKE: ["10.0.0.0/8"]
+    # Example for AKS: ["10.0.0.0/8"]
+    kubernetesAPICIDRs: []
+    # Additional egress rules (optional)
+    # Example:
+    # to:
+    #   - namespaceSelector:
+    #       matchLabels:
+    #         name: monitoring
+    #     ports:
+    #       - protocol: TCP
+    #         port: 9090
+    to: []
 
 # TLS Configuration
 tls:

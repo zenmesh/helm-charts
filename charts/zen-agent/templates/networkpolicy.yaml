@@ -1,0 +1,83 @@
+{{- if .Values.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "zen-agent.fullname" . }}
+  namespace: {{ include "zen-agent.namespace" . }}
+  labels:
+    {{- include "zen-agent.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "zen-agent.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Egress
+  # No ingress - agent initiates all connections
+  egress:
+    {{- if .Values.networkPolicy.egress.allowDNS }}
+    # Allow DNS queries (required for name resolution)
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: UDP
+          port: 53
+    {{- end }}
+    {{- if .Values.networkPolicy.egress.allowKubernetesAPI }}
+    {{- $hasServiceIP := and .Values.networkPolicy.egress.kubernetesServiceIP (ne .Values.networkPolicy.egress.kubernetesServiceIP "") }}
+    {{- $hasCIDRs := and .Values.networkPolicy.egress.kubernetesAPICIDRs (gt (len .Values.networkPolicy.egress.kubernetesAPICIDRs) 0) }}
+    {{- if not (or $hasServiceIP $hasCIDRs) }}
+    {{- fail "NetworkPolicy egress.allowKubernetesAPI=true requires at least one of: egress.kubernetesServiceIP or egress.kubernetesAPICIDRs. Set kubernetesServiceIP (for on-prem) or kubernetesAPICIDRs (for managed control planes like EKS/GKE/AKS)." }}
+    {{- end }}
+    # Allow Kubernetes API access (required for informers, CRD operations, and secret management)
+    {{- if $hasServiceIP }}
+    # Kubernetes API service IP (on-prem clusters)
+    - to:
+        - ipBlock:
+            cidr: {{ .Values.networkPolicy.egress.kubernetesServiceIP }}
+      ports:
+        - protocol: TCP
+          port: 443
+    {{- end }}
+    {{- if $hasCIDRs }}
+    # Kubernetes API server CIDR blocks (managed control planes: EKS/GKE/AKS)
+    {{- range .Values.networkPolicy.egress.kubernetesAPICIDRs }}
+    - to:
+        - ipBlock:
+            cidr: {{ . }}
+      ports:
+        - protocol: TCP
+          port: 443
+    {{- end }}
+    {{- end }}
+    {{- end }}
+    # Allow egress to SaaS API (HTTPS only)
+    {{- if .Values.saas.endpoint }}
+    {{- $saasHost := regexReplaceAll "^https?://" .Values.saas.endpoint "" | regexReplaceAll "/.*$" "" }}
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 443
+    {{- end }}
+    {{- range .Values.networkPolicy.egress.to }}
+    # Additional egress rules
+    - to:
+        {{- if .namespaceSelector }}
+        - namespaceSelector:
+            {{- toYaml .namespaceSelector | nindent 12 }}
+        {{- end }}
+        {{- if .podSelector }}
+        - podSelector:
+            {{- toYaml .podSelector | nindent 12 }}
+        {{- end }}
+        {{- if .ipBlock }}
+        - ipBlock:
+            {{- toYaml .ipBlock | nindent 12 }}
+        {{- end }}
+      ports:
+        {{- range .ports }}
+        - protocol: {{ .protocol | default "TCP" }}
+          port: {{ .port }}
+        {{- end }}
+    {{- end }}
+{{- end }}
