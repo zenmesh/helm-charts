@@ -113,16 +113,21 @@ serviceAccount:
     # Example for IRSA (AWS):
     # eks.amazonaws.com/role-arn: arn:aws:iam::ACCOUNT:role/zen-watcher-role
 
-# Security Context: Run as non-root (if image supports it)
-securityContext:
+# Security Context: Restricted Pod Security Standard
+# Matches zen-agent hardening for consistent security posture
+podSecurityContext:
   runAsNonRoot: true
   runAsUser: 65534  # nobody
   fsGroup: 65534
+  seccompProfile:
+    type: RuntimeDefault
 
-podSecurityContext:
-  runAsNonRoot: true
-  runAsUser: 65534
-  fsGroup: 65534
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
 
 # Node Selector: Optional (pin to specific nodes)
 nodeSelector: {}

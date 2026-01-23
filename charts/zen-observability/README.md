@@ -188,7 +188,6 @@ All Zen Platform services expose Prometheus-compatible metrics:
 |---------|------|----------|
 | zen-back | 8080 | /metrics |
 | zen-bff | 8080 | /metrics |
-| zen-websocket | 9090 | /metrics |
 | zen-watcher | 8080 | /metrics |
 | zen-flow | 8080 | /metrics |
 | zen-gc | 8080 | /metrics |

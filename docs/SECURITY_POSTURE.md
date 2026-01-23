@@ -24,7 +24,7 @@
 - ⚠️  zen-agent NetworkPolicy missing (RM-HELM-001)
 - ⚠️  zen-agent RBAC too broad for production
 - ⚠️  No PodDisruptionBudget (HA consideration)
-- ⚠️  zen-watcher PodSecurity needs hardening
+- ✅ zen-watcher PodSecurity hardened (Restricted profile)
 
 ### Assumptions (Relies on Cluster Policies)
 
@@ -186,10 +186,10 @@ tls:
 ### Medium Priority
 
 - **zen-watcher PodSecurity:** Match zen-agent hardening
-  - **Status:** Partial (restricted profile planned)
+  - **Status:** ✅ Completed (2026-01-23)
   - **Roadmap:** RM-HELM-002 (Watcher CRD sync automation)
-  - **Impact:** Inconsistent security posture between agent/watcher
-  - **Required:** Apply same PodSecurity standards as zen-agent
+  - **Impact:** Consistent Restricted profile security posture between agent/watcher
+  - **Completed:** values-production.yaml updated with full Restricted profile settings (allowPrivilegeEscalation: false, capabilities.drop: ALL, readOnlyRootFilesystem: true, seccompProfile: RuntimeDefault)
 
 - **Service mesh integration:** Istio/Linkerd compatibility (future)
   - **Status:** Not planned

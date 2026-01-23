@@ -50,7 +50,6 @@ All Zen Platform services expose Prometheus-compatible metrics:
 |---------|------|----------|-----------|
 | zen-back | 8080 | /metrics | Backend API |
 | zen-bff | 8080 | /metrics | BFF API |
-| zen-websocket | 9090 | /metrics | WebSocket service |
 | zen-watcher | 8080 | /metrics | Watcher controller |
 | zen-flow | 8080 | /metrics | Flow controller |
 | zen-gc | 8080 | /metrics | GC controller |
@@ -153,7 +152,7 @@ All Zen Platform services expose Prometheus-compatible metrics:
 - `PlatformServiceUnhealthy` - Service unhealthy (warning, 2m)
 
 **Coverage:**
-- All platform services (zen-back, zen-bff, zen-websocket, etc.)
+- All platform services (zen-back, zen-bff, etc.)
 
 #### 2. HTTP Services
 

@@ -17,7 +17,7 @@ spec:
       interval: 30s
       rules:
         - alert: PlatformServiceDown
-          expr: up{job=~"zen-(back|bff|websocket|watcher|flow|gc|lock|lead)"} == 0
+          expr: up{job=~"zen-(back|bff|watcher|flow|gc|lock|lead)"} == 0
           for: 5m
           labels:
             severity: critical
@@ -29,7 +29,7 @@ spec:
         - alert: PlatformServiceUnhealthy
           expr: |
             (
-              up{job=~"zen-(back|bff|websocket|watcher|flow|gc|lock|lead)"} == 1
+              up{job=~"zen-(back|bff|watcher|flow|gc|lock|lead)"} == 1
               and
               on(job) health_check_status{status="unhealthy"} == 1
             )
