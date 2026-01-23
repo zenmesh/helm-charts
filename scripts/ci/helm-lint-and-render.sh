@@ -150,7 +150,7 @@ for chart in "${CHARTS[@]}"; do
 done
 
 # Example values matrix (if enabled)
-if [ "$RUN_HELM_EXAMPLE_MATRIX" = "1" ]; then
+if [ "${RUN_HELM_EXAMPLE_MATRIX:-0}" = "1" ]; then
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo "Example Values Matrix Validation"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
