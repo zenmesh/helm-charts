@@ -22,8 +22,8 @@
 ### Known Gaps
 
 - ⚠️  zen-agent NetworkPolicy missing (RM-HELM-001)
-- ⚠️  zen-agent RBAC too broad for production
-- ⚠️  No PodDisruptionBudget (HA consideration)
+- ✅ zen-agent RBAC namespace-scoped (Role, not ClusterRole)
+- ✅ PodDisruptionBudget implemented (HA protection)
 - ✅ zen-watcher PodSecurity hardened (Restricted profile)
 
 ### Assumptions (Relies on Cluster Policies)
@@ -60,7 +60,7 @@ readOnlyRootFilesystem: true
 
 ### Network Policies
 
-**Status:** ⚠️  TODO (RM-HELM-001)
+**Status:** ✅ Implemented (RM-HELM-001)
 
 **Requirements:**
 - Egress to SaaS API (HTTPS)
@@ -68,20 +68,20 @@ readOnlyRootFilesystem: true
 - No ingress (agent initiates all connections)
 - DNS egress for name resolution
 
-**Planned:** NetworkPolicy template in chart
+**Current:** NetworkPolicy template available in chart with configurable egress rules
 
 ### RBAC
 
 **ServiceAccount:** `zen-agent` (auto-created)
 
-**ClusterRole Permissions:**
-- `get`, `list`, `watch`: All resources (observation)
-- `create`, `update`, `patch`, `delete`: ZenAgentRemediation CRDs
-- `patch`: NetworkPolicy, RoleBinding (SSA remediations)
+**Role Permissions (Namespace-Scoped):**
+- `get`, `list`, `watch`, `create`, `update`, `patch`: Secrets (for storing cluster credentials)
+- `get`, `list`, `watch`: ConfigMaps (for configuration)
+- `create`, `patch`: Events (for observability)
 
-**Status:** ✅ Implemented with least-privilege principle
+**Status:** ✅ Implemented with namespace-scoped Role (least-privilege)
 
-**Gap:** Broader than ideal for production; should scope to specific namespaces/resources
+**Note:** Current implementation is namespace-scoped (Role), not cluster-scoped. This provides better isolation for multi-tenant deployments. For cluster-wide observation, consider deploying multiple agent instances per namespace/tenant.
 
 ### Secrets Management
 
