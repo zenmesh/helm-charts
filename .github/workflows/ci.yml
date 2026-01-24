@@ -36,7 +36,7 @@ jobs:
             chart_name=$(basename "$chart")
             echo "Linting $chart_name..."
             # Build dependencies for charts that have external dependencies
-            if [[ "$chart_name" == "zen-suite" ]] || [[ "$chart_name" == "zen-observability" ]]; then
+            if [[ "$chart_name" == "zen-suite" ]]; then
               helm dependency build "$chart" || {
                 echo "❌ Failed to build dependencies for $chart_name"
                 exit 1
@@ -74,7 +74,7 @@ jobs:
             chart_name=$(basename "$chart")
             echo "Validating $chart_name..."
             # Build dependencies for charts that have external dependencies
-            if [[ "$chart_name" == "zen-suite" ]] || [[ "$chart_name" == "zen-observability" ]]; then
+            if [[ "$chart_name" == "zen-suite" ]]; then
               helm dependency build "$chart" || {
                 echo "❌ Failed to build dependencies for $chart_name"
                 exit 1
@@ -112,7 +112,7 @@ jobs:
             chart_name=$(basename "$chart")
             echo "Testing $chart_name..."
             # Build dependencies for charts that have external dependencies
-            if [[ "$chart_name" == "zen-suite" ]] || [[ "$chart_name" == "zen-observability" ]]; then
+            if [[ "$chart_name" == "zen-suite" ]]; then
               helm dependency build "$chart" || {
                 echo "❌ Failed to build dependencies for $chart_name"
                 exit 1
