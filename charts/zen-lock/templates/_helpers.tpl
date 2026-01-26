@@ -155,11 +155,12 @@ Validate webhook TLS configuration (P0: fail fast on misconfiguration)
     {{- fail (printf "webhook.certManager.enabled=true but webhook.tls.mode=%q. Set webhook.tls.mode=cert-manager when using cert-manager" $tlsMode) }}
   {{- end }}
   {{- if eq $tlsMode "provided" }}
-    {{- if not .Values.webhook.tls.caBundle }}
-      {{- fail "webhook.tls.caBundle is required when webhook.tls.mode=provided. Provide the base64-encoded CA certificate that signed the webhook serving certificate" }}
-    {{- end }}
-    {{- if eq .Values.webhook.tls.caBundle "" }}
-      {{- fail "webhook.tls.caBundle cannot be empty when webhook.tls.mode=provided. Provide a non-empty base64-encoded CA certificate" }}
+    {{- if or (not .Values.webhook.tls.caBundle) (eq .Values.webhook.tls.caBundle "") }}
+      {{- if eq .Values.webhook.tls.caBundle "" }}
+        {{- fail "webhook.tls.caBundle cannot be empty when webhook.tls.mode=provided. Provide a non-empty base64-encoded CA certificate" }}
+      {{- else }}
+        {{- fail "webhook.tls.caBundle is required when webhook.tls.mode=provided. Provide the base64-encoded CA certificate that signed the webhook serving certificate" }}
+      {{- end }}
     {{- end }}
     {{- if not .Values.webhook.certSecret }}
       {{- fail "webhook.certSecret is required when webhook.tls.mode=provided. The secret must exist and contain tls.crt and tls.key" }}
