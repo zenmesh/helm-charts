@@ -158,6 +158,9 @@ Validate webhook TLS configuration (P0: fail fast on misconfiguration)
     {{- if not .Values.webhook.tls.caBundle }}
       {{- fail "webhook.tls.caBundle is required when webhook.tls.mode=provided. Provide the base64-encoded CA certificate that signed the webhook serving certificate" }}
     {{- end }}
+    {{- if eq .Values.webhook.tls.caBundle "" }}
+      {{- fail "webhook.tls.caBundle cannot be empty when webhook.tls.mode=provided. Provide a non-empty base64-encoded CA certificate" }}
+    {{- end }}
     {{- if not .Values.webhook.certSecret }}
       {{- fail "webhook.certSecret is required when webhook.tls.mode=provided. The secret must exist and contain tls.crt and tls.key" }}
     {{- end }}

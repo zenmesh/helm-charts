@@ -10,7 +10,7 @@
 | zen-flow | 0.0.2-alpha | 0.0.1-alpha | v0.0.1-alpha | v0.1.0-alpha | Schema added in 0.0.2-alpha |
 | zen-gc | 0.0.2-alpha | 0.0.1-alpha | v0.0.1-alpha | v0.1.1-alpha | Schema added in 0.0.2-alpha; GC primitives migrated (H115) |
 | zen-watcher | 1.0.3 | 1.0.3 | v1.0.3 | v0.2.9-alpha | Version aligned (G010) - git tag v1.0.3 ↔ image 1.0.3 ↔ chart 1.0.3 ↔ app 1.0.3 |
-| zen-lock | 0.0.2-alpha | 0.0.1-alpha | v0.0.1-alpha | v0.1.0-alpha | Schema added in 0.0.2-alpha |
+| zen-lock | 0.0.3-alpha | 0.0.2-alpha | v0.0.2-alpha | v0.1.0-alpha | P0 TLS security improvements (fail-fast validation, self-signed cert support) |
 | zen-lead | 0.1.0 | 0.1.0 | v0.1.0 | N/A | Network-only (Profile A) |
 
 ## Version Policy
@@ -84,8 +84,9 @@ helm list | grep zen-flow
 - **Latest**: `v1.2.1`
 
 ### zen-lock
+- **v0.0.2-alpha**: Security validation improvements, webhook TLS hardening
 - **v0.0.1-alpha**: Initial release
-- **Latest**: `v0.0.1-alpha`
+- **Latest**: `v0.0.2-alpha`
 
 ### zen-sdk
 - **v0.2.9-alpha**: RWMutex fix in deduplication (zen-watcher v1.2.1)

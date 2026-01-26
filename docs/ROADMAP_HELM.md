@@ -79,7 +79,7 @@ helm install zen-watcher charts/zen-watcher/ -f docs/examples/values-aws.yaml
 - mTLS: ✅ Enabled
 
 **Flow:**
-1. zen-gitops creates PR in customer repo
+1. GitOps creates PR in customer repo
 2. Customer reviews and merges
 3. FluxCD/ArgoCD syncs to cluster
 4. zen-watcher processes events via webhook
@@ -218,12 +218,12 @@ helm install zen-watcher charts/zen-watcher/ -f docs/examples/values-aws.yaml
 **Current Implementation (✅ DONE):**
 1. **SSA Immediate Execution:** Agent executes immediate remediations via Server-Side Apply
 2. **SSA Scheduled Execution:** Agent creates CRD with schedule, in-cluster scheduler executes at scheduled time (resilient to SaaS outage)
-3. **GitOps PR Immediate:** zen-gitops creates PR immediately, FluxCD/ArgoCD syncs to cluster
+3. **GitOps PR Immediate:** GitOps creates PR immediately, FluxCD/ArgoCD syncs to cluster
 4. **mTLS Optional:** Agent supports mTLS to SaaS (production-ready, not required)
 5. **Pod Security:** Restricted profile enforced (non-root, read-only rootfs, dropped capabilities)
 
 **Target Production (🔮 FUTURE):**
-1. **GitOps PR Scheduled:** zen-gitops creates PR at scheduled time (delayed PR creation) - Design described in [SECURITY_INCIDENT_FLOW_PRODUCTION.md](../../../zen-alpha/docs/01-architecture/SECURITY_INCIDENT_FLOW_PRODUCTION.md) (Phase 4D: Scheduled GitOps PR)
+1. **GitOps PR Scheduled:** GitOps creates PR at scheduled time (delayed PR creation) - Design described in [SECURITY_INCIDENT_FLOW_PRODUCTION.md](../../../zen-alpha/docs/01-architecture/SECURITY_INCIDENT_FLOW_PRODUCTION.md) (Phase 4D: Scheduled GitOps PR)
 2. **Agent HA:** Formal leader election for multi-replica agents (RM-AGENT-002) - Mitigates T1, T8 in [THREAT_MODEL_PRODUCTION.md](../../../zen-alpha/docs/09-security/THREAT_MODEL_PRODUCTION.md)
 3. **NetworkPolicy:** Agent egress policies enforced (RM-HELM-001) - Mitigates T1 (compromised agent)
 4. **RBAC Scoping:** Agent permissions scoped to specific resources/namespaces (RM-HELM-001) - Mitigates T1, T9
@@ -295,7 +295,7 @@ helm install zen-watcher charts/zen-watcher/ -f docs/examples/values-aws.yaml
 **Implementation Status:** Planned (not yet wired to /clusters/new)
 
 **Design:**
-- zen-gitops service manages Git repos
+- GitOps service manages Git repos
 - Remediation execution_mode=gitops creates commits
 - FluxCD/ArgoCD syncs changes to clusters
 - Agent validates via webhook or polling
