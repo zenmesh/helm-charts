@@ -1,0 +1,116 @@
+# Copyright 2025 Kube-ZEN Contributors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{- if and .Values.webhook.enabled (eq (include "zen-lock.webhookTLSMode" .) "self-signed") }}
+---
+# P1.4: Self-signed certificate generation Job
+# This Job generates a CA and serving certificate, creates the TLS secret,
+# and patches the MutatingWebhookConfiguration with the CA bundle.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "zen-lock.fullname" . }}-webhook-cert-setup
+  namespace: {{ include "zen-lock.namespace" . }}
+  labels:
+    {{- include "zen-lock.labels" . | nindent 4 }}
+    app.kubernetes.io/component: webhook-cert-setup
+  annotations:
+    # Helm hooks: run after install/upgrade, before webhook deployment
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    metadata:
+      labels:
+        {{- include "zen-lock.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: webhook-cert-setup
+    spec:
+      serviceAccountName: {{ include "zen-lock.webhookServiceAccountName" . }}
+      restartPolicy: OnFailure
+      containers:
+        - name: cert-setup
+          # Use image with both kubectl and openssl
+          image: alpine/k8s:1.28.0
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            runAsNonRoot: true
+            runAsUser: 65534
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -euo pipefail
+              
+              # Service DNS names for the certificate
+              SERVICE_NAME="{{ include "zen-lock.fullname" . }}-webhook"
+              NAMESPACE="{{ include "zen-lock.namespace" . }}"
+              SECRET_NAME="{{ .Values.webhook.certSecret }}"
+              WEBHOOK_NAME="{{ include "zen-lock.fullname" . }}-mutating-webhook"
+              
+              DNS_NAMES="${SERVICE_NAME}.${NAMESPACE}.svc,${SERVICE_NAME}.${NAMESPACE}.svc.cluster.local"
+              
+              # Generate CA private key
+              openssl genrsa -out ca.key 4096
+              
+              # Generate CA certificate (10 years validity)
+              openssl req -new -x509 -days 3650 -key ca.key -out ca.crt \
+                -subj "/CN=zen-lock-webhook-ca"
+              
+              # Generate serving certificate private key (ECDSA P-256 for better security)
+              openssl ecparam -genkey -name prime256v1 -out server.key
+              
+              # Generate serving certificate signing request
+              openssl req -new -key server.key -out server.csr \
+                -subj "/CN=${SERVICE_NAME}.${NAMESPACE}.svc" \
+                -addext "subjectAltName=DNS:${SERVICE_NAME}.${NAMESPACE}.svc,DNS:${SERVICE_NAME}.${NAMESPACE}.svc.cluster.local"
+              
+              # Sign serving certificate with CA (1 year validity, can be rotated)
+              openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial \
+                -out server.crt -days 365 \
+                -extensions v3_ext -extfile <(
+                  echo "[v3_ext]"
+                  echo "subjectAltName=DNS:${SERVICE_NAME}.${NAMESPACE}.svc,DNS:${SERVICE_NAME}.${NAMESPACE}.svc.cluster.local"
+                )
+              
+              # Create TLS secret
+              kubectl create secret tls "${SECRET_NAME}" \
+                --cert=server.crt \
+                --key=server.key \
+                --namespace="${NAMESPACE}" \
+                --dry-run=client -o yaml | kubectl apply -f -
+              
+              # Get CA bundle (base64 encoded)
+              CA_BUNDLE=$(cat ca.crt | base64 -w 0)
+              
+              # Patch MutatingWebhookConfiguration with CA bundle
+              kubectl patch mutatingwebhookconfiguration "${WEBHOOK_NAME}" \
+                --type='json' \
+                -p="[{\"op\": \"replace\", \"path\": \"/webhooks/0/clientConfig/caBundle\", \"value\":\"${CA_BUNDLE}\"}]" || \
+              kubectl patch mutatingwebhookconfiguration "${WEBHOOK_NAME}" \
+                --type='json' \
+                -p="[{\"op\": \"add\", \"path\": \"/webhooks/0/clientConfig/caBundle\", \"value\":\"${CA_BUNDLE}\"}]"
+              
+              echo "Certificate setup completed successfully"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+{{- end }}

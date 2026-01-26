@@ -121,3 +121,47 @@ Validate controller leader election configuration (H074.2 safety rules)
 {{- end }}
 {{- end }}
 
+{{/*
+Get webhook TLS mode with smart defaults
+*/}}
+{{- define "zen-lock.webhookTLSMode" -}}
+{{- if .Values.webhook.tls.mode }}
+  {{- .Values.webhook.tls.mode }}
+{{- else if .Values.webhook.certManager.enabled }}
+  {{- "cert-manager" }}
+{{- else }}
+  {{- "self-signed" }}
+{{- end }}
+{{- end }}
+
+{{/*
+Validate webhook TLS configuration (P0: fail fast on misconfiguration)
+*/}}
+{{- define "zen-lock.validateWebhookTLS" -}}
+{{- if .Values.webhook.enabled }}
+  {{- $tlsMode := include "zen-lock.webhookTLSMode" . }}
+  {{- if not (has $tlsMode (list "cert-manager" "self-signed" "provided")) }}
+    {{- fail (printf "Invalid webhook.tls.mode: %q (must be cert-manager, self-signed, or provided)" $tlsMode) }}
+  {{- end }}
+  {{- if eq $tlsMode "cert-manager" }}
+    {{- if not .Values.webhook.certManager.enabled }}
+      {{- fail "webhook.tls.mode=cert-manager requires webhook.certManager.enabled=true. Either enable cert-manager or set webhook.tls.mode=self-signed or provided" }}
+    {{- end }}
+    {{- if not .Values.webhook.certManager.issuer.name }}
+      {{- fail "webhook.certManager.issuer.name is required when using cert-manager mode. Example: webhook.certManager.issuer.name=letsencrypt-prod" }}
+    {{- end }}
+  {{- end }}
+  {{- if and .Values.webhook.certManager.enabled (ne $tlsMode "cert-manager") }}
+    {{- fail (printf "webhook.certManager.enabled=true but webhook.tls.mode=%q. Set webhook.tls.mode=cert-manager when using cert-manager" $tlsMode) }}
+  {{- end }}
+  {{- if eq $tlsMode "provided" }}
+    {{- if not .Values.webhook.tls.caBundle }}
+      {{- fail "webhook.tls.caBundle is required when webhook.tls.mode=provided. Provide the base64-encoded CA certificate that signed the webhook serving certificate" }}
+    {{- end }}
+    {{- if not .Values.webhook.certSecret }}
+      {{- fail "webhook.certSecret is required when webhook.tls.mode=provided. The secret must exist and contain tls.crt and tls.key" }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}
+

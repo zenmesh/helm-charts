@@ -13,29 +13,57 @@
 # limitations under the License.
 
 {{- if .Values.webhook.enabled }}
+{{- include "zen-lock.validateWebhookTLS" . }}
+{{- $tlsMode := include "zen-lock.webhookTLSMode" . }}
+{{- if eq $tlsMode "cert-manager" }}
 {{- if .Values.webhook.certManager.enabled }}
+---
+# P0.2: cert-manager Certificate resource with enhanced defaults
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: {{ include "zen-lock.fullname" . }}-webhook-cert
   namespace: {{ include "zen-lock.namespace" . }}
+  labels:
+    {{- include "zen-lock.labels" . | nindent 4 }}
 spec:
   issuerRef:
     name: {{ .Values.webhook.certManager.issuer.name }}
     kind: {{ .Values.webhook.certManager.issuer.kind }}
   secretName: {{ .Values.webhook.certSecret }}
+  # P0.3: Stronger TLS defaults - ECDSA keys (smaller/faster, better security)
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+    rotationPolicy: {{ .Values.webhook.certManager.rotationPolicy | default "Always" }}
+  # P0.2: Certificate duration and renewal
+  {{- if .Values.webhook.certManager.duration }}
+  duration: {{ .Values.webhook.certManager.duration }}
+  {{- end }}
+  renewBefore: {{ .Values.webhook.certManager.renewBefore | default "240h" }}
+  # DNS names: use provided list or default to service DNS names
   dnsNames:
+    {{- if .Values.webhook.certManager.dnsNames }}
+    {{- range .Values.webhook.certManager.dnsNames }}
+    - {{ . }}
+    {{- end }}
+    {{- else }}
     - {{ include "zen-lock.fullname" . }}-webhook.{{ include "zen-lock.namespace" . }}.svc
     - {{ include "zen-lock.fullname" . }}-webhook.{{ include "zen-lock.namespace" . }}.svc.cluster.local
+    {{- end }}
+{{- end }}
 {{- end }}
 ---
+# P0.1: MutatingWebhookConfiguration with proper caBundle handling for all TLS modes
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
   name: {{ include "zen-lock.fullname" . }}-mutating-webhook
+  {{- if eq $tlsMode "cert-manager" }}
   {{- if .Values.webhook.certManager.enabled }}
   annotations:
     cert-manager.io/inject-ca-from: {{ include "zen-lock.namespace" . }}/{{ include "zen-lock.fullname" . }}-webhook-cert
+  {{- end }}
   {{- end }}
   labels:
     {{- include "zen-lock.labels" . | nindent 4 }}
@@ -46,9 +74,12 @@ webhooks:
         name: {{ include "zen-lock.fullname" . }}-webhook
         namespace: {{ include "zen-lock.namespace" . }}
         path: "/mutate-pods"
-      {{- if not .Values.webhook.certManager.enabled }}
-      # caBundle must be set manually if cert-manager is disabled
-      # caBundle: <base64-encoded-ca-certificate>
+      {{- if eq $tlsMode "provided" }}
+      # P0.4: Provided mode requires caBundle
+      caBundle: {{ .Values.webhook.tls.caBundle }}
+      {{- else if eq $tlsMode "self-signed" }}
+      # Self-signed mode: caBundle will be patched by the cert-generation job
+      # caBundle will be set via post-install/post-upgrade hook
       {{- end }}
     rules:
       - apiGroups: [""]

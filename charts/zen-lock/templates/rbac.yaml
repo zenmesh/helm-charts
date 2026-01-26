@@ -77,16 +77,22 @@ metadata:
     {{- include "zen-lock.labels" . | nindent 4 }}
     app.kubernetes.io/component: webhook
   annotations:
-    rbac.authorization.k8s.io/justification: "Webhook reads ZenLocks and creates ephemeral Secrets for Pod injection. Also refreshes stale secrets."
+    rbac.authorization.k8s.io/justification: "Webhook reads ZenLocks and creates ephemeral Secrets for Pod injection. Also refreshes stale secrets. For self-signed cert mode, patches MutatingWebhookConfiguration with CA bundle."
 rules:
   # ZenLock CRD: Read only (to fetch and decrypt)
   - apiGroups: ["security.kube-zen.io"]
     resources: ["zenlocks"]
     verbs: ["get"]
-  # Secrets: Create, get, update (for ephemeral secrets and stale-secret refresh)
+  # Secrets: Create, get, update (for ephemeral secrets, stale-secret refresh, and self-signed cert TLS secret)
   - apiGroups: [""]
     resources: ["secrets"]
     verbs: ["create", "get", "update"]
+  # MutatingWebhookConfiguration: Patch (for self-signed cert mode CA bundle injection)
+  - apiGroups: ["admissionregistration.k8s.io"]
+    resources: ["mutatingwebhookconfigurations"]
+    verbs: ["get", "patch"]
+    resourceNames:
+      - {{ include "zen-lock.fullname" . }}-mutating-webhook
 ---
 # Webhook ClusterRoleBinding
 {{- if .Values.webhook.enabled }}

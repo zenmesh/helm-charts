@@ -22,7 +22,7 @@ image:
   repository: kubezen/zen-lock
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "0.0.1-alpha"
+  tag: "0.0.2-alpha"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -92,19 +92,44 @@ webhook:
   replicaCount: 2  # Webhooks scale horizontally (no leader election)
   port: 9443
   certDir: /tmp/k8s-webhook-server/serving-certs
-  # Certificate secret name (managed by cert-manager if using webhook.certManager)
+  # Certificate secret name (managed by cert-manager, self-signed job, or user-provided)
   certSecret: zen-lock-webhook-cert
-  # Use cert-manager to manage certificates
+  # TLS certificate management mode
+  # Defaults: cert-manager if certManager.enabled=true, otherwise self-signed
+  # Options:
+  #   - cert-manager: Use cert-manager to issue and manage certificates (recommended for production)
+  #   - self-signed: Generate self-signed certificates via a Job (zero-dependency, for development/testing)
+  #   - provided: User provides the TLS secret and caBundle (for advanced use cases)
+  tls:
+    mode: ""  # cert-manager | self-signed | provided (auto-detected if empty: cert-manager if certManager.enabled=true, else self-signed)
+    # caBundle: required when mode=provided, base64-encoded CA certificate
+    # caBundle: ""
+  # Use cert-manager to manage certificates (required when tls.mode=cert-manager)
   certManager:
     enabled: false
     issuer:
-      name: ""
+      name: ""  # Required: name of ClusterIssuer or Issuer
       kind: ClusterIssuer  # ClusterIssuer or Issuer
+    # Certificate duration (default: issuer default, typically 90d for Let's Encrypt)
+    duration: ""
+    # Renew certificate before expiration (default: 240h = 10 days)
+    renewBefore: "240h"
+    # Private key rotation policy (default: Always for better security)
+    rotationPolicy: Always
+    # Optional: Override DNS names (defaults to service DNS names)
+    dnsNames: []
+    #   - "custom-webhook.example.com"
+  # Self-signed certificate configuration (used when tls.mode=self-signed)
+  selfSigned:
+    # Certificate validity duration (default: 365d)
+    duration: "365d"
+    # CA certificate validity duration (default: 10y)
+    caDuration: "87600h"  # 10 years
   # Webhook timeout in seconds (default: 10)
   timeoutSeconds: 10
   # Webhook failure policy: Fail or Ignore (default: Fail)
-  # Fail: Reject the request if webhook fails
-  # Ignore: Allow the request to proceed if webhook fails
+  # Fail: Reject the request if webhook fails (recommended for security)
+  # Ignore: Allow the request to proceed if webhook fails (not recommended)
   failurePolicy: Fail
 
 # Private key configuration
