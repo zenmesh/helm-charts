@@ -6,13 +6,18 @@ entries:
         - Kube-ZEN Cluster Agent for SaaS connectivity
         - Bootstrap token support for cluster enrollment
         - Secret management for cluster credentials
+      artifacthub.io/images: |
+        - name: zen-agent
+          image: kubezen/zen-agent:0.1.0
+      artifacthub.io/imagesWhitelist: |
+        - kubezen/zen-agent
       artifacthub.io/links: |
         - name: Documentation
           url: https://github.com/kube-zen/zen-platform
       category: Management
     apiVersion: v2
     appVersion: 0.1.0
-    created: "2026-01-21T16:09:30.853042909-05:00"
+    created: "2026-01-27T06:29:26.975561815-05:00"
     description: A Helm chart for zen-agent - Kube-ZEN Cluster Agent
     digest: 74b51998b5995a927aa2d69960ae1529daa8389d4ec2aecb541ae26c17386577
     home: https://github.com/kube-zen/zen-platform
@@ -30,7 +35,7 @@ entries:
     - https://github.com/kube-zen/zen-platform
     type: application
     urls:
-    - zen-agent-0.1.0.tgz
+    - https://kube-zen.github.io/helm-charts/zen-agent-0.1.0.tgz
     version: 0.1.0
   zen-lock:
   - annotations:
@@ -47,8 +52,45 @@ entries:
           url: https://github.com/kube-zen/zen-lock/issues
       category: Security
     apiVersion: v2
+    appVersion: 0.0.2-alpha
+    created: "2026-01-27T06:29:26.978181108-05:00"
+    description: A Helm chart for zen-lock - Zero-Knowledge secret manager for Kubernetes
+    digest: 89c81e4803bcc31bc6627c1f31dd1865631fac6fa95dbcb02368df887049d776
+    home: https://github.com/kube-zen/zen-lock
+    keywords:
+    - kubernetes
+    - kube-zen
+    - secret-management
+    - encryption
+    - zero-knowledge
+    - security
+    - operator
+    maintainers:
+    - email: team@kube-zen.io
+      name: Kube-ZEN Team
+    name: zen-lock
+    sources:
+    - https://github.com/kube-zen/zen-lock
+    type: application
+    urls:
+    - https://kube-zen.github.io/helm-charts/zen-lock-0.0.3-alpha.tgz
+    version: 0.0.3-alpha
+  - annotations:
+      artifacthub.io/changes: |
+        - Initial release
+      artifacthub.io/imagesWhitelist: |
+        - kubezen/zen-lock
+      artifacthub.io/links: |
+        - name: Documentation
+          url: https://github.com/kube-zen/zen-lock/blob/main/README.md
+        - name: Source
+          url: https://github.com/kube-zen/zen-lock
+        - name: Support
+          url: https://github.com/kube-zen/zen-lock/issues
+      category: Security
+    apiVersion: v2
     appVersion: 0.0.1-alpha
-    created: "2026-01-21T16:09:30.854766133-05:00"
+    created: "2026-01-27T06:29:26.977014152-05:00"
     description: A Helm chart for zen-lock - Zero-Knowledge secret manager for Kubernetes
     digest: ab7a356dbd44fe1a7c389b371f7835591289074a07af84223c6c21bdd522ea39
     home: https://github.com/kube-zen/zen-lock
@@ -68,7 +110,7 @@ entries:
     - https://github.com/kube-zen/zen-lock
     type: application
     urls:
-    - zen-lock-0.0.2-alpha.tgz
+    - https://kube-zen.github.io/helm-charts/zen-lock-0.0.2-alpha.tgz
     version: 0.0.2-alpha
   zen-watcher:
   - annotations:
@@ -91,7 +133,7 @@ entries:
       category: Observability
     apiVersion: v2
     appVersion: 1.2.1
-    created: "2026-01-21T16:09:30.860313529-05:00"
+    created: "2026-01-27T06:29:26.981142422-05:00"
     description: A Helm chart for zen-watcher - Universal Kubernetes Event Aggregator
     digest: 86034dca937c837567fd5cb44dba7ffd3124b944012d4fde2b61e19689874a2a
     home: https://github.com/kube-zen/zen-watcher
@@ -112,7 +154,7 @@ entries:
     - https://github.com/kube-zen/zen-watcher
     type: application
     urls:
-    - zen-watcher-1.2.1.tgz
+    - https://kube-zen.github.io/helm-charts/zen-watcher-1.2.1.tgz
     version: 1.2.1
   - annotations:
       artifacthub.io/changes: |
@@ -131,7 +173,7 @@ entries:
       category: Observability
     apiVersion: v2
     appVersion: 1.2.0
-    created: "2026-01-21T16:09:30.858517808-05:00"
+    created: "2026-01-27T06:29:26.980121703-05:00"
     description: A Helm chart for zen-watcher - Universal Kubernetes Event Aggregator
     digest: a6cc7215e74c2909c7841f69c70dd877483ddee68b2fdf8d333a5fe33245502b
     home: https://github.com/kube-zen/zen-watcher
@@ -152,7 +194,7 @@ entries:
     - https://github.com/kube-zen/zen-watcher
     type: application
     urls:
-    - zen-watcher-1.2.0.tgz
+    - https://kube-zen.github.io/helm-charts/zen-watcher-1.2.0.tgz
     version: 1.2.0
   - annotations:
       artifacthub.io/changes: |
@@ -171,7 +213,7 @@ entries:
       category: Observability
     apiVersion: v2
     appVersion: 1.0.20
-    created: "2026-01-21T16:09:30.856771843-05:00"
+    created: "2026-01-27T06:29:26.979269535-05:00"
     description: A Helm chart for zen-watcher - Universal Kubernetes Event Aggregator
     digest: 2aa634d28ad62f27e2117331340349d24da40212c828c56594558c3e5abe000c
     home: https://github.com/kube-zen/zen-watcher
@@ -192,6 +234,6 @@ entries:
     - https://github.com/kube-zen/zen-watcher
     type: application
     urls:
-    - zen-watcher-1.0.2.tgz
+    - https://kube-zen.github.io/helm-charts/zen-watcher-1.0.2.tgz
     version: 1.0.2
-generated: "2026-01-21T16:09:30.851401873-05:00"
+generated: "2026-01-27T06:29:26.974860895-05:00"
