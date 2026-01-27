@@ -93,7 +93,7 @@ EOF
         --set webhook.certManager.enabled=true \
         --set webhook.certManager.issuer.name=test-selfsigned-issuer \
         --set webhook.certManager.issuer.kind=ClusterIssuer \
-        --set image.tag=0.0.2-alpha \
+        --set image.tag=0.0.3-alpha \
         --wait --timeout 5m || {
         log_error "Helm install failed"
         return 1
@@ -160,7 +160,7 @@ test_self_signed() {
         --set webhook.enabled=true \
         --set webhook.certManager.enabled=false \
         --set webhook.tls.mode=self-signed \
-        --set image.tag=0.0.2-alpha \
+        --set image.tag=0.0.3-alpha \
         --wait --timeout 5m || {
         log_error "Helm install failed"
         return 1
@@ -254,7 +254,7 @@ test_provided() {
         --set webhook.certManager.enabled=false \
         --set webhook.tls.mode=provided \
         --set webhook.tls.caBundle="$CA_BUNDLE" \
-        --set image.tag=0.0.2-alpha \
+        --set image.tag=0.0.3-alpha \
         --wait --timeout 5m || {
         log_error "Helm install failed"
         return 1
