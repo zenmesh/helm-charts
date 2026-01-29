@@ -1,0 +1,64 @@
+# Default values for zen-protect
+# H601: Dedicated zen-protect chart for single-command installation
+
+namespace: zen-mesh
+
+global:
+  registry: zen-registry:5000
+  imageTag: "1.0.0"
+
+# Agent configuration
+agent:
+  image:
+    repository: zen-data-and-edge-planes/zen-protect
+    tag: ""
+    pullPolicy: IfNotPresent
+  
+  replicaCount: 1
+  
+  # Required: SaaS endpoint, tenant ID, cluster ID
+  # These are injected via values (not secrets) for agent configuration
+  saasBaseURL: ""  # Required: Set via --set agent.saasBaseURL="https://api.kube-zen.io"
+  tenantID: ""     # Required: Set via --set agent.tenantID="<tenant-uuid>"
+  clusterID: ""    # Required: Set via --set agent.clusterID="<cluster-uuid>"
+  
+  # Enrollment configuration
+  # H601: enrollment_bundle must come from Secret, not Helm values
+  enrollment:
+    # Optional: Bundle value (overrides secret)
+    bundle: ""
+    enabled: true  # Auto-enroll on startup
+    secretRef:
+      name: enrollment-bundle  # Secret name containing enrollment_bundle
+      key: enrollment_bundle   # Key in secret
+  
+  # Logging
+  logLevel: info
+  
+  # Health probe paths
+  healthPath: /healthz
+  readyPath: /readyz
+  
+  # Resources
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  
+  # Service configuration
+  service:
+    type: ClusterIP
+    port: 8080
+
+# Service Account
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}
+
+# RBAC - Agent needs to manage Secrets for cluster and adapter credentials
+rbac:
+  create: true

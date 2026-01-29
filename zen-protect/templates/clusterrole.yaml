@@ -1,0 +1,26 @@
+{{- if .Values.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "zen-protect.fullname" . }}
+  labels:
+    {{- include "zen-protect.labels" . | nindent 4 }}
+    app.kubernetes.io/component: agent
+rules:
+  # H601: Agent needs to manage Secrets for cluster and adapter credentials
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+  # H602: Agent needs to watch ConfigMaps for adapter registration
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch"]
+  # H602: Agent may need to watch ZenAdapter CRDs (if using CRD-based registration)
+  - apiGroups: ["zen.kube-zen.io"]
+    resources: ["zenadapters"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+  # Events for audit
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "patch"]
+{{- end }}
