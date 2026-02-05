@@ -80,9 +80,10 @@ metadata:
     rbac.authorization.k8s.io/justification: "Webhook reads ZenLocks and creates ephemeral Secrets for Pod injection. Also refreshes stale secrets. For self-signed cert mode, patches MutatingWebhookConfiguration with CA bundle."
 rules:
   # ZenLock CRD: Read only (to fetch and decrypt)
+  # NOTE: list/watch required for controller-runtime informer cache
   - apiGroups: ["security.kube-zen.io"]
     resources: ["zenlocks"]
-    verbs: ["get"]
+    verbs: ["get", "list", "watch"]
   # Secrets: Create, get, update (for ephemeral secrets, stale-secret refresh, and self-signed cert TLS secret)
   - apiGroups: [""]
     resources: ["secrets"]
