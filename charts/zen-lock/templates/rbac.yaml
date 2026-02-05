@@ -24,10 +24,10 @@ metadata:
   annotations:
     rbac.authorization.k8s.io/justification: "Controller reconciles ZenLocks and updates their status. Also sets OwnerReferences on Secrets created by webhook."
 rules:
-  # ZenLock CRD: Read and update status only
+  # ZenLock CRD: Read, update (for finalizers), and update status
   - apiGroups: ["security.kube-zen.io"]
     resources: ["zenlocks"]
-    verbs: ["get", "list", "watch"]
+    verbs: ["get", "list", "watch", "update", "patch"]
   - apiGroups: ["security.kube-zen.io"]
     resources: ["zenlocks/status"]
     verbs: ["get", "update", "patch"]
