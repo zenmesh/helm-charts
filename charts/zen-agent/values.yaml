@@ -49,42 +49,17 @@ service:
   type: ClusterIP
   port: 8080
 
-# SaaS configuration
+# H720: Only these values; no agent.*, component.*, tenant/cluster
 saas:
-  # SaaS endpoint URL (required)
   endpoint: ""
 
-# H702: Enrollment configuration (preferred) - broker derives tenant/cluster from bundle
 enrollment:
+  # Direct bundle (Option B: inline in Helm, best UX). When set, used as ENROLLMENT_BUNDLE env var.
+  bundle: ""
+  # SecretRef (alternative): read bundle from Secret. Used when bundle is empty.
   secretRef:
     name: "enrollment-bundle"
     key: "enrollment_bundle"
-
-# Component contract configuration (backward compat)
-component:
-  tenantId: ""  # H702: Optional; derived from bundle at bootstrap
-  id: ""       # H702: Optional; derived from bundle at bootstrap
-  type: "zen-agent"
-  version: ""
-  enrollment:
-    enrollmentBundle: ""
-    enrollmentBundleSecretRef:
-      name: ""
-      key: "enrollment_bundle"
-
-# Tenant and cluster configuration (deprecated, use component.*)
-# Maintained for backward compatibility
-tenant:
-  # Tenant ID (deprecated: use component.tenantId)
-  id: ""
-
-cluster:
-  # Cluster ID (deprecated: use component.id)
-  id: ""
-
-# Alternative: bootstrap token can be provided here (takes precedence over saas.clusterToken)
-bootstrap:
-  token: ""
 
 # Secret configuration
 secret:

@@ -67,38 +67,20 @@ spec:
                   fieldPath: metadata.namespace
             - name: SAAS_BASE_URL
               value: {{ .Values.saas.endpoint | quote }}
-            - name: TENANT_ID
-              value: {{ (.Values.component.tenantId | default .Values.tenant.id) | default "" | quote }}
-            - name: CLUSTER_ID
-              value: {{ (.Values.component.id | default .Values.cluster.id) | default "" | quote }}
-            {{- if .Values.component.type }}
-            - name: COMPONENT_TYPE
-              value: {{ .Values.component.type | quote }}
-            {{- end }}
-            {{- if .Values.component.version }}
-            - name: COMPONENT_VERSION
-              value: {{ .Values.component.version | quote }}
-            {{- end }}
-            {{- $enrollmentSecretName := .Values.enrollment.secretRef.name | default .Values.component.enrollment.enrollmentBundleSecretRef.name }}
-            {{- $enrollmentSecretKey := .Values.enrollment.secretRef.key | default .Values.component.enrollment.enrollmentBundleSecretRef.key | default "enrollment_bundle" }}
-            {{- if .Values.component.enrollment.enrollmentBundle }}
+            {{- if .Values.enrollment.bundle }}
             - name: ENROLLMENT_BUNDLE
-              value: {{ .Values.component.enrollment.enrollmentBundle | quote }}
-            {{- else if $enrollmentSecretName }}
+              value: {{ .Values.enrollment.bundle | quote }}
+            {{- else if .Values.enrollment.secretRef.name }}
             - name: ENROLLMENT_BUNDLE
               valueFrom:
                 secretKeyRef:
-                  name: {{ $enrollmentSecretName }}
-                  key: {{ $enrollmentSecretKey }}
+                  name: {{ .Values.enrollment.secretRef.name }}
+                  key: {{ .Values.enrollment.secretRef.key | default "enrollment_bundle" }}
             {{- end }}
             - name: PORT
               value: {{ .Values.server.port | quote }}
             - name: SECRET_BASE_PATH
               value: {{ .Values.secret.basePath | quote }}
-            {{- if or .Values.saas.clusterToken .Values.bootstrap.token }}
-            - name: BOOTSTRAP_TOKEN
-              value: {{ .Values.bootstrap.token | default .Values.saas.clusterToken | quote }}
-            {{- end }}
             {{- if .Values.server.shutdownTimeout }}
             - name: SHUTDOWN_TIMEOUT
               value: {{ .Values.server.shutdownTimeout | quote }}
