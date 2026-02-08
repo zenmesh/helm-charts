@@ -52,19 +52,34 @@ service:
 # SaaS configuration
 saas:
   # SaaS endpoint URL (required)
-  # Example: https://api.kube-zen.io
   endpoint: ""
-  # Bootstrap token for initial cluster enrollment (required)
-  # This is a one-time token used to establish initial trust
-  clusterToken: ""
 
-# Tenant and cluster configuration
+# H702: Enrollment configuration (preferred) - broker derives tenant/cluster from bundle
+enrollment:
+  secretRef:
+    name: "enrollment-bundle"
+    key: "enrollment_bundle"
+
+# Component contract configuration (backward compat)
+component:
+  tenantId: ""  # H702: Optional; derived from bundle at bootstrap
+  id: ""       # H702: Optional; derived from bundle at bootstrap
+  type: "zen-agent"
+  version: ""
+  enrollment:
+    enrollmentBundle: ""
+    enrollmentBundleSecretRef:
+      name: ""
+      key: "enrollment_bundle"
+
+# Tenant and cluster configuration (deprecated, use component.*)
+# Maintained for backward compatibility
 tenant:
-  # Tenant ID (required)
+  # Tenant ID (deprecated: use component.tenantId)
   id: ""
 
 cluster:
-  # Cluster ID (required)
+  # Cluster ID (deprecated: use component.id)
   id: ""
 
 # Alternative: bootstrap token can be provided here (takes precedence over saas.clusterToken)
