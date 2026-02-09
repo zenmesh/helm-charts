@@ -16,8 +16,8 @@ apiVersion: v2
 name: zen-agent
 description: A Helm chart for zen-agent - Kube-ZEN Cluster Agent
 type: application
-version: 0.1.0
-appVersion: "0.1.0"
+version: 0.1.1
+appVersion: "0.1.1"
 
 keywords:
   - kubernetes

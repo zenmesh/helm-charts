@@ -1,12 +1,6 @@
 {{- if .Values.rbac.create }}
 ---
-# Namespace-scoped Role for zen-agent
-# Note: This Role is namespace-scoped (least-privilege). If cluster-wide observation
-# is required, consider:
-# 1. Using ClusterRole with resource/namespace scoping per tenant
-# 2. Limiting to specific resource types needed for observation
-# 3. Using namespace selectors to restrict scope
-# See: helm-charts/docs/SECURITY_POSTURE.md for production RBAC recommendations
+# Namespace-scoped Role for zen-agent (secrets, events)
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -19,11 +13,7 @@ rules:
   - apiGroups: [""]
     resources: ["secrets"]
     verbs: ["get", "list", "watch", "create", "update", "patch"]
-  # Read access to ConfigMaps (for configuration)
-  - apiGroups: [""]
-    resources: ["configmaps"]
-    verbs: ["get", "list", "watch"]
-  # Events for observability (optional - for agent event recording)
+  # Events for observability
   - apiGroups: [""]
     resources: ["events"]
     verbs: ["create", "patch"]
@@ -42,6 +32,34 @@ subjects:
 roleRef:
   kind: Role
   name: {{ include "zen-agent.fullname" . }}
+  apiGroup: rbac.authorization.k8s.io
+---
+# ClusterRole for adapter controller: list/watch ConfigMaps cluster-wide (ZenAdapter discovery)
+# H602: Adapter controller watches ConfigMaps with zen.kubezen.io/adapter=true label
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "zen-agent.fullname" . }}-adapter-watcher
+  labels:
+    {{- include "zen-agent.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch", "update", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "zen-agent.fullname" . }}-adapter-watcher
+  labels:
+    {{- include "zen-agent.labels" . | nindent 4 }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "zen-agent.serviceAccountName" . }}
+    namespace: {{ include "zen-agent.namespace" . }}
+roleRef:
+  kind: ClusterRole
+  name: {{ include "zen-agent.fullname" . }}-adapter-watcher
   apiGroup: rbac.authorization.k8s.io
 {{- end }}
 
