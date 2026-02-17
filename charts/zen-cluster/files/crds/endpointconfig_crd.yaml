@@ -1,0 +1,142 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: endpointconfigs.routing.zen.kube-zen.io
+spec:
+  group: routing.zen.kube-zen.io
+  names:
+    kind: EndpointConfig
+    listKind: EndpointConfigList
+    plural: endpointconfigs
+    singular: endpointconfig
+    shortNames:
+    - epconfig
+    - ep
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            required:
+            - path
+            - component
+            properties:
+              path:
+                type: string
+                description: Endpoint path (e.g., /api/v1/egress/flow1)
+                pattern: "^/api/v1/[a-z0-9-]+/[a-z0-9-]+(/[a-z0-9-]+)*$"
+              component:
+                type: string
+                description: Target component (egress, bridge)
+                enum:
+                - egress
+                - bridge
+              allowedClients:
+                type: array
+                description: List of client identities allowed to send to this endpoint
+                items:
+                  type: string
+              authConfig:
+                type: object
+                description: Authentication configuration
+                properties:
+                  mtls:
+                    type: object
+                    properties:
+                      required:
+                        type: boolean
+                        default: true
+                      caCertSecret:
+                        type: string
+                        description: Secret name containing CA certificate
+                  hmac:
+                    type: object
+                    properties:
+                      enabled:
+                        type: boolean
+                        default: false
+                      secretName:
+                        type: string
+                        description: Secret name containing HMAC key
+              metadata:
+                type: object
+                description: Additional metadata for this endpoint
+                additionalProperties: true
+          status:
+            type: object
+            properties:
+              conditions:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                      - Ready
+                      - Authorized
+                    status:
+                      type: string
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                    reason:
+                      type: string
+                    message:
+                      type: string
+                    lastTransitionTime:
+                      type: string
+                      format: date-time
+              health:
+                type: object
+                properties:
+                  healthy:
+                    type: boolean
+                  lastCheck:
+                    type: string
+                    format: date-time
+                  lastError:
+                    type: string
+              stats:
+                type: object
+                properties:
+                  totalRequests:
+                    type: integer
+                  successfulRequests:
+                    type: integer
+                  failedRequests:
+                    type: integer
+                  lastRequestTime:
+                    type: string
+                    format: date-time
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - name: Path
+      type: string
+      jsonPath: .spec.path
+      priority: 1
+    - name: Component
+      type: string
+      jsonPath: .spec.component
+    - name: Ready
+      type: string
+      jsonPath: .status.conditions[?(@.type=="Ready")].status
+    - name: Healthy
+      type: boolean
+      jsonPath: .status.health.healthy
+      priority: 1
+    - name: Requests
+      type: integer
+      jsonPath: .status.stats.totalRequests
+      priority: 1
+    - name: Age
+      type: date
+      jsonPath: .metadata.creationTimestamp

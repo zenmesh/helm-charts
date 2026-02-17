@@ -1,0 +1,28 @@
+{{- /*
+H711: ZenAdapter ConfigMap for ingester - triggers zen-agent to register adapter with SaaS and write zen-adapter-cred-<adapterID> Secret.
+When ingester.enabled and ingester.adapterID are set, this ConfigMap is created.
+zen-agent watches for ConfigMaps with zen.kubezen.io/adapter=true, calls SaaS adapters:sync, derives adapter key, writes Secret.
+saasBaseURL is NOT required here — zen-agent already knows the SaaS endpoint from its own enrollment.
+*/}}
+{{- if and .Values.ingester.enabled .Values.ingester.adapterID }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zen-adapter-ingester
+  namespace: {{ .Values.namespace }}
+  labels:
+    zen.kubezen.io/adapter: "true"
+    zen.kubezen.io/adapter-type: "ingester"
+    zen.kubezen.io/adapter-id: {{ .Values.ingester.adapterID | quote }}
+    zen.kubezen.io/adapter-namespace: {{ .Values.namespace | quote }}
+  annotations:
+    zen.kubezen.io/adapter-config: |
+      {
+        "adapter_id": {{ .Values.ingester.adapterID | quote }},
+        "adapter_type": "ingester",
+        "namespace": {{ .Values.namespace | quote }},
+        "runtime_class": {{ .Values.global.plane | default "edge" | quote }},
+        "service_account": {{ printf "%s-ingester" (include "zen-cluster.fullname" .) | quote }}
+      }
+data: {}
+{{- end }}

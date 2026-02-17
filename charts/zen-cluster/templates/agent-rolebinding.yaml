@@ -1,0 +1,18 @@
+{{- if and .Values.agent.enabled (eq .Values.agent.rbac.scope "namespace") }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "zen-cluster.fullname" . }}-agent
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "zen-cluster.labels" . | nindent 4 }}
+    app.kubernetes.io/component: agent
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "zen-cluster.fullname" . }}-agent
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "zen-cluster.fullname" . }}-agent
+    namespace: {{ .Values.namespace }}
+{{- end }}

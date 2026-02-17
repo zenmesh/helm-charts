@@ -1,0 +1,218 @@
+# H045: PCI Zone deployment profile for zen-cluster
+# Creates a dedicated PCI namespace/cluster boundary with:
+# - default-deny NetPol, explicit allowlists
+# - separate ingress, separate node pools (if EKS), separate KMS keys
+# - strict RBAC + break-glass workflow
+# - Automated "segmentation test" job that proves forbidden paths are blocked (CI gate)
+
+# Override namespace for PCI isolation
+namespace: zen-pci-dp
+
+# PCI Zone configuration
+pciZone:
+  enabled: true
+  # Separate KMS key for encryption (EKS/cloud KMS integration)
+  kmsKeyARN: ""  # Set to KMS key ARN for PCI zone encryption
+  # Separate node pool selector (if using EKS node groups)
+  nodeSelector:
+    zen.kube-zen.com/pci-zone: "true"
+  tolerations:
+    - key: "pci-zone"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+  
+  # Break-glass access configuration
+  breakGlass:
+    enabled: true
+    # Break-glass service account for emergency access
+    serviceAccountName: "pci-break-glass"
+    # RBAC role for break-glass (bypasses normal restrictions)
+    roleName: "pci-break-glass-role"
+    # Token TTL (short-lived for break-glass)
+    tokenTTL: 15m
+    # Audit all break-glass access
+    auditEnabled: true
+
+# Network Policy: Strict default-deny with explicit allowlists
+networkPolicy:
+  enabled: true  # Required for PCI Zone
+  defaultDeny: true  # Enforce default deny
+  # Explicit allowlist rules (PCI-zone specific)
+  allowList:
+    # Allow ingress from SaaS plane only (if split)
+    - from:
+        namespaceSelector:
+          matchLabels:
+            zen.kube-zen.com/plane: saas
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/component: bridge
+      ports:
+        - protocol: TCP
+          port: 8080
+    # Allow egress to external destinations (via egress proxy)
+    - to:
+        namespaceSelector:
+          matchLabels:
+            zen.kube-zen.com/plane: pci-egress-proxy
+      ports:
+        - protocol: TCP
+          port: 443
+    # Allow egress to SaaS plane for control-plane communication
+    - to:
+        namespaceSelector:
+          matchLabels:
+            zen.kube-zen.com/plane: saas
+      ports:
+        - protocol: TCP
+          port: 443
+    # Always allow DNS (required)
+    - to:
+        namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+# Separate ingress configuration for PCI zone
+ingress:
+  enabled: true
+  className: nginx
+  grpc:
+    # PCI-specific ingress host
+    host: "pci.api.kube-zen.io"  # Separate FQDN for PCI zone
+    service: zen-ingester
+    port: 8080
+    annotations:
+      nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+      nginx.ingress.kubernetes.io/grpc-read-timeout: "300"
+      nginx.ingress.kubernetes.io/grpc-send-timeout: "300"
+      # PCI-specific TLS requirements
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/ssl-protocols: "TLSv1.2 TLSv1.3"
+  tls:
+    secretName: pci-zone-tls  # Separate TLS secret for PCI zone
+
+# Enhanced security context for PCI zone
+ingester:
+  enabled: true
+  # Resource limits (stricter for PCI zone)
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  # Security context: read-only root filesystem, non-root user
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+  # Pod security context
+  podSecurityContext:
+    fsGroup: 1000
+    seccompProfile:
+      type: RuntimeDefault
+  # PCI mode: enable PCI policy (PAN detection, CHD blocking)
+  env:
+    - name: PCI_MODE_ENABLED
+      value: "true"
+    - name: PCI_BLOCK_ACTION
+      value: "reject"
+
+egress:
+  enabled: true
+  # Same security hardening as ingester
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+  podSecurityContext:
+    fsGroup: 1000
+    seccompProfile:
+      type: RuntimeDefault
+
+# RBAC: Strict role-based access control
+rbac:
+  create: true
+  # Separate service account for PCI zone
+  serviceAccount:
+    create: true
+    name: "zen-cluster-pci"
+    annotations:
+      eks.amazonaws.com/role-arn: ""  # IAM role for KMS access (if using EKS IRSA)
+  # ClusterRole with minimal permissions
+  clusterRole:
+    rules:
+      - apiGroups: [""]
+        resources: ["configmaps"]
+        verbs: ["get", "list"]
+      - apiGroups: ["zen.kube-zen.io"]
+        resources: ["deliveryflows", "destinations"]
+        verbs: ["get", "list", "watch"]
+      # No create/update/delete for PCI zone (control-plane only)
+
+# Segmentation test job (proves forbidden paths are blocked)
+segmentationTest:
+  enabled: true
+  # Job runs on schedule to verify network isolation
+  schedule: "0 */6 * * *"  # Every 6 hours
+  image:
+    repository: zen-cluster/segmentation-test
+    tag: "1.0.0"
+  tests:
+    - name: "deny-external-ingress"
+      description: "Verify external ingress is blocked"
+      from:
+        namespace: default
+        pod: test-pod
+      to:
+        namespace: zen-pci-dp
+        service: zen-ingester
+      expectedResult: "blocked"
+    - name: "deny-cross-namespace"
+      description: "Verify cross-namespace communication is blocked"
+      from:
+        namespace: zen-mesh  # Regular namespace
+        pod: test-pod
+      to:
+        namespace: zen-pci-dp
+        service: zen-ingester
+      expectedResult: "blocked"
+    - name: "allow-saas-bridge"
+      description: "Verify SaaS bridge can communicate with PCI zone"
+      from:
+        namespace: zen-saas
+        pod: zen-bridge
+      to:
+        namespace: zen-pci-dp
+        service: zen-ingester
+      expectedResult: "allowed"
+
+# Pod Disruption Budget: Ensure availability during disruptions
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Monitoring: Separate Prometheus scrape config for PCI zone
+monitoring:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    labels:
+      zen.kube-zen.com/pci-zone: "true"
+    scrapeInterval: 30s

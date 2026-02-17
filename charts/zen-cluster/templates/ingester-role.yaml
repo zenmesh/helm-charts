@@ -1,0 +1,25 @@
+{{- if .Values.ingester.enabled }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "zen-cluster.fullname" . }}-ingester
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "zen-cluster.labels" . | nindent 4 }}
+    component: ingester
+rules:
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list", "watch"]
+{{- if or (eq .Values.ingester.leaderElection.mode "builtin") (eq .Values.ingester.leaderElection.mode "disabled") }}
+# Workaround: Add leases permissions even when disabled, as some ingester versions
+# may still attempt leader election despite LEADER_ELECTION_MODE=disabled
+- apiGroups: ["coordination.k8s.io"]
+  resources: ["leases"]
+  verbs: ["get", "list", "watch", "create", "update", "patch"]
+{{- end }}
+{{- end }}
+

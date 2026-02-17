@@ -1,0 +1,86 @@
+{{- if and .Values.networkPolicy.enabled .Values.networkPolicy.defaultDeny }}
+# H034: Network Policy for zen-dp namespace
+# Implements split-by-namespace as if it were split-by-cluster
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: np-zen-dp-isolation
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "zen-cluster.labels" . | nindent 4 }}
+    zen.kube-zen.com/plane: data-plane
+spec:
+  podSelector: {}  # Apply to all pods in namespace
+  policyTypes:
+    - Ingress
+    - Egress
+  
+  ingress:
+    {{- if .Values.networkPolicy.allowList }}
+    {{- range .Values.networkPolicy.allowList }}
+    {{- if .from }}
+    - from:
+        {{- if .from.namespaceSelector }}
+        - namespaceSelector:
+            {{- if .from.namespaceSelector.matchLabels }}
+            {{- toYaml .from.namespaceSelector.matchLabels | nindent 14 }}
+            {{- end }}
+        {{- end }}
+        {{- if .from.podSelector }}
+        - podSelector:
+            {{- toYaml .from.podSelector.matchLabels | nindent 14 }}
+        {{- end }}
+      {{- if .ports }}
+      ports:
+        {{- range .ports }}
+        - protocol: {{ .protocol }}
+          port: {{ .port }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- else }}
+    # Default: deny all ingress
+    []
+    {{- end }}
+  
+  egress:
+    {{- if .Values.networkPolicy.allowList }}
+    {{- range .Values.networkPolicy.allowList }}
+    {{- if .to }}
+    - to:
+        {{- if .to.namespaceSelector }}
+        - namespaceSelector:
+            {{- if .to.namespaceSelector.matchLabels }}
+            {{- toYaml .to.namespaceSelector.matchLabels | nindent 14 }}
+            {{- end }}
+        {{- end }}
+        {{- if .to.podSelector }}
+        - podSelector:
+            {{- toYaml .to.podSelector.matchLabels | nindent 14 }}
+        {{- end }}
+      {{- if .ports }}
+      ports:
+        {{- range .ports }}
+        - protocol: {{ .protocol }}
+          port: {{ .port }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- else }}
+    # Default: deny all egress
+    []
+    {{- end }}
+    
+    # Always allow DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+{{- end }}

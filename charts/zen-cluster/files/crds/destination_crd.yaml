@@ -1,0 +1,123 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: destinations.routing.zen.kube-zen.io
+spec:
+  group: routing.zen.kube-zen.io
+  names:
+    kind: Destination
+    listKind: DestinationList
+    plural: destinations
+    singular: destination
+    shortNames:
+    - dest
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            required: ["type"]
+            properties:
+              type:
+                type: string
+                enum: ["direct", "bridge", "saas", "webhook"]
+              transport:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    enum: ["grpc", "http", "websocket", "nats", "quic"]
+                    default: "grpc"
+                required: ["type"]
+              direct:
+                type: object
+                properties:
+                  egressRef:
+                    type: string
+                  tenant:
+                    type: string
+                  region:
+                    type: string
+              bridge:
+                type: object
+                properties:
+                  region:
+                    type: string
+                  plan:
+                    type: string
+                  features:
+                    type: object
+                    properties:
+                      auditRetention:
+                        type: boolean
+                      encryption:
+                        type: boolean
+              saas:
+                type: object
+                properties:
+                  servicePath:
+                    type: string
+                    pattern: "^[a-z0-9-]+/[a-z0-9-]+$"
+              webhook:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri
+                  auth:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum: ["none", "bearer", "basic", "hmac"]
+                        default: "none"
+                      secretName:
+                        type: string
+            x-kubernetes-validations:
+            - rule: '(self.type == "direct" && has(self.direct)) || (self.type == "bridge" && has(self.bridge)) || (self.type == "saas" && has(self.saas)) || (self.type == "webhook" && has(self.webhook))'
+              message: 'Addressing block must match destination type'
+          status:
+            type: object
+            properties:
+              conditions:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                    status:
+                      type: string
+                      enum: ["True", "False", "Unknown"]
+                    reason:
+                      type: string
+                    message:
+                      type: string
+                    lastTransitionTime:
+                      type: string
+                      format: date-time
+              lastHealthCheck:
+                type: string
+                format: date-time
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - name: Type
+      type: string
+      jsonPath: .spec.type
+    - name: Transport
+      type: string
+      jsonPath: .spec.transport.type
+      priority: 1
+    - name: Ready
+      type: string
+      jsonPath: .status.conditions[?(@.type=="Ready")].status
+    - name: Age
+      type: date
+      jsonPath: .metadata.creationTimestamp

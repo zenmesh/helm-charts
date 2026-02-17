@@ -1,0 +1,110 @@
+{{- if and .Values.bootstrap.enabled .Values.agent.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "zen-cluster.fullname" . }}-bootstrap
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "zen-cluster.labels" . | nindent 4 }}
+    app.kubernetes.io/component: bootstrap
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels:
+        {{- include "zen-cluster.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: bootstrap
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: {{ include "zen-cluster.serviceAccountName" . }}
+      initContainers:
+      - name: wait-for-agent
+        image: curlimages/curl:latest
+        command:
+        - sh
+        - -c
+        - |
+          set -e
+          echo "Waiting for zen-agent to be ready..."
+          {{- if .Values.bootstrap.agentServiceName }}
+          AGENT_SERVICE="{{ .Values.bootstrap.agentServiceName }}"
+          {{- else }}
+          AGENT_SERVICE="{{ include "zen-cluster.fullname" . }}-agent"
+          {{- end }}
+          AGENT_URL="http://${AGENT_SERVICE}:8080"
+          for i in $(seq 1 30); do
+            if curl -f -s "${AGENT_URL}/healthz" > /dev/null; then
+              echo "zen-agent is ready"
+              exit 0
+            fi
+            echo "Attempt $i/30: zen-agent not ready, waiting 2s..."
+            sleep 2
+          done
+          echo "ERROR: zen-agent did not become ready within 60 seconds"
+          exit 1
+      containers:
+      - name: bootstrap
+        image: curlimages/curl:latest
+        command:
+        - sh
+        - -c
+        - |
+          set -e
+          {{- if .Values.bootstrap.agentServiceName }}
+          AGENT_SERVICE="{{ .Values.bootstrap.agentServiceName }}"
+          {{- else }}
+          AGENT_SERVICE="{{ include "zen-cluster.fullname" . }}-agent"
+          {{- end }}
+          AGENT_URL="http://${AGENT_SERVICE}:8080/v1/agents/bootstrap"
+          REQUEST_BODY=$(cat <<EOF
+          {
+            "enrollment_bundle": "${ENROLLMENT_BUNDLE}",
+            "cluster_id": "{{ .Values.ingester.clusterID }}",
+            "tenant_id": "${TENANT_ID}"
+          }
+          EOF
+          )
+          
+          echo "Calling zen-agent bootstrap endpoint..."
+          RESPONSE=$(curl -f -s -w "\n%{http_code}" -X POST \
+            -H "Content-Type: application/json" \
+            -d "${REQUEST_BODY}" \
+            "${AGENT_URL}")
+          
+          HTTP_CODE=$(echo "${RESPONSE}" | tail -n1)
+          BODY=$(echo "${RESPONSE}" | sed '$d')
+          
+          if [ "${HTTP_CODE}" != "201" ] && [ "${HTTP_CODE}" != "200" ]; then
+            echo "ERROR: Bootstrap failed with HTTP ${HTTP_CODE}"
+            echo "Response: ${BODY}"
+            exit 1
+          fi
+          
+          echo "Bootstrap successful!"
+          echo "${BODY}" | grep -q "key_id" && echo "HMAC key provisioned successfully" || echo "Warning: Response missing key_id"
+        env:
+        - name: ENROLLMENT_BUNDLE
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.bootstrap.enrollmentBundleSecretRef.name }}
+              key: {{ .Values.bootstrap.enrollmentBundleSecretRef.key }}
+        - name: TENANT_ID
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.ingester.tenantID.secretName }}
+              key: {{ .Values.ingester.tenantID.secretKey }}
+      {{- with .Values.bootstrap.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.bootstrap.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
+

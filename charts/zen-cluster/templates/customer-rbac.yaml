@@ -1,0 +1,58 @@
+# H037: Customer RBAC - allows customers to manage their own CRDs in their namespace
+# This Role allows customers to create/update Ingester, DeliveryFlow, Destination, EndpointConfig
+# in their own namespace
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: zen-customer-resources
+  namespace: {{ .Values.customerNamespace | default "default" }}
+rules:
+  # H037: Customers can manage Ingester CRDs in their namespace
+  - apiGroups: ["zen.kube-zen.io"]
+    resources: ["ingesters"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  
+  # H037: Customers can manage DeliveryFlow CRDs in their namespace
+  - apiGroups: ["routing.zen.kube-zen.io"]
+    resources: ["deliveryflows"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  
+  # H037: Customers can manage Destination CRDs in their namespace
+  - apiGroups: ["routing.zen.kube-zen.io"]
+    resources: ["destinations"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  
+  # H037: Customers can manage EndpointConfig CRDs in their namespace
+  - apiGroups: ["routing.zen.kube-zen.io"]
+    resources: ["endpointconfigs"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  
+  # H037: Customers can read status subresources
+  - apiGroups: ["zen.kube-zen.io"]
+    resources: ["ingesters/status"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["routing.zen.kube-zen.io"]
+    resources: ["deliveryflows/status", "destinations/status", "endpointconfigs/status"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: zen-customer-resources
+  namespace: {{ .Values.customerNamespace | default "default" }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: zen-customer-resources
+subjects:
+  # H037: Bind to customer's ServiceAccount or User/Group
+  # In production, this should be bound to customer's identity
+  - kind: ServiceAccount
+    name: {{ .Values.customerServiceAccount | default "default" }}
+    namespace: {{ .Values.customerNamespace | default "default" }}
+  # Example: Bind to a user or group
+  # - kind: User
+  #   name: customer-user@example.com
+  # - kind: Group
+  #   name: customer-group

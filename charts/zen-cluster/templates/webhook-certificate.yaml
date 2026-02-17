@@ -1,0 +1,37 @@
+{{- if and .Values.ingress.enabled .Values.webhooks.tls.enabled }}
+# S202: Certificate spec (CN "zen", SAN-driven, rotation-friendly)
+# cert-manager Certificate resource that produces the TLS secret used by ingress
+# Secret: zen-webhook-tls (standardized name)
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "zen-cluster.fullname" . }}-webhook-tls
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "zen-cluster.labels" . | nindent 4 }}
+spec:
+  secretName: {{ .Values.webhooks.tls.secretName | default "zen-webhook-tls" }}
+  # S202: CN "zen" (requested; note: modern TLS validation is SAN-based)
+  commonName: {{ .Values.webhooks.tls.commonName | default "zen" }}
+  # S202: SAN-driven (dnsNames)
+  dnsNames:
+    {{- range .Values.webhooks.tls.dnsNames }}
+    - {{ . }}
+    {{- end }}
+    {{- if .Values.webhooks.tls.wildcardDNS }}
+    - {{ .Values.webhooks.tls.wildcardDNS }}
+    {{- end }}
+  # S202: Private key rotation policy
+  privateKey:
+    rotationPolicy: {{ .Values.webhooks.tls.rotationPolicy | default "Always" }}
+  # S202: Renew before expiration (default 240h = 10 days)
+  renewBefore: {{ .Values.webhooks.tls.renewBefore | default "240h" }}
+  # S202: Issuer: cluster issuer per env (letsencrypt-prod, private CA issuer, or Vault issuer)
+  issuerRef:
+    name: {{ .Values.webhooks.tls.issuerRef.name | required "webhooks.tls.issuerRef.name is required" }}
+    kind: {{ .Values.webhooks.tls.issuerRef.kind | default "ClusterIssuer" }}
+  # Optional: duration (if not specified, issuer default is used)
+  {{- if .Values.webhooks.tls.duration }}
+  duration: {{ .Values.webhooks.tls.duration }}
+  {{- end }}
+{{- end }}

@@ -1,0 +1,22 @@
+{{- if and .Values.ingester.enabled .Values.ingester.pdb.enabled (gt (int .Values.ingester.replicaCount) 1) }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "zen-cluster.fullname" . }}-ingester
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "zen-cluster.labels" . | nindent 4 }}
+    component: ingester
+spec:
+  {{- if .Values.ingester.pdb.minAvailable }}
+  minAvailable: {{ .Values.ingester.pdb.minAvailable }}
+  {{- else if .Values.ingester.pdb.maxUnavailable }}
+  maxUnavailable: {{ .Values.ingester.pdb.maxUnavailable }}
+  {{- else }}
+  minAvailable: 1
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "zen-cluster.selectorLabels" . | nindent 6 }}
+      component: ingester
+{{- end }}

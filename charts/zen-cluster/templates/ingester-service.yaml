@@ -1,0 +1,25 @@
+{{- if .Values.ingester.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "zen-cluster.fullname" . }}-ingester
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "zen-cluster.labels" . | nindent 4 }}
+    component: ingester
+spec:
+  type: ClusterIP
+  ports:
+  - port: {{ .Values.ingester.webhookPort }}
+    targetPort: webhook
+    protocol: TCP
+    name: webhook
+  - port: {{ .Values.ingester.healthPort }}
+    targetPort: health
+    protocol: TCP
+    name: health
+  selector:
+    {{- include "zen-cluster.selectorLabels" . | nindent 4 }}
+    component: ingester
+{{- end }}
+

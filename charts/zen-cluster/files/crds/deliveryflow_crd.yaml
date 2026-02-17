@@ -1,0 +1,217 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: deliveryflows.routing.zen.kube-zen.io
+spec:
+  group: routing.zen.kube-zen.io
+  names:
+    kind: DeliveryFlow
+    listKind: DeliveryFlowList
+    plural: deliveryflows
+    singular: deliveryflow
+    shortNames:
+    - flow
+    - dflow
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            required:
+            - sources
+            - outputs
+            properties:
+              sources:
+                type: array
+                minItems: 1
+                items:
+                  type: object
+                  properties:
+                    ingesterRef:
+                      type: object
+                      required:
+                      - name
+                      properties:
+                        name:
+                          type: string
+                        namespace:
+                          type: string
+                    sourceName:
+                      type: string
+              outputs:
+                type: array
+                minItems: 1
+                items:
+                  type: object
+                  required:
+                  - targets
+                  properties:
+                    name:
+                      type: string
+                    targets:
+                      type: array
+                      minItems: 1
+                      items:
+                        type: object
+                        required:
+                        - destinationRef
+                        - role
+                        properties:
+                          destinationRef:
+                            type: object
+                            required:
+                            - name
+                            properties:
+                              name:
+                                type: string
+                              namespace:
+                                type: string
+                          role:
+                            type: string
+                            enum:
+                            - primary
+                            - standby
+                          activation:
+                            type: string
+                            enum:
+                            - always
+                            - onFailure
+                            default: always
+                    failoverPolicy:
+                      type: object
+                      properties:
+                        switchAfter:
+                          type: string
+                          pattern: ^[0-9]+(ns|us|µs|ms|s|m|h)$
+                        cooldown:
+                          type: string
+                          pattern: ^[0-9]+(ns|us|µs|ms|s|m|h)$
+                        requireHealthyFor:
+                          type: string
+                          pattern: ^[0-9]+(ns|us|µs|ms|s|m|h)$
+                        maxSwitchesPerHour:
+                          type: integer
+                          minimum: 1
+                          default: 10
+          status:
+            type: object
+            properties:
+              conditions:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                      - Entitled
+                      - Ready
+                    status:
+                      type: string
+                      enum:
+                      - 'True'
+                      - 'False'
+                      - Unknown
+                    reason:
+                      type: string
+                    message:
+                      type: string
+                    lastTransitionTime:
+                      type: string
+                      format: date-time
+              outputs:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    activeTarget:
+                      type: object
+                      properties:
+                        destinationRef:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            namespace:
+                              type: string
+                        role:
+                          type: string
+                    linkHealth:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          destinationRef:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              namespace:
+                                type: string
+                          healthy:
+                            type: boolean
+                          lastCheck:
+                            type: string
+                            format: date-time
+                          lastError:
+                            type: string
+                    failoverReason:
+                      type: string
+                    failoverTime:
+                      type: string
+                      format: date-time
+                    bytesSinceActive:
+                      type: integer
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - name: Active-Target
+      type: string
+      description: Current active destination target (namespace/name)
+      jsonPath: .status.outputs[0].activeTarget.destinationRef.name
+      priority: 1
+    - name: Active-Namespace
+      type: string
+      description: Namespace of active target
+      jsonPath: .status.outputs[0].activeTarget.destinationRef.namespace
+      priority: 1
+    - name: Entitlement
+      type: string
+      description: Entitlement status
+      jsonPath: .status.conditions[?(@.type=="Entitled")].status
+      priority: 1
+    - name: Entitlement-Reason
+      type: string
+      description: Entitlement reason (GracePeriod/Expired/NotEntitled)
+      jsonPath: .status.conditions[?(@.type=="Entitled")].reason
+      priority: 1
+    - name: Ready
+      type: string
+      description: Ready condition status
+      jsonPath: .status.conditions[?(@.type=="Ready")].status
+      priority: 1
+    - name: Failover-Count
+      type: integer
+      description: Number of failover events
+      jsonPath: .status.outputs[0].failoverCount
+      priority: 1
+    - name: Sources
+      type: integer
+      description: Number of source configurations
+      jsonPath: '.spec.sources ? size(.spec.sources) : 0'
+    - name: Outputs
+      type: integer
+      description: Number of output configurations
+      jsonPath: '.spec.outputs ? size(.spec.outputs) : 0'
+    - name: Age
+      type: date
+      description: Age of the resource
+      jsonPath: .metadata.creationTimestamp

@@ -1,0 +1,9 @@
+# MVP: Ship DeliveryFlow, Destination, and EndpointConfig CRDs from the same install path.
+# When crds.enabled (default true), all files in files/crds/ are applied with the chart.
+# EndpointConfig is required for dynamic endpoints/receivers datapath.
+{{- if .Values.crds.enabled }}
+{{- range $path, $_ := .Files.Glob "files/crds/*.yaml" }}
+---
+{{ $.Files.Get $path | nindent 0 }}
+{{- end }}
+{{- end }}

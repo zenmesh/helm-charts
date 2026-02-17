@@ -1,0 +1,9 @@
+dependencies:
+- name: keda
+  repository: https://kedacore.github.io/charts
+  version: 2.12.0
+- name: redis
+  repository: https://charts.bitnami.com/bitnami
+  version: 20.0.0
+digest: sha256:31b76a544487f00f42228a5f58c67eeeff390d78393a45c11fff73e6381e8632
+generated: "2026-01-25T05:52:30.632582506-05:00"

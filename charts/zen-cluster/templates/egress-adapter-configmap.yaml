@@ -1,0 +1,28 @@
+{{- /*
+P215: ZenAdapter ConfigMap for egress - triggers zen-agent to register adapter with SaaS and write zen-adapter-cred-<adapterID> Secret.
+When egress.enabled and egress.adapterID are set, this ConfigMap is created.
+zen-agent watches for ConfigMaps with zen.kubezen.io/adapter=true, calls SaaS adapters:sync, derives adapter key, writes Secret.
+Mirrors ingester-adapter-configmap pattern for adapter-type: egress.
+*/}}
+{{- if and .Values.egress.enabled .Values.egress.adapterID }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zen-adapter-egress
+  namespace: {{ .Values.namespace }}
+  labels:
+    zen.kubezen.io/adapter: "true"
+    zen.kubezen.io/adapter-type: "egress"
+    zen.kubezen.io/adapter-id: {{ .Values.egress.adapterID | quote }}
+    zen.kubezen.io/adapter-namespace: {{ .Values.namespace | quote }}
+  annotations:
+    zen.kubezen.io/adapter-config: |
+      {
+        "adapter_id": {{ .Values.egress.adapterID | quote }},
+        "adapter_type": "egress",
+        "namespace": {{ .Values.namespace | quote }},
+        "runtime_class": "tenant-cluster",
+        "service_account": {{ printf "%s-egress" (include "zen-cluster.fullname" .) | quote }}
+      }
+data: {}
+{{- end }}

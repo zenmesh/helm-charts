@@ -1,0 +1,34 @@
+{{- if .Values.join.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "zen-cluster.fullname" . }}-join-policy
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "zen-cluster.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "zen-cluster.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: agent
+  policyTypes:
+  - Ingress
+  ingress:
+  # Allow ingress from component namespaces (zen-ingester, zen-egress, zen-bridge)
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: {{ .Values.namespace }}
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/component: ingester
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/component: egress
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/component: bridge
+    ports:
+    - protocol: TCP
+      port: 8080
+{{- end }}

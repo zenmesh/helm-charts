@@ -1,0 +1,22 @@
+{{- if and .Values.egress.enabled .Values.egress.pdb.enabled (gt (int .Values.egress.replicaCount) 1) }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "zen-cluster.fullname" . }}-egress
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "zen-cluster.labels" . | nindent 4 }}
+    component: egress
+spec:
+  {{- if .Values.egress.pdb.minAvailable }}
+  minAvailable: {{ .Values.egress.pdb.minAvailable }}
+  {{- else if .Values.egress.pdb.maxUnavailable }}
+  maxUnavailable: {{ .Values.egress.pdb.maxUnavailable }}
+  {{- else }}
+  minAvailable: 1
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "zen-cluster.selectorLabels" . | nindent 6 }}
+      component: egress
+{{- end }}

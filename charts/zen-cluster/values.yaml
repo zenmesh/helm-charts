@@ -1,0 +1,548 @@
+# Default values for zen-cluster
+# This is a YAML-formatted file.
+
+namespace: zen-mesh
+
+# KEDA configuration (Kubernetes Event-Driven Autoscaling)
+# KEDA is included as a chart dependency and will be installed automatically
+# License: Apache 2.0 (allows commercial use and distribution)
+# Set keda.enabled=false if you want to use a pre-installed KEDA operator
+keda:
+  enabled: true  # Install KEDA operator automatically (recommended)
+  operator:
+    replicaCount: 1
+    resources:
+      requests:
+        cpu: 100m
+        memory: 100Mi
+      limits:
+        cpu: 500m
+        memory: 500Mi
+  metricsServer:
+    replicaCount: 1
+    resources:
+      requests:
+        cpu: 100m
+        memory: 100Mi
+      limits:
+        cpu: 500m
+        memory: 500Mi
+
+global:
+  registry: docker.io
+  imageTag: "1.0.0"
+  # P134: Plane placement enforcement
+  # Edge/data plane components MUST set plane=data or plane=edge
+  plane: edge  # Allowed: data or edge (default: edge for customer clusters)
+
+ingester:
+  enabled: false  # G102: Disabled by default until ingester repo/code exists (wire-first choice)
+  image:
+    repository: kubezen/zen-ingester
+    tag: "1.0.0-b311"
+    digest: ""  # P227: Optional sha256 digest for immutable pinning (e.g. sha256:abc123...)
+  replicaCount: 2
+  
+  # H603: Adapter ID for auto-enrollment (zen-agent creates zen-adapter-cred-<adapterID> Secret)
+  # If set, credentials will be consumed from zen-adapter-cred-<adapterID> Secret
+  adapterID: ""  # Set to adapter UUID for auto-enrollment via zen-agent
+  # Leader election configuration (Profiles B/C)
+  # Note: zen-ingester uses custom informers, not controller-runtime
+  # This schema is standardized for consistency, but leader election
+  # may need custom implementation if HA is required
+  leaderElection:
+    mode: builtin        # builtin | zenlead | disabled
+    electionID: ""       # default to "zen-ingester-leader-election" if empty
+    leaseName: ""        # required if mode=zenlead
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  webhookPort: 8080
+  healthPort: 8081
+  
+  # KEDA autoscaling configuration
+  keda:
+    enabled: true  # Enable KEDA autoscaling (requires keda.enabled=true)
+    minReplicas: 1
+    maxReplicas: 50
+    cooldownPeriod: 300  # 5 minutes
+    pollingInterval: 30  # 30 seconds
+    prometheusServer: "http://prometheus:9090"  # Prometheus server for metrics
+    triggers:
+      queueDepth: true  # Scale based on queue depth
+      eventRate: true    # Scale based on event ingestion rate
+      cpu: false         # CPU-based scaling (fallback)
+    queueDepthThreshold: "1000"  # Scale up if queue > 1000
+    eventRateThreshold: "100"   # Scale up if > 100 events/s
+    cpuThreshold: "70"           # CPU threshold (if cpu trigger enabled)
+  
+  # B313: Mode A (CRD-only) configuration - default
+  saasBaseURL: ""  # Empty for CRD-only mode
+  clusterID: "sandbox-cluster"  # Non-empty cluster ID (required)
+  tenantID:
+    secretName: "zen-cluster-secrets"  # Secret containing tenant-id (required for Mode A)
+    secretKey: "tenant-id"  # Key name in secret (required for Mode A)
+  # B313: Mode B (SaaS-enabled) configuration - uncomment to enable
+  # saasBaseURL: "https://api.kube-zen.io"  # Non-empty for SaaS mode
+  # rbac:
+  #   secretNames: ["hmac-sandbox-cluster"]  # HMAC secret names (required for Mode B)
+  
+  # Component Join authentication (Age PoP)
+  join:
+    enabled: false  # Enable Join authentication via Age Proof-of-Possession
+    # When enabled, zen-lock will inject age-private-key at /zen-lock/secrets/age-private-key
+    # Component will use this key to authenticate with zen-agent via Join flow
+  
+  # Rate limiting configuration (per-ingester source)
+  # Priority: CRD config > per-source env var > default env var > no rate limit
+  # This allows operators to set global defaults via env vars while still allowing CRD overrides
+  rateLimiting:
+    # Default rate limits (used when source-specific or CRD config not set)
+    default:
+      rpm: 0    # 0 = no default (use CRD config only)
+      burst: 0  # 0 = calculated from RPM if RPM is set
+    # Per-source rate limits (override defaults for specific ingester sources)
+    # Example: falco ingester
+    sources:
+      # falco:
+      #   rpm: 100
+      #   burst: 200
+      # trivy:
+      #   rpm: 50
+      #   burst: 100
+  
+  # Pod Disruption Budget (HA protection)
+  # PDB is only created when replicaCount > 1
+  pdb:
+    enabled: true
+    minAvailable: 1  # Ensure at least 1 pod is available during disruptions
+    # Alternative: use maxUnavailable instead of minAvailable
+    # maxUnavailable: 1
+
+  # Environment variables
+  # CRITICAL: Set ENVIRONMENT=production for production deployments (enforces TLS requirements)
+  # In development, set GRPC_INSECURE_ALLOWED=true for explicit opt-in to insecure connections
+  env:
+    # - name: ENVIRONMENT
+    #   value: "production"  # Required for production: enforces TLS, K8s Secrets requirements
+    # - name: GRPC_INSECURE_ALLOWED
+    #   value: "true"  # Development only: explicit opt-in for insecure gRPC connections (ignored in production)
+    # - name: ALLOW_K8S_SECRETS_FALLBACK
+    #   value: "true"  # Development only: explicit opt-in for K8s Secrets fallback (ignored in production)
+
+egress:
+  enabled: true
+  join:
+    enabled: false
+  image:
+    repository: kubezen/zen-egress
+    tag: "1.0.0"
+    digest: ""  # P227: Optional sha256 digest for immutable pinning
+    pullPolicy: IfNotPresent
+  
+  replicaCount: 2
+
+  service:
+    type: ClusterIP
+    port: 8080
+    grpcPort: 9090
+  healthPath: /healthz
+  readyPath: /readyz
+  logLevel: info
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  keda:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 40
+  autoscaling:
+    enabled: false
+  rbac:
+    create: true
+    rules: []
+  
+  # H603: Adapter ID for auto-enrollment (zen-agent creates zen-adapter-cred-<adapterID> Secret)
+  # If set, credentials will be consumed from zen-adapter-cred-<adapterID> Secret
+  # If not set, falls back to legacy hmacSecretName (deprecated)
+  adapterID: ""  # Set to adapter UUID for auto-enrollment via zen-agent
+  hmacSecretName: ""  # Legacy: Fallback secret name (deprecated, use adapterID instead)
+  
+  # E203: Edge local state persistence (SQLite)
+  state:
+    backend: sqlite  # sqlite or memory (memory for dev only)
+    path: /var/lib/zen/state.db
+    ttlHours: 168  # 7 days default TTL
+    maxSizeMB: 100  # Maximum database size in MB
+  
+  # E203: Volume mount for SQLite persistence
+  persistence:
+    enabled: true
+    # Use emptyDir for dev (default), or PVC for persistence across reschedules
+    type: emptyDir  # emptyDir or pvc
+    pvc:
+      storageClassName: ""  # Use default storage class if empty
+      size: 1Gi
+
+  # CP↔EP/DP mTLS (CP_EP_DP_INTERFACE_MATRIX): optional TLS secret mount for production
+  # When enabled, use secretName (K8s Secret) or zenLockBundle (zen-lock bundle); mutually exclusive.
+  # zenLockBundle: ZenLock CRD name; bundle keys tls.crt, tls.key, ca.crt. Requires zen-lock operator in cluster.
+  tls:
+    enabled: false
+    secretName: ""  # e.g. egress-tls (cert-manager or external)
+    zenLockBundle: ""  # e.g. egress-tls; use zen-lock instead of Secret when set
+    mountPath: /etc/egress-tls
+    certKey: tls.crt
+    keyKey: tls.key
+    caKey: ca.crt
+  
+  # E203: Security context - readOnlyRootFilesystem with writable /var/lib/zen mount
+  securityContext:
+    readOnlyRootFilesystem: true
+
+  serviceAccount:
+    annotations: {}  # Optional; avoid nil when using values overlays (e.g. production)
+
+  # Pod Disruption Budget (HA protection)
+  # PDB is only created when replicaCount > 1
+  pdb:
+    enabled: true
+    minAvailable: 1  # Ensure at least 1 pod is available during disruptions
+    # Alternative: use maxUnavailable instead of minAvailable
+    # maxUnavailable: 1
+
+agent:
+  enabled: false  # H414: Disabled by default until agent code is fully present and tested
+  image:
+    repository: kubezen/zen-agent
+    tag: "1.0.0"
+    digest: ""  # P227: Optional sha256 digest for immutable pinning
+    pullPolicy: IfNotPresent
+  
+  replicaCount: 1  # H308: Single replica by default until enrollment is idempotent and race-safe
+  
+  # Resource limits and requests
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  
+  # Horizontal Pod Autoscaler
+  # H308: Disabled by default until enrollment is idempotent and race-safe
+  # When enabled, minReplicas must be at least 1 to prevent scale-to-zero during enrollment
+  autoscaling:
+    enabled: false  # H308: Disable HPA until enrollment is idempotent (enrollment is already idempotent, but keeping disabled for single-replica stability)
+    minReplicas: 1  # H308: If enabled, must be at least 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+  
+  # Service configuration
+  service:
+    type: ClusterIP
+    port: 8080
+    grpcPort: 9090
+  
+  # Health probe paths
+  healthPath: /healthz
+  readyPath: /readyz
+  
+  # Logging
+  logLevel: info
+  
+  # Required environment variables (must be provided)
+  # H403: Enrollment path - inject SAAS_BASE_URL, TENANT_ID, CLUSTER_ID via values
+  # SAAS_BASE_URL, TENANT_ID, CLUSTER_ID must be provided via env or secrets
+  # NAMESPACE/POD_NAMESPACE auto-detected from pod service account
+  # These can be set via --set agent.env[0].name=SAAS_BASE_URL --set agent.env[0].value="..." during helm install
+  env: []
+  
+  # Component contract configuration (preferred)
+  # Uses standardized component identity envelope
+  component:
+    # Component tenant ID (required)
+    # Example: "550e8400-e29b-41d4-a716-446655440000"
+    tenantId: ""
+    # Component ID (required)
+    # Example: "zen-agent-cluster-abc123" or auto-derived from POD_NAME/HOSTNAME
+    id: ""
+    # Component type (required)
+    # Example: "zen-agent"
+    type: "zen-agent"
+    # Component version (optional, defaults to image tag)
+    version: ""
+    # Component enrollment configuration
+    # Prefer direct enrollmentBundle (single-command UX), fallback to SecretRef
+    enrollment:
+      # Direct enrollment bundle (age-encrypted, base64) - preferred for single copy-paste Helm command
+      enrollmentBundle: ""
+      enrollmentBundleSecretRef:
+        name: ""
+        key: "enrollment_bundle"
+  
+  # H403: Enrollment configuration (injected via install-bundle endpoint) (deprecated, use component.*)
+  saasBaseURL: ""  # Deprecated: Set via --set agent.component.tenantId and saas.endpoint
+  tenantID: ""     # Deprecated: use agent.component.tenantId
+  clusterID: ""    # Deprecated: use agent.component.id
+  
+  # HMAC authentication (for bridge communication)
+  hmacSecretName: zen-cluster-secrets
+  
+  # Service Account (required - high security bar)
+  serviceAccount:
+    name: ""  # Auto-generated if empty
+    annotations: {}
+  
+  # RBAC - Agent needs to watch Observation CRDs
+  # RM-HELM-001: Support namespace-scoped RBAC for multi-tenant deployments
+  rbac:
+    create: true
+    # Scope: "cluster" (ClusterRole) or "namespace" (Role)
+    # Default: "cluster" for backward compatibility
+    # Use "namespace" for better isolation in multi-tenant deployments
+    scope: "cluster"  # cluster | namespace
+    # Custom rules (optional, uses defaults if not specified)
+    rules: []
+      # Example namespace-scoped rules:
+      # - apiGroups: ["zen.kube-zen.io"]
+      #   resources: ["observations"]
+      #   verbs: ["get", "list", "watch", "update", "patch"]
+      # - apiGroups: [""]
+      #   resources: ["secrets"]
+      #   verbs: ["get", "list", "watch", "create", "update", "patch"]
+      # - apiGroups: [""]
+      #   resources: ["configmaps"]
+      #   verbs: ["get", "list", "watch"]
+      # - apiGroups: [""]
+      #   resources: ["events"]
+      #   verbs: ["create", "patch"]
+    # Additional namespaces to watch (for namespace-scoped mode)
+    # When scope=namespace, agent can watch multiple namespaces by creating RoleBindings in each
+    namespaces: []
+      # Example:
+      # - "tenant-1"
+      # - "tenant-2"
+  
+  # Pod Security Context
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    fsGroup: 1000
+    seccompProfile:
+      type: RuntimeDefault
+  
+  # Container Security Context
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+  
+  # Pod Disruption Budget (HA protection)
+  # PDB is only created when replicaCount > 1
+  pdb:
+    enabled: true
+    minAvailable: 1  # Ensure at least 1 pod is available during disruptions
+    # Alternative: use maxUnavailable instead of minAvailable
+    # maxUnavailable: 1
+
+  # Network Policy (RM-HELM-001: Agent network isolation)
+  # Restricts network traffic to only required destinations:
+  # - Kubernetes API server (egress)
+  # - SaaS API endpoint (egress, HTTPS)
+  # - DNS (egress)
+  # - No ingress (agent initiates all connections)
+  networkPolicy:
+    enabled: false  # Enable for production deployments requiring network isolation
+    egress: []  # Additional egress rules (optional)
+
+# Component Join NetworkPolicy (restricts Join endpoint access)
+join:
+  networkPolicy:
+    enabled: false  # Enable NetworkPolicy to restrict Join endpoint access to component namespaces
+      # Example:
+      # - to:
+      #   - namespaceSelector:
+      #       matchLabels:
+      #         name: monitoring
+      #   ports:
+      #   - protocol: TCP
+      #     port: 9090
+  
+  # Node selector
+  nodeSelector: {}
+  
+  # Tolerations
+  tolerations: []
+  
+  # Affinity (anti-affinity to spread across nodes)
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: zen-cluster
+                app.kubernetes.io/component: agent
+            topologyKey: kubernetes.io/hostname
+
+ingress:
+  enabled: true
+  className: nginx
+  grpc:
+    # Host is read from config/env_contract.yaml via scripts/phases/cluster_deploy.sh
+    # Default: sandbox. Override via --set ingress.grpc.host=api.staging.kube-zen.io
+    host: "api.kube-zen.io"  # Default: sandbox. Override for other environments
+    service: zen-ingester
+    port: 8080
+    annotations:
+      nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+      nginx.ingress.kubernetes.io/grpc-read-timeout: "300"
+      nginx.ingress.kubernetes.io/grpc-send-timeout: "300"
+  tls:
+    secretName: kube-zen-tls
+  # S201-S206: Webhook ingress configuration
+  webhook:
+    enabled: true
+    host: "zen.kube-zen.io"  # Default: sandbox. Override for other environments
+    service: zen-ingester
+    port: 8080
+    path: "/ingest"
+    annotations: {}  # Optional; avoid nil when using overlays
+    tls:
+      secretName: zen-webhook-tls  # Managed by cert-manager Certificate
+
+# S306: Edge provider abstraction (Ingress now, Gateway API future)
+edge:
+  # Mode: ingress (default, supported now) | gatewayapi (future, north star)
+  mode: ingress  # ingress | gatewayapi
+  host: "zen.kube-zen.io"  # Base host for webhook endpoints
+  tls:
+    secretName: zen-webhook-tls  # Shared TLS Secret (cert-manager managed)
+  # Gateway API configuration (future, when mode=gatewayapi)
+  gatewayapi:
+    gatewayClassName: nginx  # Gateway class name
+    namespace: zen-mesh  # Gateway namespace
+
+# S201-S206: Webhook endpoint configuration
+webhooks:
+  enabled: true
+  # Mode: path (default) or subdomain (optional)
+  mode: path  # path | subdomain
+  # Base URL format:
+  # path: https://zen.<env>.<dp-domain>/ingest/<tenant-id>/<webhook-id>
+  # subdomain: https://<hooklabel>.zen.<env>.<dp-domain>
+  baseURL: "https://zen.kube-zen.io"  # Resolved per environment
+  wildcardBase: "*.zen.kube-zen.io"  # Only used if mode=subdomain
+  # S202: TLS certificate configuration (cert-manager)
+  tls:
+    enabled: true
+    secretName: zen-webhook-tls  # Standardized secret name
+    commonName: zen  # CN "zen" (requested; modern TLS validation is SAN-based)
+    dnsNames:
+      - zen.kube-zen.io  # Base domain
+      # Wildcard DNS (only if mode=subdomain)
+      # - "*.zen.kube-zen.io"
+    # Rotation policy
+    rotationPolicy: Always
+    renewBefore: 240h  # 10 days
+    # Issuer configuration (required - set per environment)
+    issuerRef:
+      name: letsencrypt-prod  # or letsencrypt-staging, vault-issuer, etc.
+      kind: ClusterIssuer
+    # Optional: certificate duration (if not specified, issuer default is used)
+    # duration: 2160h  # 90 days
+
+
+# Bootstrap configuration
+bootstrap:
+  # Enable bootstrap Job for cluster onboarding via GitOps
+  # When enabled, the Job will:
+  # 1. Wait for zen-agent service to be ready
+  # 2. Read enrollment bundle from Secret (enrollmentBundleSecretRef)
+  # 3. Call zen-agent HTTP endpoint POST /v1/agents/bootstrap with tenant_id, cluster_id, enrollment_bundle
+  # 4. zen-agent validates bundle, derives HMAC key deterministically, and creates Kubernetes Secret
+  # 5. Job exits idempotently if secret already exists (no bundle reuse - replay protection)
+  enabled: false
+  
+  # Enrollment bundle secret reference (age-encrypted, time-limited, no plaintext secrets in values)
+  # Bundle should be provided via external secret management (e.g., External Secrets Operator, Sealed Secrets)
+  enrollmentBundleSecretRef:
+    name: "enrollment-bundle"  # Secret name containing enrollment bundle (default)
+    key: "enrollment_bundle"   # Key name in secret
+  
+  # SaaS endpoint for bootstrap API
+  saasEndpoint: "https://api.kube-zen.io"
+  
+  # Target namespace for HMAC secret (defaults to chart namespace)
+  targetNamespace: ""
+  
+  # HMAC secret name (defaults to hmac-{cluster-id})
+  hmacSecretName: ""
+  
+  # zen-agent service name (defaults to {release-name}-agent, e.g., zen-cluster-agent)
+  # This should match the service name of the deployed zen-agent
+  agentServiceName: ""  # Auto-generated from release name if empty
+
+# Service account configuration
+serviceAccount:
+  create: true
+
+# H034: Network Policy configuration for split-by-namespace parity
+networkPolicy:
+  enabled: false  # Disabled by default - enable for sandbox/testing
+  defaultDeny: true  # Default deny all traffic
+  allowList: []  # Explicit allow-list rules (configured via values overlays)
+  name: ""
+
+# CRDs configuration (MVP: EndpointConfig + DeliveryFlow + Destination)
+crds:
+  # When true, installs DeliveryFlow, Destination, and EndpointConfig from files/crds/.
+  # Set to false if CRDs are managed separately (e.g., ArgoCD, Flux).
+  enabled: true
+
+# H045: PCI Zone (optional). Enable via values.pci-zone.yaml or --set pciZone.enabled=true
+pciZone:
+  enabled: false
+
+# H045: Segmentation test job (proves forbidden paths blocked). Requires pciZone.enabled.
+segmentationTest:
+  enabled: false
+  schedule: "0 */6 * * *"
+  image:
+    repository: kubezen/zen-ingester
+    tag: "1.0.0"
+  tests: []
+
+# Redis configuration (optional - defaults to in-memory storage if not enabled)
+# Redis is used for nonce tracking and idempotency in zen-ingester and zen-egress (default OFF)
+redis:
+  enabled: false  # Default OFF for edge components (defaults to in-memory)
+  auth:
+    enabled: false  # Set to true and provide password in production
+    password: ""  # Redis password (set via secret in production)
+  architecture: standalone  # standalone or replication
+  master:
+    persistence:
+      enabled: true
+      size: 4Gi
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi

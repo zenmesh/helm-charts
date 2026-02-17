@@ -1,0 +1,237 @@
+{{- include "zen-cluster.validatePlane" . }}
+{{- include "zen-cluster.commitmentValidations" . }}
+{{- if .Values.ingester.enabled }}
+{{- include "zen-cluster.validateIngesterLeaderElection" . }}
+{{- /* B313: Template validation guardrails - fail fast with actionable errors */}}
+{{- if .Values.ingester.adapterID }}
+{{- /* H713: Adapter mode — zen-agent provisions all credentials (tenant, cluster, saas endpoint).
+       No clusterID, tenantID, or saasBaseURL required in Helm values. */}}
+{{- else }}
+{{- /* Non-adapter modes: require clusterID */}}
+{{- if not .Values.ingester.clusterID }}
+{{- fail "zen-cluster.ingester.clusterID is required when adapterID is not set. Set ingester.clusterID or use ingester.adapterID for agent-mediated enrollment." }}
+{{- end }}
+{{- if .Values.ingester.saasBaseURL }}
+{{- /* Mode B (SaaS-enabled legacy): require rbac.secretNames and tenantID */}}
+{{- if not (hasKey .Values.ingester "rbac") }}
+{{- fail "zen-cluster.ingester.rbac is required when saasBaseURL is set and adapterID is not provided. Either set adapterID for agent-mediated enrollment, or configure rbac.secretNames." }}
+{{- end }}
+{{- if not .Values.ingester.rbac.secretNames }}
+{{- fail "zen-cluster.ingester.rbac.secretNames is required when saasBaseURL is set and adapterID is not provided." }}
+{{- end }}
+{{- if eq (len .Values.ingester.rbac.secretNames) 0 }}
+{{- fail "zen-cluster.ingester.rbac.secretNames must contain at least one secret name." }}
+{{- end }}
+{{- if not (hasKey .Values.ingester "tenantID") }}
+{{- fail "zen-cluster.ingester.tenantID is required when saasBaseURL is set and adapterID is not provided." }}
+{{- end }}
+{{- if not .Values.ingester.tenantID.secretName }}
+{{- fail "zen-cluster.ingester.tenantID.secretName is required." }}
+{{- end }}
+{{- if not .Values.ingester.tenantID.secretKey }}
+{{- fail "zen-cluster.ingester.tenantID.secretKey is required." }}
+{{- end }}
+{{- else }}
+{{- /* Mode A (CRD-only): require tenantID secret reference */}}
+{{- if not (hasKey .Values.ingester "tenantID") }}
+{{- fail "zen-cluster.ingester.tenantID is required when saasBaseURL is empty (Mode A). Configure tenantID.secretName and tenantID.secretKey." }}
+{{- end }}
+{{- if not .Values.ingester.tenantID.secretName }}
+{{- fail "zen-cluster.ingester.tenantID.secretName is required when saasBaseURL is empty (Mode A)." }}
+{{- end }}
+{{- if not .Values.ingester.tenantID.secretKey }}
+{{- fail "zen-cluster.ingester.tenantID.secretKey is required when saasBaseURL is empty (Mode A)." }}
+{{- end }}
+{{- end }}
+{{- end }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "zen-cluster.fullname" . }}-ingester
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "zen-cluster.labels" . | nindent 4 }}
+    component: ingester
+spec:
+  {{- if and .Values.ingester.enabled .Values.ingester.keda.enabled .Values.keda.enabled }}
+  # KEDA will manage replicas - set initial count
+  replicas: {{ .Values.ingester.keda.minReplicas | default 1 }}
+  {{- else }}
+  replicas: {{ .Values.ingester.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "zen-cluster.selectorLabels" . | nindent 6 }}
+      component: ingester
+  template:
+    metadata:
+      labels:
+        {{- include "zen-cluster.selectorLabels" . | nindent 8 }}
+        component: ingester
+      {{- if .Values.ingester.join.enabled }}
+      annotations:
+        # zen-lock injection annotations for Join authentication
+        zen-lock/inject: "zen-join-zen-ingester"
+        zen-lock/mount-path: "/zen-lock/secrets"
+      {{- end }}
+    spec:
+      serviceAccountName: {{ include "zen-cluster.fullname" . }}-ingester
+      volumes:
+      {{- if and .Values.ingester.saasBaseURL (not .Values.ingester.adapterID) }}
+      {{- /* Mode B Legacy: Mount HMAC secrets as volumes */}}
+      - name: hmac-secret-{{ (index .Values.ingester.rbac.secretNames 0) | replace "-" "-" | replace "." "-" | lower | trunc 63 | trimSuffix "-" }}
+        secret:
+          secretName: {{ index .Values.ingester.rbac.secretNames 0 }}
+      {{- end }}
+      {{- if .Values.ingester.adapterID }}
+      {{- /* H713: Adapter cred from zen-agent; optional so pod can start before secret exists */}}
+      - name: adapter-cred
+        secret:
+          secretName: zen-adapter-cred-{{ .Values.ingester.adapterID }}
+          optional: true
+      {{- end }}
+      containers:
+      - name: ingester
+        image: {{ include "zen-cluster.image" (dict "registry" .Values.global.registry "repo" .Values.ingester.image.repository "tag" ( .Values.ingester.image.tag | default .Values.global.imageTag ) "digest" .Values.ingester.image.digest ) | quote }}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: {{ .Values.ingester.webhookPort }}
+          name: webhook
+        - containerPort: {{ .Values.ingester.healthPort }}
+          name: health
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: health
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: health
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          {{- toYaml .Values.ingester.resources | nindent 10 }}
+        env:
+        # Per-ingester rate limit configuration (for zen-ingester webhook adapter)
+        # Format: RATE_LIMIT_INGESTER_{SOURCE}_RPM and RATE_LIMIT_INGESTER_{SOURCE}_BURST
+        # Example: RATE_LIMIT_INGESTER_FALCO_RPM=100, RATE_LIMIT_INGESTER_FALCO_BURST=200
+        # Default rate limits (used when source-specific or CRD config not set)
+        {{- if .Values.ingester.rateLimiting.default.rpm }}
+        - name: RATE_LIMIT_INGESTER_DEFAULT_RPM
+          value: {{ .Values.ingester.rateLimiting.default.rpm | quote }}
+        {{- end }}
+        {{- if .Values.ingester.rateLimiting.default.burst }}
+        - name: RATE_LIMIT_INGESTER_DEFAULT_BURST
+          value: {{ .Values.ingester.rateLimiting.default.burst | quote }}
+        {{- end }}
+        # Per-source rate limits (override defaults for specific ingester sources)
+        {{- range $source, $config := .Values.ingester.rateLimiting.sources }}
+        {{- if $config.rpm }}
+        - name: RATE_LIMIT_INGESTER_{{ $source | upper }}_RPM
+          value: {{ $config.rpm | quote }}
+        {{- end }}
+        {{- if $config.burst }}
+        - name: RATE_LIMIT_INGESTER_{{ $source | upper }}_BURST
+          value: {{ $config.burst | quote }}
+        {{- end }}
+        {{- end }}
+        - name: GOTRACEBACK
+          value: "all"
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: LEADER_ELECTION_MODE
+          value: {{ .Values.ingester.leaderElection.mode | quote }}
+        {{- if .Values.ingester.leaderElection.electionID }}
+        - name: LEADER_ELECTION_ID
+          value: {{ .Values.ingester.leaderElection.electionID | quote }}
+        {{- end }}
+        {{- if eq .Values.ingester.leaderElection.mode "zenlead" }}
+        - name: LEADER_ELECTION_LEASE_NAME
+          value: {{ .Values.ingester.leaderElection.leaseName | quote }}
+        {{- end }}
+        {{- if .Values.ingester.adapterID }}
+        {{- /* H713: Adapter mode - IDs come from agent-provisioned secret; set ADAPTER_ID and SECRET_BASE_PATH */}}
+        - name: ADAPTER_ID
+          value: {{ .Values.ingester.adapterID | quote }}
+        - name: SECRET_BASE_PATH
+          value: "/etc/secrets"
+        {{- else }}
+        - name: SAAS_BASE_URL
+          value: {{ .Values.ingester.saasBaseURL | quote }}
+        - name: CLUSTER_ID
+          value: {{ .Values.ingester.clusterID | quote }}
+        {{- if not .Values.ingester.saasBaseURL }}
+        {{- /* Mode A: TENANT_ID from secret */}}
+        - name: TENANT_ID
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.ingester.tenantID.secretName }}
+              key: {{ .Values.ingester.tenantID.secretKey }}
+        {{- else }}
+        {{- /* Mode B Legacy: TENANT_ID from secret */}}
+        {{- if .Values.ingester.tenantID }}
+        - name: TENANT_ID
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.ingester.tenantID.secretName }}
+              key: {{ .Values.ingester.tenantID.secretKey }}
+        {{- end }}
+        {{- end }}
+        {{- end }}
+        {{- /* H713: When adapterID is set, credentials come from volume mount at SECRET_BASE_PATH - no secretKeyRef */}}
+        {{- /* Redis configuration (optional - defaults to in-memory if not enabled) */}}
+        {{- if .Values.redis.enabled }}
+        - name: REDIS_URL
+          {{- if .Values.redis.auth.enabled }}
+          {{- if .Values.redis.auth.password }}
+          value: "redis://:{{ .Values.redis.auth.password }}@{{ .Release.Name }}-redis-master:6379"
+          {{- else }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-redis
+              key: redis-password
+              optional: true
+          {{- end }}
+          {{- else }}
+          value: "redis://{{ .Release.Name }}-redis-master:6379"
+          {{- end }}
+        {{- end }}
+        {{- /* Environment variables from values.yaml (e.g., ENVIRONMENT, GRPC_INSECURE_ALLOWED, ALLOW_K8S_SECRETS_FALLBACK) */}}
+        {{- range .Values.ingester.env }}
+        - name: {{ .name }}
+          {{- if .value }}
+          value: {{ .value | quote }}
+          {{- else if .valueFrom }}
+          valueFrom:
+            {{- toYaml .valueFrom | nindent 12 }}
+          {{- end }}
+        {{- end }}
+        {{- if or (and .Values.ingester.saasBaseURL (not .Values.ingester.adapterID)) .Values.ingester.adapterID }}
+        volumeMounts:
+        {{- if and .Values.ingester.saasBaseURL (not .Values.ingester.adapterID) }}
+        {{- /* Mode B Legacy: Mount HMAC secret to /etc/secrets/<cluster-id>/hmac-key */}}
+        - name: hmac-secret-{{ (index .Values.ingester.rbac.secretNames 0) | replace "-" "-" | replace "." "-" | lower | trunc 63 | trimSuffix "-" }}
+          mountPath: /etc/secrets/{{ .Values.ingester.clusterID }}
+          readOnly: true
+        {{- end }}
+        {{- if .Values.ingester.adapterID }}
+        {{- /* H713: Mount adapter credential at SECRET_BASE_PATH (optional - pod starts before zen-agent creates secret) */}}
+        - name: adapter-cred
+          mountPath: /etc/secrets
+          readOnly: true
+        {{- end }}
+        {{- end }}
+        startupProbe:
+          httpGet:
+            path: /healthz
+            port: health
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 30
+{{- end }}
+

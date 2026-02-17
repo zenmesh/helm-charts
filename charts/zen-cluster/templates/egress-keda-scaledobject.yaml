@@ -1,0 +1,49 @@
+{{- if and .Values.egress.enabled .Values.egress.keda.enabled }}
+{{- if .Values.keda.enabled }}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ include "zen-cluster.fullname" . }}-egress
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "zen-cluster.labels" . | nindent 4 }}
+    app.kubernetes.io/component: egress
+    managed-by: keda
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "zen-cluster.fullname" . }}-egress
+  minReplicaCount: {{ .Values.egress.keda.minReplicas | default 1 }}
+  maxReplicaCount: {{ .Values.egress.keda.maxReplicas | default 40 }}
+  cooldownPeriod: {{ .Values.egress.keda.cooldownPeriod | default 300 }}
+  pollingInterval: {{ .Values.egress.keda.pollingInterval | default 30 }}
+  triggers:
+  {{- if and (hasKey .Values.egress.keda "triggers") .Values.egress.keda.triggers.queueDepth }}
+  # Scale based on egress queue depth
+  - type: prometheus
+    metadata:
+      serverAddress: {{ .Values.egress.keda.prometheusServer | default "http://prometheus:9090" }}
+      metricName: egress_queue_depth
+      threshold: "{{ .Values.egress.keda.queueDepthThreshold | default "500" }}"
+      query: sum(egress_queue_depth{component="zen-egress"})
+  {{- end }}
+  {{- if and (hasKey .Values.egress.keda "triggers") .Values.egress.keda.triggers.eventRate }}
+  # Scale based on egress dispatch rate
+  - type: prometheus
+    metadata:
+      serverAddress: {{ .Values.egress.keda.prometheusServer | default "http://prometheus:9090" }}
+      metricName: egress_events_per_second
+      threshold: "{{ .Values.egress.keda.eventRateThreshold | default "80" }}"
+      query: sum(rate(egress_events_total{component="zen-egress"}[1m]))
+  {{- end }}
+  {{- if and (hasKey .Values.egress.keda "triggers") .Values.egress.keda.triggers.cpu }}
+  # Scale based on CPU utilization (fallback)
+  - type: cpu
+    metadata:
+      type: Utilization
+      value: "{{ .Values.egress.keda.cpuThreshold | default "70" }}"
+  {{- end }}
+{{- end }}
+{{- end }}
+

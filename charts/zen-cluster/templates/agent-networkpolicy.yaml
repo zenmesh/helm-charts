@@ -1,0 +1,54 @@
+{{- if and .Values.agent.enabled .Values.agent.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "zen-cluster.fullname" . }}-agent
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "zen-cluster.labels" . | nindent 4 }}
+    component: agent
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "zen-cluster.selectorLabels" . | nindent 6 }}
+      component: agent
+  policyTypes:
+    - Ingress
+    - Egress
+  
+  # No ingress allowed (agent initiates all connections)
+  ingress: []
+  
+  egress:
+    # Allow egress to Kubernetes API server
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: TCP
+          port: 443
+    # Allow egress to SaaS API (HTTPS)
+    {{- if .Values.agent.saasBaseURL }}
+    - to: []  # Allow all external egress (SaaS is external)
+      ports:
+        - protocol: TCP
+          port: 443
+    {{- end }}
+    # Allow DNS resolution
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # Allow custom egress rules if configured
+    {{- if .Values.agent.networkPolicy.egress }}
+    {{- range .Values.agent.networkPolicy.egress }}
+    - {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- end }}
+{{- end }}

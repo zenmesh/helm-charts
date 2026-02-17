@@ -1,0 +1,49 @@
+{{- if and .Values.ingester.enabled .Values.ingester.keda.enabled }}
+{{- if .Values.keda.enabled }}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ include "zen-cluster.fullname" . }}-ingester
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "zen-cluster.labels" . | nindent 4 }}
+    app.kubernetes.io/component: ingester
+    managed-by: keda
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "zen-cluster.fullname" . }}-ingester
+  minReplicaCount: {{ .Values.ingester.keda.minReplicas | default 1 }}
+  maxReplicaCount: {{ .Values.ingester.keda.maxReplicas | default 50 }}
+  cooldownPeriod: {{ .Values.ingester.keda.cooldownPeriod | default 300 }}
+  pollingInterval: {{ .Values.ingester.keda.pollingInterval | default 30 }}
+  triggers:
+  {{- if and (hasKey .Values.ingester.keda "triggers") .Values.ingester.keda.triggers.queueDepth }}
+  # Scale based on observation queue depth
+  - type: prometheus
+    metadata:
+      serverAddress: {{ .Values.ingester.keda.prometheusServer | default "http://prometheus:9090" }}
+      metricName: ingester_queue_depth
+      threshold: "{{ .Values.ingester.keda.queueDepthThreshold | default "1000" }}"
+      query: sum(ingester_queue_depth{component="zen-ingester"})
+  {{- end }}
+  {{- if and (hasKey .Values.ingester.keda "triggers") .Values.ingester.keda.triggers.eventRate }}
+  # Scale based on ingestion rate
+  - type: prometheus
+    metadata:
+      serverAddress: {{ .Values.ingester.keda.prometheusServer | default "http://prometheus:9090" }}
+      metricName: ingester_events_per_second
+      threshold: "{{ .Values.ingester.keda.eventRateThreshold | default "100" }}"
+      query: sum(rate(ingester_events_total{component="zen-ingester"}[1m]))
+  {{- end }}
+  {{- if and (hasKey .Values.ingester.keda "triggers") .Values.ingester.keda.triggers.cpu }}
+  # Scale based on CPU utilization (fallback)
+  - type: cpu
+    metadata:
+      type: Utilization
+      value: "{{ .Values.ingester.keda.cpuThreshold | default "70" }}"
+  {{- end }}
+{{- end }}
+{{- end }}
+

@@ -1,0 +1,37 @@
+{{- if and .Values.agent.enabled (eq .Values.agent.rbac.scope "namespace") }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "zen-cluster.fullname" . }}-agent
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "zen-cluster.labels" . | nindent 4 }}
+    app.kubernetes.io/component: agent
+rules:
+  {{- if .Values.agent.rbac.rules }}
+  {{- toYaml .Values.agent.rbac.rules | nindent 2 }}
+  {{- else }}
+  # Default namespace-scoped rules
+  - apiGroups: ["zen.kube-zen.io"]
+    resources: ["observations"]
+    verbs: ["get", "list", "watch", "update", "patch"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "patch"]
+  {{- end }}
+  # Additional namespace-scoped rules for multi-namespace deployments
+  {{- if .Values.agent.rbac.namespaces }}
+  {{- range .Values.agent.rbac.namespaces }}
+  - apiGroups: ["zen.kube-zen.io"]
+    resources: ["observations"]
+    resourceNames: []
+    verbs: ["get", "list", "watch"]
+  {{- end }}
+  {{- end }}
+{{- end }}

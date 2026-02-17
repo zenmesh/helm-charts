@@ -1,0 +1,19 @@
+{{- if and .Values.egress.enabled (eq .Values.egress.persistence.type "pvc") }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "zen-cluster.fullname" . }}-egress-state
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "zen-cluster.labels" . | nindent 4 }}
+    app.kubernetes.io/component: egress
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.egress.persistence.pvc.size | default "1Gi" }}
+  {{- if .Values.egress.persistence.pvc.storageClassName }}
+  storageClassName: {{ .Values.egress.persistence.pvc.storageClassName }}
+  {{- end }}
+{{- end }}

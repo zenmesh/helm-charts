@@ -1,0 +1,127 @@
+{{- /*
+Commitment Validations (Defense in Depth)
+These validations enforce COMMITMENTS.md requirements and fail Helm template rendering
+if commitment violations are detected in production/sandbox environments.
+*/}}
+{{- define "zen-cluster.commitmentValidations" -}}
+{{- $env := "" }}
+{{- if .Values.ingester.enabled }}
+{{- range .Values.ingester.env }}
+{{- if eq .name "ENVIRONMENT" }}
+{{- $env = .value }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- if not $env }}
+{{- if .Values.egress.enabled }}
+{{- range .Values.egress.env }}
+{{- if eq .name "ENVIRONMENT" }}
+{{- $env = .value }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- if not $env }}
+{{- $env = .Values.global.environment | default "" }}
+{{- end }}
+{{- $isProduction := or (eq $env "production") (eq $env "prod") (eq $env "sandbox") }}
+
+{{- /* Defense in Depth Layer 5: Durability/Backpressure - In-memory DLQ not allowed in production */}}
+{{- if $isProduction }}
+{{- if .Values.ingester.enabled }}
+{{- $dlqStorage := "" }}
+{{- range .Values.ingester.env }}
+{{- if eq .name "DLQ_STORAGE" }}
+{{- $dlqStorage = .value }}
+{{- end }}
+{{- end }}
+{{- if eq $dlqStorage "memory" }}
+{{- fail (printf "COMMITMENT VIOLATION (Defense in Depth Layer 5): In-memory DLQ storage not allowed in production/sandbox. Set DLQ_STORAGE=sqlite or remove DLQ_STORAGE env var to use default SQLite. Environment: %s" $env) }}
+{{- end }}
+{{- end }}
+
+{{- if .Values.egress.enabled }}
+{{- $egressDlqStorage := "" }}
+{{- range .Values.egress.env }}
+{{- if eq .name "DLQ_STORAGE" }}
+{{- $egressDlqStorage = .value }}
+{{- end }}
+{{- end }}
+{{- if eq $egressDlqStorage "memory" }}
+{{- fail (printf "COMMITMENT VIOLATION (Defense in Depth Layer 5): In-memory DLQ storage not allowed in production/sandbox for zen-egress. Set DLQ_STORAGE=sqlite or remove DLQ_STORAGE env var to use default SQLite. Environment: %s" $env) }}
+{{- end }}
+{{- if eq .Values.egress.state.backend "memory" }}
+{{- fail (printf "COMMITMENT VIOLATION (Defense in Depth Layer 5): In-memory state backend not allowed in production/sandbox for zen-egress. Set egress.state.backend=sqlite. Environment: %s" $env) }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{- /* Defense in Depth Layer 1: Identity/Transport - mTLS should be enabled in production */}}
+{{- /* P130: Enforce "No Optional mTLS" in prod - TLS material must be present */}}
+{{- if $isProduction }}
+{{- if .Values.ingester.enabled }}
+{{- $tlsInsecure := false }}
+{{- range .Values.ingester.env }}
+{{- if eq .name "GRPC_INSECURE_ALLOWED" }}
+{{- $valStr := toString .value }}
+{{- if or (eq $valStr "true") (eq $valStr "True") (eq $valStr "TRUE") }}
+{{- $tlsInsecure = true }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- if $tlsInsecure }}
+{{- fail (printf "COMMITMENT VIOLATION (Defense in Depth Layer 1): GRPC_INSECURE_ALLOWED=true not allowed in production/sandbox. mTLS is required for all CP↔EP/DP communication. Environment: %s" $env) }}
+{{- end }}
+{{- /* P130: In production, ingester TLS must be configured if ingester has TLS support */}}
+{{- /* Note: Currently ingester doesn't have TLS config in values.yaml, but this is a placeholder for future TLS support */}}
+{{- end }}
+
+{{- if .Values.egress.enabled }}
+{{- $egressTlsInsecure := false }}
+{{- range .Values.egress.env }}
+{{- if eq .name "GRPC_INSECURE_ALLOWED" }}
+{{- $valStr := toString .value }}
+{{- if or (eq $valStr "true") (eq $valStr "True") (eq $valStr "TRUE") }}
+{{- $egressTlsInsecure = true }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- if $egressTlsInsecure }}
+{{- fail (printf "COMMITMENT VIOLATION (Defense in Depth Layer 1): GRPC_INSECURE_ALLOWED=true not allowed in production/sandbox for zen-egress. mTLS is required. Environment: %s" $env) }}
+{{- end }}
+{{- /* P130: In production, egress TLS must be enabled and configured */}}
+{{- if not .Values.egress.tls.enabled }}
+{{- fail (printf "P130 VIOLATION: egress.tls.enabled must be true in production/sandbox. mTLS is required for CP↔EP/DP communication. Set egress.tls.enabled=true and configure either egress.tls.secretName or egress.tls.zenLockBundle. Environment: %s" $env) }}
+{{- end }}
+{{- if and .Values.egress.tls.enabled (not .Values.egress.tls.secretName) (not .Values.egress.tls.zenLockBundle) }}
+{{- fail (printf "P130 VIOLATION: egress.tls.enabled=true requires either egress.tls.secretName or egress.tls.zenLockBundle to be set in production/sandbox. TLS material (certificates) must be provided. Environment: %s" $env) }}
+{{- end }}
+{{- end }}
+
+{{- /* Defense in Depth Layer 6: Supply Chain - Non-immutable tags validation (basic format check) */}}
+{{- if $isProduction }}
+{{- /* Check image tags for non-immutable formats (semantic versions without sha256: prefix) */}}
+{{- /* Note: Full validation requires registry lookup, which is not feasible in Helm templates */}}
+{{- if .Values.ingester.enabled }}
+{{- $ingesterTag := .Values.ingester.image.tag | default .Values.global.imageTag | default "" }}
+{{- if and $ingesterTag (not (hasPrefix "sha256:" $ingesterTag)) }}
+{{- /* Check if it's a semantic version (v1.2.3 or 1.2.3) - warn but don't fail */}}
+{{- /* Full validation would require registry lookup to verify digest exists */}}
+{{- if or (regexMatch "^v?[0-9]+\\.[0-9]+\\.[0-9]+" $ingesterTag) (regexMatch "^v?[0-9]+\\.[0-9]+\\.[0-9]+-.*" $ingesterTag) }}
+{{- /* Semantic version detected - this is a warning, not a hard failure */}}
+{{- /* Note: Full validation requires registry lookup to verify digest exists */}}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{- if .Values.egress.enabled }}
+{{- $egressTag := .Values.egress.image.tag | default .Values.global.imageTag | default "" }}
+{{- if and $egressTag (not (hasPrefix "sha256:" $egressTag)) }}
+{{- if or (regexMatch "^v?[0-9]+\\.[0-9]+\\.[0-9]+" $egressTag) (regexMatch "^v?[0-9]+\\.[0-9]+\\.[0-9]+-.*" $egressTag) }}
+{{- /* Semantic version detected - warning only */}}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

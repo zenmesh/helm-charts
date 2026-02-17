@@ -1,0 +1,73 @@
+# Production deployment profile for zen-cluster
+# Enforces security best practices including mandatory NetworkPolicies
+
+# Network Policy: REQUIRED in production for zero-trust security
+networkPolicy:
+  enabled: true  # REQUIRED: Network policies must be enabled in production
+  defaultDeny: true  # Enforce default deny all traffic
+  allowList:
+    # Allow ingress from SaaS plane (bridge)
+    - from:
+        namespaceSelector:
+          matchLabels:
+            zen.kube-zen.com/plane: saas
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/component: bridge
+      ports:
+        - protocol: TCP
+          port: 8080
+    # Allow egress to SaaS plane (control-plane communication)
+    - to:
+        namespaceSelector:
+          matchLabels:
+            zen.kube-zen.com/plane: saas
+      ports:
+        - protocol: TCP
+          port: 443
+    # Allow egress to external destinations (via egress proxy if configured)
+    - to:
+        namespaceSelector:
+          matchLabels:
+            zen.kube-zen.com/plane: egress-proxy
+      ports:
+        - protocol: TCP
+          port: 443
+    # Always allow DNS
+    - to:
+        namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+# Security: Enable all security features
+security:
+  enabled: true
+  # Enforce TLS for all connections
+  tls:
+    enabled: true
+    required: true
+  # Enforce mTLS for service-to-service
+  mtls:
+    enabled: true
+    required: true
+
+# CP↔EP/DP mTLS fail-closed (see CP_EP_DP_INTERFACE_MATRIX.md): egress must use TLS in production
+# egress.tls: mount secret, inject EGRESS_*_TLS_* paths. Create Secret "egress-tls" (tls.crt, tls.key, ca.crt) via cert-manager or external.
+egress:
+  env:
+    - name: ENVIRONMENT
+      value: "production"
+    - name: EGRESS_GRPC_TLS_ENABLED
+      value: "true"
+    - name: EGRESS_HTTP_TLS_ENABLED
+      value: "true"
+  tls:
+    enabled: true
+    secretName: egress-tls  # Secret with tls.crt, tls.key, ca.crt (cert-manager or external)
+
+# Bridge TLS: use zen-saas chart bridge.tls (secretName, mountPath). See charts/zen-saas/values.yaml bridge.tls.

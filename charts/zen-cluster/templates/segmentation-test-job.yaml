@@ -1,0 +1,115 @@
+{{- if and .Values.pciZone.enabled .Values.segmentationTest.enabled }}
+# H045: Segmentation test job for PCI zone
+# Automated test that proves forbidden paths are blocked (CI gate)
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "zen-cluster.fullname" . }}-segmentation-test
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "zen-cluster.labels" . | nindent 4 }}
+    zen.kube-zen.com/pci-zone: "true"
+    app.kubernetes.io/component: segmentation-test
+spec:
+  schedule: {{ .Values.segmentationTest.schedule | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            {{- include "zen-cluster.selectorLabels" . | nindent 12 }}
+            app.kubernetes.io/component: segmentation-test
+        spec:
+          restartPolicy: OnFailure
+          serviceAccountName: {{ include "zen-cluster.serviceAccountName" . }}-segmentation-test
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            fsGroup: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+          - name: segmentation-test
+            image: "{{ .Values.global.registry }}/{{ .Values.segmentationTest.image.repository }}:{{ .Values.segmentationTest.image.tag }}"
+            imagePullPolicy: IfNotPresent
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
+              readOnlyRootFilesystem: true
+              runAsNonRoot: true
+              runAsUser: 1000
+            env:
+            - name: TEST_NAMESPACE
+              value: {{ .Release.Namespace | quote }}
+            - name: PCI_ZONE_ENABLED
+              value: "true"
+            {{- range .Values.segmentationTest.tests }}
+            - name: TEST_{{ .name | upper | replace "-" "_" }}_FROM_NS
+              value: {{ .from.namespace | quote }}
+            - name: TEST_{{ .name | upper | replace "-" "_" }}_TO_NS
+              value: {{ .to.namespace | quote }}
+            - name: TEST_{{ .name | upper | replace "-" "_" }}_TO_SVC
+              value: {{ .to.service | quote }}
+            - name: TEST_{{ .name | upper | replace "-" "_" }}_EXPECTED
+              value: {{ .expectedResult | quote }}
+            {{- end }}
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
+              limits:
+                cpu: 200m
+                memory: 256Mi
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "zen-cluster.fullname" . }}-segmentation-test
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "zen-cluster.labels" . | nindent 4 }}
+    app.kubernetes.io/component: segmentation-test
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "zen-cluster.fullname" . }}-segmentation-test
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "zen-cluster.labels" . | nindent 4 }}
+rules:
+  # Allow creating pods for network tests
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["create", "get", "list", "delete"]
+  # Allow reading network policies to verify isolation
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["networkpolicies"]
+    verbs: ["get", "list"]
+  # Allow reading services to verify connectivity
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "zen-cluster.fullname" . }}-segmentation-test
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "zen-cluster.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "zen-cluster.fullname" . }}-segmentation-test
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "zen-cluster.fullname" . }}-segmentation-test
+    namespace: {{ .Release.Namespace }}
+{{- end }}

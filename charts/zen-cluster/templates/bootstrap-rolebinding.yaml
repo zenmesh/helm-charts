@@ -1,0 +1,19 @@
+{{- if .Values.bootstrap.enabled }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "zen-cluster.fullname" . }}-bootstrap
+  namespace: {{ .Values.bootstrap.targetNamespace | default .Values.namespace }}
+  labels:
+    {{- include "zen-cluster.labels" . | nindent 4 }}
+    app.kubernetes.io/component: bootstrap
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "zen-cluster.fullname" . }}-bootstrap
+subjects:
+- kind: ServiceAccount
+  name: {{ include "zen-cluster.serviceAccountName" . }}
+  namespace: {{ .Values.namespace }}
+{{- end }}
+

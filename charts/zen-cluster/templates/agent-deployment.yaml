@@ -1,0 +1,122 @@
+{{- if .Values.agent.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "zen-cluster.fullname" . }}-agent
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "zen-cluster.labels" . | nindent 4 }}
+    app.kubernetes.io/component: agent
+spec:
+  replicas: {{ .Values.agent.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      {{- include "zen-cluster.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: agent
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+      labels:
+        {{- include "zen-cluster.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: agent
+    spec:
+      serviceAccountName: {{ include "zen-cluster.fullname" . }}-agent
+      containers:
+        - name: agent
+          image: {{ include "zen-cluster.image" (dict "registry" .Values.global.registry "repo" .Values.agent.image.repository "tag" ( .Values.agent.image.tag | default .Values.global.imageTag ) "digest" .Values.agent.image.digest ) | quote }}
+          imagePullPolicy: {{ .Values.agent.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: PORT
+              value: "8080"
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: LOG_LEVEL
+              value: {{ .Values.agent.logLevel | quote }}
+            # Prefer component.* fields, fallback to agent.* for backward compatibility
+            {{- if .Values.agent.saasBaseURL }}
+            - name: SAAS_BASE_URL
+              value: {{ .Values.agent.saasBaseURL | quote }}
+            {{- end }}
+            {{- $tenantID := .Values.agent.component.tenantId | default .Values.agent.tenantID }}
+            {{- if $tenantID }}
+            - name: TENANT_ID
+              value: {{ $tenantID | quote }}
+            {{- end }}
+            {{- $clusterID := .Values.agent.component.id | default .Values.agent.clusterID }}
+            {{- if $clusterID }}
+            - name: CLUSTER_ID
+              value: {{ $clusterID | quote }}
+            {{- end }}
+            {{- if .Values.agent.component.type }}
+            - name: COMPONENT_TYPE
+              value: {{ .Values.agent.component.type | quote }}
+            {{- end }}
+            {{- if .Values.agent.component.version }}
+            - name: COMPONENT_VERSION
+              value: {{ .Values.agent.component.version | quote }}
+            {{- end }}
+            {{- if .Values.agent.component.enrollment.enrollmentBundle }}
+            - name: ENROLLMENT_BUNDLE
+              value: {{ .Values.agent.component.enrollment.enrollmentBundle | quote }}
+            {{- else if .Values.agent.component.enrollment.enrollmentBundleSecretRef.name }}
+            - name: ENROLLMENT_BUNDLE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.agent.component.enrollment.enrollmentBundleSecretRef.name }}
+                  key: {{ .Values.agent.component.enrollment.enrollmentBundleSecretRef.key | default "enrollment_bundle" }}
+            {{- end }}
+            {{- range .Values.agent.env }}
+            - name: {{ .name }}
+              {{- if .value }}
+              value: {{ .value | quote }}
+              {{- else if .valueFrom }}
+              valueFrom:
+                {{- toYaml .valueFrom | nindent 16 }}
+              {{- end }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.agent.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.agent.healthPath }}
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.agent.readyPath }}
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+{{- end }}
+
