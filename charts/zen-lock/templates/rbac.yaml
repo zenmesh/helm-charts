@@ -84,10 +84,10 @@ rules:
   - apiGroups: ["security.kube-zen.io"]
     resources: ["zenlocks"]
     verbs: ["get", "list", "watch"]
-  # Secrets: Create, get, update (for ephemeral secrets, stale-secret refresh, and self-signed cert TLS secret)
+  # Secrets: List/watch for informer cache; create, get, update (for ephemeral secrets, stale-secret refresh, and self-signed cert TLS secret)
   - apiGroups: [""]
     resources: ["secrets"]
-    verbs: ["create", "get", "update"]
+    verbs: ["list", "watch", "create", "get", "update"]
   # MutatingWebhookConfiguration: Patch (for self-signed cert mode CA bundle injection)
   - apiGroups: ["admissionregistration.k8s.io"]
     resources: ["mutatingwebhookconfigurations"]
