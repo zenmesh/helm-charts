@@ -1,6 +1,6 @@
 # Release Version Matrix
 
-**Last Updated**: 2025-01-05  
+**Last Updated**: 2026-02-20  
 **Purpose**: Single source of truth for chart versions, component versions, and zen-sdk dependency versions
 
 ## Version Mapping
@@ -9,7 +9,7 @@
 |-------|--------------|-------------|-------------------|-------------|-------|
 | zen-flow | 0.0.2-alpha | 0.0.1-alpha | v0.0.1-alpha | v0.1.0-alpha | Schema added in 0.0.2-alpha |
 | zen-gc | 0.0.2-alpha | 0.0.1-alpha | v0.0.1-alpha | v0.1.1-alpha | Schema added in 0.0.2-alpha; GC primitives migrated (H115) |
-| zen-watcher | 1.2.3 | 1.2.3 | v1.2.3 | v0.2.11-alpha | CRDStore refactoring - generic store pattern, removed unused indexes |
+| zen-watcher | 1.2.3 | 1.2.3 | v1.2.3 | v0.2.14-alpha | CRDStore refactoring; zen-sdk v0.2.14 adds pkg/problemdetails (RFC 9457) |
 | zen-lock | 0.0.3-alpha | 0.0.2-alpha | v0.0.2-alpha | v0.1.0-alpha | P0 TLS security improvements (fail-fast validation, self-signed cert support) |
 | zen-lead | 0.1.0 | 0.1.0 | v0.1.0 | N/A | Network-only (Profile A) |
 
@@ -29,13 +29,14 @@
 
 ### zen-sdk Dependency
 
-- **zen-watcher**: Pin to `zen-sdk v0.2.11-alpha` (CRDStore refactoring, generic store pattern)
+- **zen-watcher**: Pin to `zen-sdk v0.2.14-alpha` (CRDStore refactoring; RFC 9457 pkg/problemdetails)
 - **zen-gc**: Pin to `zen-sdk v0.1.1-alpha` (H115: GC primitives migration)
 - **Other components**: Pin to `zen-sdk v0.1.0-alpha` (H104)
 - No pseudo-versions allowed in production
 - Components must update go.mod to reference tagged version
 
 **Migration Notes**:
+- **v0.2.14-alpha**: Added pkg/problemdetails for RFC 9457 (application/problem+json); components can use for error responses
 - **v0.2.11-alpha**: Added generic CRDStore package for reusable CRD configuration stores (zen-watcher v1.2.3, zen-ingester, zen-egress)
 - **v0.2.9-alpha**: Fixed RWMutex unlock bug in deduplication (zen-watcher v1.2.1)
 - **v0.1.1-alpha**: GC backoff/ratelimiter now sourced from zen-sdk. See [VERSION_MATRIX.md](../../docs/VERSION_MATRIX.md) for details.
@@ -92,11 +93,12 @@ helm list | grep zen-flow
 - **Latest**: `v0.0.2-alpha`
 
 ### zen-sdk
+- **v0.2.14-alpha**: pkg/problemdetails for RFC 9457 (application/problem+json)
 - **v0.2.11-alpha**: Generic CRDStore package for reusable CRD configuration stores (zen-watcher v1.2.3, zen-ingester, zen-egress)
 - **v0.2.9-alpha**: RWMutex fix in deduplication (zen-watcher v1.2.1)
 - **v0.1.1-alpha**: GC primitives migration (H115)
 - **v0.1.0-alpha**: Leadership contract v1.0.0, Model A denylist (H104)
-- **Latest**: `v0.2.11-alpha`
+- **Latest**: `v0.2.14-alpha`
 
 ## Schema Addition (H091)
 
