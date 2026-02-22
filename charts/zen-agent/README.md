@@ -43,6 +43,25 @@ Same k3d cluster (in-cluster URL):
 
 See `values.yaml` for all available configuration options.
 
+## RBAC contract
+
+zen-agent must run with a ServiceAccount that has the following permissions so adapter sync and enrollment work. The chart creates these when `rbac.create: true` (default).
+
+- **Secrets (namespace-scoped)**  
+  The SA must be able to **get**, **list**, **watch**, **create**, **update**, and **patch** Secrets in the same namespace as the agent (e.g. `zen-mesh`).  
+  - **Cluster credential:** zen-agent reads the cluster key from a Secret named `zen-cluster-cred-<cluster_id>` (cluster_id sanitized: `/` → `-`). Exactly one such Secret must exist in the namespace after bootstrap.  
+  - **Adapter credentials:** zen-agent writes Secrets named `zen-adapter-cred-<adapter_id>` (adapter_id sanitized) in the same or target namespace.  
+  If the SA cannot list/get Secrets, bulk sync fails with "forbidden" or "not found"; fix RBAC in the agent namespace before debugging further.
+
+- **ConfigMaps (cluster-wide for adapter discovery)**  
+  The chart grants the SA a ClusterRole to **get**, **list**, **watch**, **update**, and **patch** ConfigMaps so it can discover ZenAdapter ConfigMaps (label `zen.kubezen.io/adapter=true`).
+
+- **Events**  
+  The SA can **create** and **patch** Events in its namespace for observability.
+
+**Quick check:**  
+`kubectl auth can-i get,list secrets --as=system:serviceaccount:<namespace>:zen-agent -n <namespace>`
+
 ## License
 
 Copyright 2025 Kube-ZEN Contributors

@@ -24,6 +24,27 @@ See [docs/KEDA_AUTOSCALING.md](docs/KEDA_AUTOSCALING.md) for detailed configurat
 
 ## Installation
 
+### Adapter mode (recommended)
+
+Ingester enrolls via zen-agent: set `ingester.adapterID` only. Do **not** set `ingester.clusterID`, `ingester.tenantID`, or `ingester.saasBaseURL`. zen-agent watches the adapter ConfigMap, calls SaaS `adapters/sync`, and writes `zen-adapter-cred-<adapterID>`; ingester becomes Ready once that Secret is mounted.
+
+```bash
+NS=zen-mesh
+ADAPTER_ID=sandbox-ingester-1
+
+helm upgrade --install zen-cluster ./charts/zen-cluster \
+  -n $NS --create-namespace \
+  --set ingester.enabled=true \
+  --set ingester.adapterID=$ADAPTER_ID \
+  --set bootstrap.enabled=false
+```
+
+See [ADAPTER_ENROLLMENT_RUNBOOK.md](../../zen-platform/docs/04-operations/ADAPTER_ENROLLMENT_RUNBOOK.md) for verification steps.
+
+### Legacy (clusterID/tenantID)
+
+When not using adapter mode, you can install with explicit cluster/tenant (e.g. pre-agent or non–agent-mediated flows):
+
 ```bash
 helm install zen-cluster ./charts/zen-cluster \
   --namespace zen-mesh \

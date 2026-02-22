@@ -56,6 +56,23 @@ Validates rendered Helm manifests against Kubernetes schemas using kubeconform.
 
 **Note:** Script gracefully exits if kubeconform is not installed.
 
+### zen-agent-rbac-gate.sh (N9)
+
+Runs on any change to zen-agent chart or RBAC verification script. Keeps chart RBAC contract aligned with rendered manifests.
+
+**Usage:**
+```bash
+./scripts/ci/zen-agent-rbac-gate.sh
+```
+
+**Trigger:** Run when `charts/zen-agent/**` or `scripts/verify-zen-agent-rbac.sh` changes.
+
+**What it does:**
+- `helm lint charts/zen-agent`
+- `./scripts/verify-zen-agent-rbac.sh` (Role/ClusterRole verbs for secrets, events, configmaps)
+
+**Acceptance:** Any drift in Role/ClusterRole verbs causes a hard CI failure.
+
 ### chart-testing.sh
 
 Runs chart-testing (ct) for install/upgrade smoke tests on kind.
