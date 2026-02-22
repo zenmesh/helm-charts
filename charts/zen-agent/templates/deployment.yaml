@@ -70,12 +70,6 @@ spec:
             {{- if .Values.enrollment.bundle }}
             - name: ENROLLMENT_BUNDLE
               value: {{ .Values.enrollment.bundle | quote }}
-            {{- else if .Values.enrollment.secretRef.name }}
-            - name: ENROLLMENT_BUNDLE
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.enrollment.secretRef.name }}
-                  key: {{ .Values.enrollment.secretRef.key | default "enrollment_bundle" }}
             {{- end }}
             - name: PORT
               value: {{ .Values.server.port | quote }}

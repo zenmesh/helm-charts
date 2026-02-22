@@ -16,7 +16,7 @@ apiVersion: v2
 name: zen-agent
 description: A Helm chart for zen-agent - Kube-ZEN Cluster Agent
 type: application
-version: 0.1.1
+version: 0.1.2
 appVersion: "0.1.1"
 
 keywords:
@@ -37,6 +37,7 @@ maintainers:
 annotations:
   category: Management
   artifacthub.io/changes: |
+    - ENROLLMENT_BUNDLE env from enrollment.bundle (base64 only; required for install)
     - Kube-ZEN Cluster Agent for SaaS connectivity
     - Bootstrap token support for cluster enrollment
     - Secret management for cluster credentials

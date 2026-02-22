@@ -53,13 +53,9 @@ service:
 saas:
   endpoint: ""
 
+# Enrollment: base64-encoded age bundle only. Pass via: --set-string enrollment.bundle='<base64>'
 enrollment:
-  # Direct bundle (Option B: inline in Helm, best UX). When set, used as ENROLLMENT_BUNDLE env var.
   bundle: ""
-  # SecretRef (alternative): read bundle from Secret. Used when bundle is empty.
-  secretRef:
-    name: "enrollment-bundle"
-    key: "enrollment_bundle"
 
 # Secret configuration
 secret:
