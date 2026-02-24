@@ -67,9 +67,13 @@ spec:
                   fieldPath: metadata.namespace
             - name: SAAS_BASE_URL
               value: {{ .Values.saas.endpoint | quote }}
-            {{- if .Values.enrollment.bundle }}
+            {{- $bundle := .Values.agent.enrollment.bundle | default .Values.enrollment.bundle }}
+            {{- if and .Values.agent.enrollment.enabled (not $bundle) }}
+            {{- fail "agent.enrollment.bundle is required when agent.enrollment.enabled=true" }}
+            {{- end }}
+            {{- if $bundle }}
             - name: ENROLLMENT_BUNDLE
-              value: {{ .Values.enrollment.bundle | quote }}
+              value: {{ $bundle | quote }}
             {{- end }}
             - name: PORT
               value: {{ .Values.server.port | quote }}

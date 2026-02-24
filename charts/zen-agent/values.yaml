@@ -49,11 +49,18 @@ service:
   type: ClusterIP
   port: 8080
 
-# H720: Only these values; no agent.*, component.*, tenant/cluster
+# H720: Only these values for enrollment
 saas:
   endpoint: ""
 
-# Enrollment: base64-encoded age bundle only. Pass via: --set-string enrollment.bundle='<base64>'
+# Enrollment: bundle only (no SecretRef). Pass via: --set agent.enrollment.bundle='<base64>'
+# Bundle is short-lived; ok to pass via Helm values for demo/sandbox; prod may use zen-lock injection.
+agent:
+  enrollment:
+    enabled: true
+    bundle: ""  # Required when enabled. Base64 from install-bundle response.
+
+# Backward compat: prefer agent.enrollment.bundle
 enrollment:
   bundle: ""
 

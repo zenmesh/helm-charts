@@ -23,7 +23,7 @@ helm upgrade --install zen-agent kube-zen/zen-agent \
   --namespace zen-mesh \
   --create-namespace \
   --set saas.endpoint="https://api.kube-zen.io" \
-  --set-string enrollment.bundle='<BASE64_ENROLLMENT_BUNDLE_FROM_UI>'
+  --set agent.enrollment.bundle='<BASE64_BUNDLE>'
 ```
 
 Same k3d cluster (in-cluster URL):
@@ -37,7 +37,7 @@ Same k3d cluster (in-cluster URL):
 ### Required Values
 
 - `saas.endpoint`: SaaS API base URL (e.g. `https://api.kube-zen.io` or in-cluster `http://zen-saas-back.zen-apps.svc.cluster.local:8080`)
-- `enrollment.bundle`: Base64-encoded enrollment bundle from the SaaS UI (install-bundle). Pass with `--set-string enrollment.bundle='...'`
+- `agent.enrollment.bundle`: Base64 enrollment bundle from install-bundle. Required when `agent.enrollment.enabled=true`. Pass with `--set agent.enrollment.bundle="<BASE64_BUNDLE>"`
 
 ### Optional Values
 
