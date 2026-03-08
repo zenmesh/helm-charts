@@ -10,6 +10,12 @@ Canonical SHA for adapter/zen-agent RBAC scope (N9, H5) is recorded here. Full c
 
 After committing chart/script changes, run `git rev-parse HEAD` and paste above. Cross-link: zen-platform's SOURCE_OF_TRUTH_REFERENCE.md table includes this SHA for helm-charts.
 
+## Review quickstart (N17)
+
+**Review head:** `20581d0` (includes N12 cross-link). Full quickstart (checkout, verify-release-candidate, playbook, alerts) is in **zen-platform** `docs/04-operations/SOURCE_OF_TRUTH_REFERENCE.md`.
+
+**Chart-only validation:** From this repo root run `./scripts/ci/zen-agent-rbac-gate.sh` (helm lint + RBAC contract verify).
+
 ## Paths in this repo
 
 - `charts/zen-agent/README.md` — RBAC contract section

@@ -49,13 +49,14 @@ service:
   type: ClusterIP
   port: 8080
 
-# H720: Only these values for enrollment
+# H720: Only these values for enrollment. Identity (tenant_id, cluster_id) comes from the bundle only — do not set tenantID/clusterID.
 saas:
   endpoint: ""
 
-# Enrollment: bundle only (no SecretRef). Pass via: --set agent.enrollment.bundle='<base64>'
-# Bundle is short-lived; ok to pass via Helm values for demo/sandbox; prod may use zen-lock injection.
+# SaaS base URL (optional override). If set, used for SAAS_BASE_URL; else saas.endpoint.
 agent:
+  saasBaseURL: ""  # Optional. When empty, saas.endpoint is used.
+  # tenantID and clusterID are never set here; agent derives them from the enrollment bundle at bootstrap.
   enrollment:
     enabled: true
     bundle: ""  # Required when enabled. Base64 from install-bundle response.

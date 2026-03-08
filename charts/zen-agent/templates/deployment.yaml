@@ -66,7 +66,7 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
             - name: SAAS_BASE_URL
-              value: {{ .Values.saas.endpoint | quote }}
+              value: {{ (.Values.agent.saasBaseURL | default .Values.saas.endpoint) | quote }}
             {{- $bundle := .Values.agent.enrollment.bundle | default .Values.enrollment.bundle }}
             {{- if and .Values.agent.enrollment.enabled (not $bundle) }}
             {{- fail "agent.enrollment.bundle is required when agent.enrollment.enabled=true" }}
