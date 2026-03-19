@@ -135,12 +135,25 @@ webhook:
 # Private key configuration
 # IMPORTANT: The private key must be provided via a Kubernetes Secret
 # The secret must contain the key specified in privateKey.secretKey
+#
+# WORKFLOW:
+# 1. Generate key: zen-lock keygen --output private-key.age
+# 2a. Option A (recommended): Pre-create secret, then set createPlaceholder=false
+# 2b. Option B: Install with createPlaceholder=true, then immediately replace placeholder
+# 3. Verify: kubectl get secret zen-lock-master-key -o jsonpath='{.data.key\.txt}' | base64 -d | head -c 20
+#    Expected: AGE-SECRET-KEY-1... (NOT "PLACEHOLDER_REPLACE_WITH_ACTUAL_KEY")
+#
+# WARNING: If createPlaceholder=true and you forget to replace the placeholder,
+# all Pods with zen-lock/inject annotations will fail with decryption errors.
+#
 privateKey:
   # Name of the secret containing the private key
   secretName: zen-lock-master-key
   # Key within the secret that contains the private key
   secretKey: key.txt
   # Create a placeholder secret (user must update it with actual key)
+  # true: Chart creates a dummy secret; operator MUST replace with real key
+  # false: Operator must pre-create the secret before installing the chart
   createPlaceholder: true
 
 # Metrics configuration
