@@ -17,6 +17,7 @@
 # P1.4: Self-signed certificate generation Job
 # This Job generates a CA and serving certificate, creates the TLS secret,
 # and patches the MutatingWebhookConfiguration with the CA bundle.
+# Uses kube-webhook-certgen which is purpose-built for this task.
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -40,9 +41,8 @@ spec:
       serviceAccountName: {{ include "zen-lock.webhookServiceAccountName" . }}
       restartPolicy: OnFailure
       containers:
-        - name: cert-setup
-          # Use image with both kubectl and openssl
-          image: alpine/k8s:1.28.0
+        - name: create
+          image: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.4.4
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -50,67 +50,42 @@ spec:
               - ALL
             runAsNonRoot: true
             runAsUser: 65534
-          command:
-            - /bin/bash
-            - -c
-            - |
-              set -euo pipefail
-              
-              # Service DNS names for the certificate
-              SERVICE_NAME="{{ include "zen-lock.fullname" . }}-webhook"
-              NAMESPACE="{{ include "zen-lock.namespace" . }}"
-              SECRET_NAME="{{ .Values.webhook.certSecret }}"
-              WEBHOOK_NAME="{{ include "zen-lock.fullname" . }}-mutating-webhook"
-              
-              DNS_NAMES="${SERVICE_NAME}.${NAMESPACE}.svc,${SERVICE_NAME}.${NAMESPACE}.svc.cluster.local"
-              
-              # Generate CA private key
-              openssl genrsa -out ca.key 4096
-              
-              # Generate CA certificate (10 years validity)
-              openssl req -new -x509 -days 3650 -key ca.key -out ca.crt \
-                -subj "/CN=zen-lock-webhook-ca"
-              
-              # Generate serving certificate private key (ECDSA P-256 for better security)
-              openssl ecparam -genkey -name prime256v1 -out server.key
-              
-              # Generate serving certificate signing request
-              openssl req -new -key server.key -out server.csr \
-                -subj "/CN=${SERVICE_NAME}.${NAMESPACE}.svc" \
-                -addext "subjectAltName=DNS:${SERVICE_NAME}.${NAMESPACE}.svc,DNS:${SERVICE_NAME}.${NAMESPACE}.svc.cluster.local"
-              
-              # Sign serving certificate with CA (1 year validity, can be rotated)
-              openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial \
-                -out server.crt -days 365 \
-                -extensions v3_ext -extfile <(
-                  echo "[v3_ext]"
-                  echo "subjectAltName=DNS:${SERVICE_NAME}.${NAMESPACE}.svc,DNS:${SERVICE_NAME}.${NAMESPACE}.svc.cluster.local"
-                )
-              
-              # Create TLS secret
-              kubectl create secret tls "${SECRET_NAME}" \
-                --cert=server.crt \
-                --key=server.key \
-                --namespace="${NAMESPACE}" \
-                --dry-run=client -o yaml | kubectl apply -f -
-              
-              # Get CA bundle (base64 encoded)
-              CA_BUNDLE=$(cat ca.crt | base64 -w 0)
-              
-              # Patch MutatingWebhookConfiguration with CA bundle
-              kubectl patch mutatingwebhookconfiguration "${WEBHOOK_NAME}" \
-                --type='json' \
-                -p="[{\"op\": \"replace\", \"path\": \"/webhooks/0/clientConfig/caBundle\", \"value\":\"${CA_BUNDLE}\"}]" || \
-              kubectl patch mutatingwebhookconfiguration "${WEBHOOK_NAME}" \
-                --type='json' \
-                -p="[{\"op\": \"add\", \"path\": \"/webhooks/0/clientConfig/caBundle\", \"value\":\"${CA_BUNDLE}\"}]"
-              
-              echo "Certificate setup completed successfully"
+          args:
+            - create
+            - --host={{ include "zen-lock.fullname" . }}-webhook,{{ include "zen-lock.fullname" . }}-webhook.{{ include "zen-lock.namespace" . }}.svc,{{ include "zen-lock.fullname" . }}-webhook.{{ include "zen-lock.namespace" . }}.svc.cluster.local
+            - --namespace={{ include "zen-lock.namespace" . }}
+            - --secret-name={{ .Values.webhook.certSecret }}
+            - --cert-name=tls.crt
+            - --key-name=tls.key
           resources:
             requests:
               cpu: 100m
               memory: 128Mi
             limits:
               cpu: 500m
-              memory: 512Mi
+              memory: 256Mi
+        - name: patch
+          image: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.4.4
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            runAsNonRoot: true
+            runAsUser: 65534
+          args:
+            - patch
+            - --webhook-name={{ include "zen-lock.fullname" . }}-mutating-webhook
+            - --namespace={{ include "zen-lock.namespace" . }}
+            - --secret-name={{ .Values.webhook.certSecret }}
+            - --patch-mutating=true
+            - --patch-validating=false
+            - --patch-failure-policy=Fail
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
 {{- end }}
