@@ -27,9 +27,9 @@ metadata:
     {{- include "zen-lock.labels" . | nindent 4 }}
     app.kubernetes.io/component: webhook-cert-setup
   annotations:
-    # Helm hooks: run after install/upgrade, before webhook deployment
-    "helm.sh/hook": post-install,post-upgrade
-    "helm.sh/hook-weight": "1"
+    # H130-FIX: Run as pre-install to ensure cert exists before webhook pod mounts it
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-5"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
   template:
@@ -38,7 +38,7 @@ spec:
         {{- include "zen-lock.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: webhook-cert-setup
     spec:
-      serviceAccountName: {{ include "zen-lock.webhookServiceAccountName" . }}
+      serviceAccountName: {{ include "zen-lock.controllerServiceAccountName" . }}
       restartPolicy: OnFailure
       containers:
         - name: create

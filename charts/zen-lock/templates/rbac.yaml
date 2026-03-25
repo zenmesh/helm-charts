@@ -32,9 +32,10 @@ rules:
     resources: ["zenlocks/status"]
     verbs: ["get", "update", "patch"]
   # Secrets: Update to set OwnerReferences (created by webhook)
+  # H130-FIX: Add 'create' for webhook-cert-setup job which uses controller serviceaccount
   - apiGroups: [""]
     resources: ["secrets"]
-    verbs: ["get", "list", "watch", "update", "patch", "delete"]
+    verbs: ["get", "list", "watch", "update", "patch", "delete", "create"]
   # Pods: Read to get UID for OwnerReference
   - apiGroups: [""]
     resources: ["pods"]
@@ -91,7 +92,7 @@ rules:
   # MutatingWebhookConfiguration: Patch (for self-signed cert mode CA bundle injection)
   - apiGroups: ["admissionregistration.k8s.io"]
     resources: ["mutatingwebhookconfigurations"]
-    verbs: ["get", "patch"]
+    verbs: ["get", "patch", "update"]
     resourceNames:
       - {{ include "zen-lock.fullname" . }}-mutating-webhook
 ---

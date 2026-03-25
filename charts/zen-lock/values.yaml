@@ -182,8 +182,10 @@ crd:
   install: true
 
 # Namespace configuration
+# H130-FIX: Default to false to avoid conflict with helmfile --create-namespace
+# Set to true only when not using helmfile or when deploying standalone without --create-namespace
 namespace:
-  create: true
+  create: false
   name: zen-lock-system
 
 # Additional environment variables
