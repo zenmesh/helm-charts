@@ -17,7 +17,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   name: {{ include "gc-controller.fullname" . }}-alerts
-  namespace: {{ .Values.namespace | default "gc-system" }}
+  namespace: {{ .Values.namespace | default .Release.Namespace }}
   labels:
     {{- include "gc-controller.labels" . | nindent 4 }}
     prometheus: kube-prometheus

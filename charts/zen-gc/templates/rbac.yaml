@@ -90,5 +90,5 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: {{ include "gc-controller.serviceAccountName" . }}
-    namespace: {{ .Values.namespace | default "gc-system" }}
+    namespace: {{ .Values.namespace | default .Release.Namespace }}
 

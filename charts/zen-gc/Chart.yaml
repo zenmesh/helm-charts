@@ -16,38 +16,38 @@ apiVersion: v2
 name: zen-gc
 description: A Helm chart for the Generic Garbage Collection Controller for Kubernetes
 type: application
-version: 0.0.2-alpha
+version: 0.0.3-alpha
 appVersion: "0.0.1-alpha"
 keywords:
   - kubernetes
-  - kube-zen
+  - zen-mesh
   - garbage-collection
   - gc
   - ttl
   - cleanup
   - operator
 
-home: https://github.com/kube-zen/zen-gc
+home: https://github.com/zenmesh/zen-gc
 sources:
-  - https://github.com/kube-zen/zen-gc
+  - https://github.com/zenmesh/zen-gc
 
 maintainers:
-  - name: Kube-ZEN Team
-    email: team@kube-zen.io
+  - name: Zen-Mesh Team
+    email: team@zen-mesh.io
 
 annotations:
   category: Utilities
   artifacthub.io/changes: |
-    - Initial release
+    - Updated API group to gc.ops.zen-mesh.io
   artifacthub.io/links: |
     - name: Documentation
-      url: https://github.com/kube-zen/zen-gc/blob/main/README.md
+      url: https://github.com/zenmesh/zen-gc/blob/main/README.md
     - name: Source
-      url: https://github.com/kube-zen/zen-gc
+      url: https://github.com/zenmesh/zen-gc
     - name: Support
-      url: https://github.com/kube-zen/zen-gc/issues
+      url: https://github.com/zenmesh/zen-gc/issues
   artifacthub.io/imagesWhitelist: |
-    - kubezen/zen-gc
+    - zenmesh/zen-gc-controller
 
 # kubeVersion constraint removed for better compatibility with EKS and other distributions
 # The controller works with Kubernetes 1.20+ based on client-go dependencies

@@ -17,7 +17,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "gc-controller.fullname" . }}
-  namespace: {{ .Values.namespace | default "gc-system" }}
+  namespace: {{ .Values.namespace | default .Release.Namespace }}
   labels:
     {{- include "gc-controller.labels" . | nindent 4 }}
 spec:
@@ -51,12 +51,12 @@ spec:
             {{- range .Values.args }}
             - {{ . }}
             {{- end }}
-            - --leader-election-mode={{ .Values.leaderElection.mode }}
+            - --leader-election={{ .Values.leaderElection.enabled }}
             {{- if .Values.leaderElection.electionID }}
             - --leader-election-id={{ .Values.leaderElection.electionID }}
             {{- end }}
-            {{- if eq .Values.leaderElection.mode "zenlead" }}
-            - --leader-election-lease-name={{ .Values.leaderElection.leaseName }}
+            {{- if .Values.leaderElection.namespace }}
+            - --leader-election-namespace={{ .Values.leaderElection.namespace }}
             {{- end }}
           env:
             - name: POD_NAME

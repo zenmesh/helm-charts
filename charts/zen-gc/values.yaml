@@ -17,6 +17,9 @@
 
 replicaCount: 2
 
+# Namespace override (optional, defaults to release namespace)
+# namespace: zen-gc-system
+
 image:
   repository: docker.io/kubezen/gc-controller
   pullPolicy: IfNotPresent
@@ -78,11 +81,11 @@ affinity: {}
 # High Availability (HA) configuration
 replicaCount: 2  # Default: 2 replicas for HA
 
-# Leader election configuration (Profiles B/C)
+# Leader election configuration
 leaderElection:
-  mode: builtin        # builtin | zenlead | disabled
-  electionID: ""        # default to "gc-controller-leader-election" if empty
-  leaseName: ""         # required if mode=zenlead
+  enabled: true
+  electionID: "gc-controller-leader-election"
+  namespace: ""  # defaults to POD_NAMESPACE
 
 # Controller arguments
 # Leader election is mandatory and handled automatically via zen-sdk

@@ -8,49 +8,32 @@
       "default": 2,
       "description": "Number of replicas"
     },
+    "namespace": {
+      "type": "string",
+      "default": "",
+      "description": "Target namespace (defaults to release namespace if empty)"
+    },
     "leaderElection": {
       "type": "object",
       "properties": {
-        "mode": {
-          "type": "string",
-          "enum": ["builtin", "zenlead", "disabled"],
-          "default": "builtin",
-          "description": "Leader election mode: builtin (Profile B), zenlead (Profile C), or disabled"
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable leader election for HA"
         },
         "electionID": {
           "type": "string",
-          "default": "",
-          "description": "Leader election ID (defaults to component-leader-election if empty)"
+          "default": "gc-controller-leader-election",
+          "description": "Leader election ID"
         },
-        "leaseName": {
+        "namespace": {
           "type": "string",
           "default": "",
-          "description": "Lease name (required if mode=zenlead)"
+          "description": "Leader election namespace (defaults to POD_NAMESPACE)"
         }
       },
-      "required": ["mode"],
-      "allOf": [
-        {
-          "if": {
-            "properties": {
-              "mode": {
-                "const": "zenlead"
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "leaseName": {
-                "minLength": 1,
-                "description": "leaseName is required when mode=zenlead"
-              }
-            },
-            "required": ["leaseName"]
-          }
-        }
-      ]
+      "required": ["enabled"]
     }
   },
   "required": ["leaderElection"]
 }
-
