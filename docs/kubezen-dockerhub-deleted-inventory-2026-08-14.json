@@ -1,0 +1,49 @@
+{
+ "zen-watcher": [
+  "latest",
+  "fix-custom-factory-sync-v3",
+  "fix-custom-factory-sync-v2",
+  "fix-custom-factory-sync",
+  "fix-existing-resources",
+  "debug-logging-v3",
+  "debug-logging-v2",
+  "1.0.3",
+  "fix-leader-election",
+  "test-generic-webhooks",
+  "1.2.1",
+  "1.2.0"
+ ],
+ "gc-controller": [
+  "latest",
+  "20260103-045430",
+  "0.0.2-alpha",
+  "v0.0.2-alpha",
+  "0.0.1-alpha"
+ ],
+ "zen-flow": [
+  "latest",
+  "20260103-045430",
+  "e64a814"
+ ],
+ "zen-flow-controller": [
+  "latest",
+  "20260103-155146",
+  "20260103-045430",
+  "a30daba-dirty",
+  "0.0.1-alpha"
+ ],
+ "zen-lead": [
+  "latest",
+  "20260103-155232",
+  "20260103-045430",
+  "0.1.0-alpha",
+  "test"
+ ],
+ "zen-agent": [
+  "0.1.0",
+  "0.1.1"
+ ],
+ "zen-lock": [
+  "0.0.3-alpha"
+ ]
+}
