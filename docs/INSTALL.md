@@ -1,6 +1,6 @@
 # Installation Guide
 
-This guide covers installing Kube-Zen components using Helm charts.
+This guide covers installing Zen Mesh components using Helm charts.
 
 ## Quick Start (zen-suite)
 
@@ -8,11 +8,11 @@ The fastest way to get started is using the zen-suite chart, which installs all 
 
 ```bash
 # Add repository
-helm repo add kube-zen https://kube-zen.github.io/helm-charts
+helm repo add zenmesh https://zenmesh.github.io/helm-charts
 helm repo update
 
 # Install all components
-helm install zen-suite kube-zen/zen-suite \
+helm install zen-suite zenmesh/zen-suite \
   --namespace zen-system \
   --create-namespace
 ```
@@ -31,11 +31,11 @@ helm install zen-suite kube-zen/zen-suite \
 
 ```bash
 # Add repository
-helm repo add kube-zen https://kube-zen.github.io/helm-charts
+helm repo add zenmesh https://zenmesh.github.io/helm-charts
 helm repo update
 
 # Install zen-lock
-helm install zen-lock kube-zen/zen-lock \
+helm install zen-lock zenmesh/zen-lock \
   --namespace zen-lock-system \
   --create-namespace
 ```
@@ -43,7 +43,7 @@ helm install zen-lock kube-zen/zen-lock \
 ### zen-flow
 
 ```bash
-helm install zen-flow kube-zen/zen-flow \
+helm install zen-flow zenmesh/zen-flow \
   --namespace zen-flow-system \
   --create-namespace
 ```
@@ -51,7 +51,7 @@ helm install zen-flow kube-zen/zen-flow \
 ### zen-gc
 
 ```bash
-helm install zen-gc kube-zen/zen-gc \
+helm install zen-gc zenmesh/zen-gc \
   --namespace zen-gc-system \
   --create-namespace
 ```
@@ -59,7 +59,7 @@ helm install zen-gc kube-zen/zen-gc \
 ### zen-watcher
 
 ```bash
-helm install zen-watcher kube-zen/zen-watcher \
+helm install zen-watcher zenmesh/zen-watcher \
   --namespace zen-watcher-system \
   --create-namespace
 ```
@@ -78,10 +78,10 @@ kubectl create namespace zen-gc-system
 kubectl create namespace zen-watcher-system
 
 # Install components
-helm install zen-lock kube-zen/zen-lock --namespace zen-lock-system
-helm install zen-flow kube-zen/zen-flow --namespace zen-flow-system
-helm install zen-gc kube-zen/zen-gc --namespace zen-gc-system
-helm install zen-watcher kube-zen/zen-watcher --namespace zen-watcher-system
+helm install zen-lock zenmesh/zen-lock --namespace zen-lock-system
+helm install zen-flow zenmesh/zen-flow --namespace zen-flow-system
+helm install zen-gc zenmesh/zen-gc --namespace zen-gc-system
+helm install zen-watcher zenmesh/zen-watcher --namespace zen-watcher-system
 ```
 
 ### 2. Custom Values
@@ -104,7 +104,7 @@ resources:
 EOF
 
 # Install with custom values
-helm install zen-lock kube-zen/zen-lock \
+helm install zen-lock zenmesh/zen-lock \
   --namespace zen-lock-system \
   --values zen-lock-prod-values.yaml
 ```
@@ -194,7 +194,7 @@ kubectl get pods -n zen-gc-system
 kubectl get pods -n zen-watcher-system
 
 # Check CRDs
-kubectl get crds | grep kube-zen.io
+kubectl get crds | grep zen-mesh.io
 
 # Check services
 kubectl get svc -n zen-lock-system
@@ -219,11 +219,11 @@ helm uninstall zen-watcher --namespace zen-watcher-system
 
 # Note: CRDs are not automatically removed (by design)
 # To remove CRDs manually:
-kubectl delete crd zenlocks.security.kube-zen.io
-kubectl delete crd jobflows.workflow.kube-zen.io
-kubectl delete crd garbagecollectionpolicies.gc.kube-zen.io
-kubectl delete crd observations.zen.kube-zen.io
-kubectl delete crd ingesters.zen.kube-zen.io
+kubectl delete crd zenlocks.security.zen-mesh.io
+kubectl delete crd jobflows.workflow.zen-mesh.io
+kubectl delete crd garbagecollectionpolicies.gc.zen-mesh.io
+kubectl delete crd observations.zen.zen-mesh.io
+kubectl delete crd ingesters.zen.zen-mesh.io
 ```
 
 ## Troubleshooting
@@ -247,7 +247,7 @@ kubectl describe pod -n zen-lock-system -l app.kubernetes.io/name=zen-lock
 Verify CRDs are installed:
 
 ```bash
-kubectl get crds | grep kube-zen.io
+kubectl get crds | grep zen-mesh.io
 ```
 
 If CRDs are missing, they are typically installed automatically by Helm. Check the chart's `crds/` directory.

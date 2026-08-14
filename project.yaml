@@ -1,6 +1,6 @@
 projectType: charts
 projectName: helm-charts
-projectDescription: "Kube-ZEN component"
+projectDescription: "Zen Mesh component"
 goVersion: "1.25"
 imageName: ""
 hasHelmChart: false

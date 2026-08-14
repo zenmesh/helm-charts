@@ -38,7 +38,7 @@ global:
 ingester:
   enabled: false  # G102: Disabled by default until ingester repo/code exists (wire-first choice)
   image:
-    repository: kubezen/zen-ingester
+    repository: zenmesh/zen-ingester
     tag: "1.0.0-b311"
     digest: ""  # P227: Optional sha256 digest for immutable pinning (e.g. sha256:abc123...)
   replicaCount: 2
@@ -87,7 +87,7 @@ ingester:
     secretName: "zen-cluster-secrets"  # Secret containing tenant-id (required for Mode A)
     secretKey: "tenant-id"  # Key name in secret (required for Mode A)
   # B313: Mode B (SaaS-enabled) configuration - uncomment to enable
-  # saasBaseURL: "https://api.kube-zen.io"  # Non-empty for SaaS mode
+  # saasBaseURL: "https://api.zen-mesh.io"  # Non-empty for SaaS mode
   # rbac:
   #   secretNames: ["hmac-sandbox-cluster"]  # HMAC secret names (required for Mode B)
   
@@ -139,7 +139,7 @@ egress:
   join:
     enabled: false
   image:
-    repository: kubezen/zen-egress
+    repository: zenmesh/zen-egress
     tag: "1.0.0"
     digest: ""  # P227: Optional sha256 digest for immutable pinning
     pullPolicy: IfNotPresent
@@ -222,7 +222,7 @@ egress:
 agent:
   enabled: false  # H414: Disabled by default until agent code is fully present and tested
   image:
-    repository: kubezen/zen-agent
+    repository: zenmesh/zen-agent
     tag: "1.0.0"
     digest: ""  # P227: Optional sha256 digest for immutable pinning
     pullPolicy: IfNotPresent
@@ -315,7 +315,7 @@ agent:
     # Custom rules (optional, uses defaults if not specified)
     rules: []
       # Example namespace-scoped rules:
-      # - apiGroups: ["zen.kube-zen.io"]
+      # - apiGroups: ["zen.zen-mesh.io"]
       #   resources: ["observations"]
       #   verbs: ["get", "list", "watch", "update", "patch"]
       # - apiGroups: [""]
@@ -404,8 +404,8 @@ ingress:
   className: nginx
   grpc:
     # Host is read from config/env_contract.yaml via scripts/phases/cluster_deploy.sh
-    # Default: sandbox. Override via --set ingress.grpc.host=api.staging.kube-zen.io
-    host: "api.kube-zen.io"  # Default: sandbox. Override for other environments
+    # Default: sandbox. Override via --set ingress.grpc.host=api.staging.zen-mesh.io
+    host: "api.zen-mesh.io"  # Default: sandbox. Override for other environments
     service: zen-ingester
     port: 8080
     annotations:
@@ -413,11 +413,11 @@ ingress:
       nginx.ingress.kubernetes.io/grpc-read-timeout: "300"
       nginx.ingress.kubernetes.io/grpc-send-timeout: "300"
   tls:
-    secretName: kube-zen-tls
+    secretName: zen-mesh-tls
   # S201-S206: Webhook ingress configuration
   webhook:
     enabled: true
-    host: "zen.kube-zen.io"  # Default: sandbox. Override for other environments
+    host: "zen.zen-mesh.io"  # Default: sandbox. Override for other environments
     service: zen-ingester
     port: 8080
     path: "/ingest"
@@ -429,7 +429,7 @@ ingress:
 edge:
   # Mode: ingress (default, supported now) | gatewayapi (future, north star)
   mode: ingress  # ingress | gatewayapi
-  host: "zen.kube-zen.io"  # Base host for webhook endpoints
+  host: "zen.zen-mesh.io"  # Base host for webhook endpoints
   tls:
     secretName: zen-webhook-tls  # Shared TLS Secret (cert-manager managed)
   # Gateway API configuration (future, when mode=gatewayapi)
@@ -445,17 +445,17 @@ webhooks:
   # Base URL format:
   # path: https://zen.<env>.<dp-domain>/ingest/<tenant-id>/<webhook-id>
   # subdomain: https://<hooklabel>.zen.<env>.<dp-domain>
-  baseURL: "https://zen.kube-zen.io"  # Resolved per environment
-  wildcardBase: "*.zen.kube-zen.io"  # Only used if mode=subdomain
+  baseURL: "https://zen.zen-mesh.io"  # Resolved per environment
+  wildcardBase: "*.zen.zen-mesh.io"  # Only used if mode=subdomain
   # S202: TLS certificate configuration (cert-manager)
   tls:
     enabled: true
     secretName: zen-webhook-tls  # Standardized secret name
     commonName: zen  # CN "zen" (requested; modern TLS validation is SAN-based)
     dnsNames:
-      - zen.kube-zen.io  # Base domain
+      - zen.zen-mesh.io  # Base domain
       # Wildcard DNS (only if mode=subdomain)
-      # - "*.zen.kube-zen.io"
+      # - "*.zen.zen-mesh.io"
     # Rotation policy
     rotationPolicy: Always
     renewBefore: 240h  # 10 days
@@ -485,7 +485,7 @@ bootstrap:
     key: "enrollment_bundle"   # Key name in secret
   
   # SaaS endpoint for bootstrap API
-  saasEndpoint: "https://api.kube-zen.io"
+  saasEndpoint: "https://api.zen-mesh.io"
   
   # Target namespace for HMAC secret (defaults to chart namespace)
   targetNamespace: ""
@@ -523,7 +523,7 @@ segmentationTest:
   enabled: false
   schedule: "0 */6 * * *"
   image:
-    repository: kubezen/zen-ingester
+    repository: zenmesh/zen-ingester
     tag: "1.0.0"
   tests: []
 

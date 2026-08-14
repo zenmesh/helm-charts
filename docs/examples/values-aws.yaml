@@ -3,12 +3,12 @@
 # See: docs/ROADMAP_HELM.md for AWS/open demo details
 
 image:
-  repository: kubezen/zen-agent
+  repository: zenmesh/zen-agent
   tag: "latest"  # Pin to specific version (update to actual version when available)
   pullPolicy: IfNotPresent
 
 saas:
-  endpoint: "https://agent.kube-zen.io"  # Public SaaS FQDN (HTTPS only, no .svc.cluster.local)
+  endpoint: "https://agent.zen-mesh.io"  # Public SaaS FQDN (HTTPS only, no .svc.cluster.local)
   clusterToken: ""  # Set via AWS Secrets Manager or IRSA (RM-AGENT-004)
 
 tenant:

@@ -200,9 +200,9 @@ if [ "$RUN_GUARDRAILS" = "1" ]; then
     echo "[1/2] Checking registry policies..."
     for chart in "${CHARTS[@]}"; do
         if [ -f "$chart/values.yaml" ]; then
-            # Check for docker.io (should use kubezen/*)
-            if grep -E "repository:.*docker\.io" "$chart/values.yaml" 2>/dev/null | grep -v "kubezen" > /dev/null; then
-                echo "  ⚠️  $chart uses docker.io registry (should use kubezen/*)"
+            # Check for docker.io (should use zenmesh/*)
+            if grep -E "repository:.*docker\.io" "$chart/values.yaml" 2>/dev/null | grep -v "zenmesh" > /dev/null; then
+                echo "  ⚠️  $chart uses docker.io registry (should use zenmesh/*)"
                 GUARDRAIL_WARNINGS=$((GUARDRAIL_WARNINGS + 1))
             fi
         fi

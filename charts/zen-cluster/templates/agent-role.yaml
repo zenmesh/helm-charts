@@ -12,7 +12,7 @@ rules:
   {{- toYaml .Values.agent.rbac.rules | nindent 2 }}
   {{- else }}
   # Default namespace-scoped rules
-  - apiGroups: ["zen.kube-zen.io"]
+  - apiGroups: ["zen.zen-mesh.io"]
     resources: ["observations"]
     verbs: ["get", "list", "watch", "update", "patch"]
   - apiGroups: [""]
@@ -28,7 +28,7 @@ rules:
   # Additional namespace-scoped rules for multi-namespace deployments
   {{- if .Values.agent.rbac.namespaces }}
   {{- range .Values.agent.rbac.namespaces }}
-  - apiGroups: ["zen.kube-zen.io"]
+  - apiGroups: ["zen.zen-mesh.io"]
     resources: ["observations"]
     resourceNames: []
     verbs: ["get", "list", "watch"]

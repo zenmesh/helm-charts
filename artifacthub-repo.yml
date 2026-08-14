@@ -7,29 +7,29 @@ repositoryID: 55f38f71-a6fa-4705-ade1-1e27d82e21c4
 
 # Repository owners (users/organizations that own this repository)
 owners:
-  - name: kube-zen
-    email: team@kube-zen.io
+  - name: zenmesh
+    email: zen@zen-mesh.io
 
 # Display name for the repository
-displayName: Kube-Zen Helm Charts
+displayName: Zen Mesh Helm Charts
 
 # Links
 links:
   - name: Home
-    url: https://kube-zen.io
+    url: https://zen-mesh.io
   - name: Source
-    url: https://github.com/kube-zen/helm-charts
+    url: https://github.com/zenmesh/helm-charts
   - name: Issues
-    url: https://github.com/kube-zen/helm-charts/issues
+    url: https://github.com/zenmesh/helm-charts/issues
   - name: Documentation
-    url: https://github.com/kube-zen/helm-charts/blob/main/README.md
+    url: https://github.com/zenmesh/helm-charts/blob/main/README.md
 
 # Verified publisher (optional - requires GPG key setup)
 # verifiedPublisher: true
 
 # Provider (optional - for organizations)
 # provider:
-#   name: Kube-Zen
-#   email: team@kube-zen.io
-#   url: https://kube-zen.io
+#   name: Zen Mesh
+#   email: zen@zen-mesh.io
+#   url: https://zen-mesh.io
 

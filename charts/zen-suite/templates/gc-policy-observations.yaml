@@ -1,5 +1,5 @@
 {{- if and .Values.integrations.observationsGc.enabled .Values.zenGc.enabled .Values.zenWatcher.enabled }}
-apiVersion: gc.kube-zen.io/v1alpha1
+apiVersion: gc.zen-mesh.io/v1alpha1
 kind: GarbageCollectionPolicy
 metadata:
   name: {{ .Release.Name }}-observations-gc
@@ -9,10 +9,10 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/component: integration
-    kube-zen.io/integration: observations-gc
+    zen-mesh.io/integration: observations-gc
 spec:
   targetResource:
-    apiVersion: zen.kube-zen.io/v1
+    apiVersion: zen.zen-mesh.io/v1
     kind: Observation
     {{- if .Values.integrations.observationsGc.targetNamespace }}
     namespace: {{ .Values.integrations.observationsGc.targetNamespace }}

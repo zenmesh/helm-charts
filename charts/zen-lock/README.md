@@ -22,7 +22,7 @@ ZenLock CRDs store only ciphertext (source-of-truth). During Pod injection, zen-
 
 ```bash
 # Add the repository
-helm repo add zen-lock https://kube-zen.github.io/zen-lock
+helm repo add zen-lock https://zenmesh.github.io/zen-lock
 helm repo update
 
 # Install zen-lock
@@ -74,7 +74,7 @@ Key configuration options (see `values.yaml` for all options):
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `image.repository` | Container image repository | `kubezen/zen-lock` |
+| `image.repository` | Container image repository | `zenmesh/zen-lock` |
 | `image.tag` | Container image tag | `0.0.1-alpha` |
 | `replicaCount` | Number of replicas | `1` |
 | `webhook.enabled` | Enable mutating webhook | `true` |
@@ -141,7 +141,7 @@ kubectl label namespace my-namespace zen-lock=enabled
 
 2. Create ZenLock CRD:
    ```yaml
-   apiVersion: security.kube-zen.io/v1alpha1
+   apiVersion: security.zen-mesh.io/v1alpha1
    kind: ZenLock
    metadata:
      name: my-secret
@@ -175,7 +175,7 @@ helm uninstall zen-lock --namespace zen-lock-system
 **Note**: This will not delete the CRDs. To remove CRDs:
 
 ```bash
-kubectl delete crd zenlocks.security.kube-zen.io
+kubectl delete crd zenlocks.security.zen-mesh.io
 ```
 
 ## Troubleshooting
@@ -231,13 +231,13 @@ See [docs/FAQ.md](../../docs/FAQ.md) for detailed positioning and [docs/INTEGRAT
 
 ## Chart Repository
 
-- **GitHub Pages**: https://kube-zen.github.io/zen-lock
+- **GitHub Pages**: https://zenmesh.github.io/zen-lock
 - **Artifact Hub**: https://artifacthub.io/packages/helm/zen-lock/zen-lock
 
 ## Support
 
 For issues and questions:
-- GitHub: https://github.com/kube-zen/zen-lock
-- Documentation: https://github.com/kube-zen/zen-lock/docs
+- GitHub: https://github.com/zenmesh/zen-lock
+- Documentation: https://github.com/zenmesh/zen-lock/docs
 - Helm Repository: See [docs/HELM_REPOSITORY.md](../../docs/HELM_REPOSITORY.md)
 

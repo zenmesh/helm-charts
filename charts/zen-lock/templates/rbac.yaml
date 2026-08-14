@@ -1,4 +1,4 @@
-# Copyright 2025 Kube-ZEN Contributors
+# Copyright 2025 Zen Mesh
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,10 +25,10 @@ metadata:
     rbac.authorization.k8s.io/justification: "Controller reconciles ZenLocks and updates their status. Also sets OwnerReferences on Secrets created by webhook."
 rules:
   # ZenLock CRD: Read, update (for finalizers), and update status
-  - apiGroups: ["security.kube-zen.io"]
+  - apiGroups: ["security.zen-mesh.io"]
     resources: ["zenlocks"]
     verbs: ["get", "list", "watch", "update", "patch"]
-  - apiGroups: ["security.kube-zen.io"]
+  - apiGroups: ["security.zen-mesh.io"]
     resources: ["zenlocks/status"]
     verbs: ["get", "update", "patch"]
   # Secrets: Update to set OwnerReferences (created by webhook)
@@ -82,7 +82,7 @@ metadata:
 rules:
   # ZenLock CRD: Read only (to fetch and decrypt)
   # NOTE: list/watch required for controller-runtime informer cache
-  - apiGroups: ["security.kube-zen.io"]
+  - apiGroups: ["security.zen-mesh.io"]
     resources: ["zenlocks"]
     verbs: ["get", "list", "watch"]
   # Secrets: List/watch for informer cache; create, get, update (for ephemeral secrets, stale-secret refresh, and self-signed cert TLS secret)

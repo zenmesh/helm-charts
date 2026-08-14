@@ -1,7 +1,7 @@
 # Tool Interop Matrix
 
 **Last Updated**: 2015-12-31  
-**Purpose**: Document how Kube-ZEN projects consume each other's functionality through Kubernetes resources and contracts
+**Purpose**: Document how Zen Mesh projects consume each other's functionality through Kubernetes resources and contracts
 
 **Canonical Location**: This file is the authoritative source for tool-to-tool interoperability patterns.
 
@@ -9,7 +9,7 @@
 
 ## Overview
 
-Kube-ZEN components interact through **Kubernetes-native mechanisms** (CRDs, APIs, controller-runtime) and **shared libraries** (zen-sdk). This matrix documents the producer → consumer relationships and their configuration surfaces.
+Zen Mesh components interact through **Kubernetes-native mechanisms** (CRDs, APIs, controller-runtime) and **shared libraries** (zen-sdk). This matrix documents the producer → consumer relationships and their configuration surfaces.
 
 **Key Principle**: Composition happens via CRDs/APIs or zen-sdk libraries. **Do not import repo-to-repo code** (no zen-watcher importing zen-gc packages directly).
 
@@ -74,7 +74,7 @@ integrations:
       propagationPolicy: Background
 ```
 
-**Implementation**: zen-suite creates a GarbageCollectionPolicy CRD that targets `zen.kube-zen.io/v1, Kind=Observation`.
+**Implementation**: zen-suite creates a GarbageCollectionPolicy CRD that targets `zen.zen-mesh.io/v1, Kind=Observation`.
 
 **Prerequisites**:
 - `zenWatcher.enabled: true`
@@ -106,13 +106,13 @@ integrations:
 **Example**: A component can create a GarbageCollectionPolicy to prune its own resources:
 
 ```yaml
-apiVersion: gc.kube-zen.io/v1alpha1
+apiVersion: gc.zen-mesh.io/v1alpha1
 kind: GarbageCollectionPolicy
 metadata:
   name: prune-old-jobflows
 spec:
   targetResource:
-    apiVersion: flow.kube-zen.io/v1alpha1
+    apiVersion: flow.zen-mesh.io/v1alpha1
     kind: JobFlow
   ttl:
     secondsAfterCreation: 86400  # 1 day
@@ -150,7 +150,7 @@ zenLead:
 **Bad**:
 ```go
 // In zen-watcher
-import "github.com/kube-zen/zen-gc/pkg/controller"  // ❌ DON'T DO THIS
+import "github.com/zenmesh/zen-gc/pkg/controller"  // ❌ DON'T DO THIS
 ```
 
 **Why**: Creates tight coupling, version conflicts, and circular dependencies.
@@ -162,7 +162,7 @@ import "github.com/kube-zen/zen-gc/pkg/controller"  // ❌ DON'T DO THIS
 **Bad**:
 ```go
 // In zen-flow
-import "github.com/kube-zen/zen-lock/pkg/lock"  // ❌ DON'T DO THIS
+import "github.com/zenmesh/zen-lock/pkg/lock"  // ❌ DON'T DO THIS
 ```
 
 **Correct**: Use CRDs/APIs for inter-component communication.
@@ -172,8 +172,8 @@ import "github.com/kube-zen/zen-lock/pkg/lock"  // ❌ DON'T DO THIS
 **Good**:
 ```go
 // In any component
-import "github.com/kube-zen/zen-sdk/pkg/zenlead"
-import "github.com/kube-zen/zen-sdk/pkg/gc/ratelimiter"
+import "github.com/zenmesh/zen-sdk/pkg/zenlead"
+import "github.com/zenmesh/zen-sdk/pkg/gc/ratelimiter"
 ```
 
 **Why**: zen-sdk is designed for shared primitives, versioned, and tested.

@@ -10,7 +10,7 @@ networkPolicy:
     - from:
         namespaceSelector:
           matchLabels:
-            zen.kube-zen.com/plane: saas
+            zen-mesh.io/plane: saas
         podSelector:
           matchLabels:
             app.kubernetes.io/component: bridge
@@ -21,7 +21,7 @@ networkPolicy:
     - to:
         namespaceSelector:
           matchLabels:
-            zen.kube-zen.com/plane: saas
+            zen-mesh.io/plane: saas
       ports:
         - protocol: TCP
           port: 443
@@ -29,7 +29,7 @@ networkPolicy:
     - to:
         namespaceSelector:
           matchLabels:
-            zen.kube-zen.com/plane: egress-proxy
+            zen-mesh.io/plane: egress-proxy
       ports:
         - protocol: TCP
           port: 443

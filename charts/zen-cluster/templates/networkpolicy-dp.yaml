@@ -8,7 +8,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "zen-cluster.labels" . | nindent 4 }}
-    zen.kube-zen.com/plane: data-plane
+    zen-mesh.io/plane: data-plane
 spec:
   podSelector: {}  # Apply to all pods in namespace
   policyTypes:

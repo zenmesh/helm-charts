@@ -1,4 +1,4 @@
-# Copyright 2025 Kube-ZEN Contributors
+# Copyright 2025 Zen Mesh
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ metadata:
 rules:
   # Read and update GarbageCollectionPolicy CRDs (controller only needs to read policies and update status)
   - apiGroups:
-      - gc.kube-zen.io
+      - gc.zen-mesh.io
     resources:
       - garbagecollectionpolicies
     verbs:
@@ -30,7 +30,7 @@ rules:
       - watch
   # Update status subresource only (controller manages status, not spec)
   - apiGroups:
-      - gc.kube-zen.io
+      - gc.zen-mesh.io
     resources:
       - garbagecollectionpolicies/status
     verbs:

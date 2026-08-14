@@ -1,10 +1,10 @@
 # Versioning Strategy
 
-This document describes the versioning strategy for Kube-Zen Helm charts.
+This document describes the versioning strategy for Zen Mesh Helm charts.
 
 ## Overview
 
-Kube-Zen charts use **independent versioning** - each component chart has its own version that can be updated independently. The zen-suite umbrella chart versions are tied to dependency changes and suite configuration changes.
+Zen Mesh charts use **independent versioning** - each component chart has its own version that can be updated independently. The zen-suite umbrella chart versions are tied to dependency changes and suite configuration changes.
 
 ## Component Chart Versioning
 

@@ -97,7 +97,7 @@ egress:
 
 **Example ZenLock CRD for egress TLS:**
 ```yaml
-apiVersion: security.kube-zen.io/v1alpha1
+apiVersion: security.zen-mesh.io/v1alpha1
 kind: ZenLock
 metadata:
   name: egress-tls

@@ -4,8 +4,8 @@
 # Default Kubernetes Events Ingester
 # This is a minimal Ingester that watches Kubernetes Events across all namespaces
 # It provides immediate value after installation - you'll see Observations created from k8s events
-# For more advanced configuration, see: https://github.com/kube-zen/zen-watcher/tree/main/examples/ingesters
-apiVersion: zen.kube-zen.io/v1alpha1
+# For more advanced configuration, see: https://github.com/zenmesh/zen-watcher/tree/main/examples/ingesters
+apiVersion: zen.zen-mesh.io/v1alpha1
 kind: Ingester
 metadata:
   name: {{ include "zen-watcher.fullname" . }}-default-k8s-events

@@ -5,7 +5,7 @@
 replicaCount: 2
 
 image:
-  repository: kubezen/zen-lead
+  repository: zenmesh/zen-lead
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "0.1.0"

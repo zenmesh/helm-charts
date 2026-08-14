@@ -1,4 +1,4 @@
-# Copyright 2025 Kube-ZEN Contributors
+# Copyright 2025 Zen Mesh
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 replicaCount: 2
 
 image:
-  repository: kubezen/zen-watcher
+  repository: zenmesh/zen-watcher
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   # Default: 1.2.1 (matches appVersion)
@@ -270,7 +270,7 @@ prometheusRule:
   # 
   # Default: false (opt-in) - Set to true if Prometheus Operator is installed
   # If Prometheus Operator is not available, apply alerts manually:
-  #   kubectl apply -f https://raw.githubusercontent.com/kube-zen/zen-watcher/main/config/prometheus/rules/leader-election-alerts.yml
+  #   kubectl apply -f https://raw.githubusercontent.com/zenmesh/zen-watcher/main/config/prometheus/rules/leader-election-alerts.yml
   enabled: false
 
 # ServiceMonitor configuration (Prometheus Operator)

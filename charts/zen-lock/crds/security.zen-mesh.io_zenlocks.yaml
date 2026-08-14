@@ -3,10 +3,10 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.20.0
-  name: zenlocks.security.kube-zen.io
+    controller-gen.kubebuilder.io/version: v0.21.0
+  name: zenlocks.security.zen-mesh.io
 spec:
-  group: security.kube-zen.io
+  group: security.zen-mesh.io
   names:
     kind: ZenLock
     listKind: ZenLockList
@@ -21,6 +21,12 @@ spec:
     - jsonPath: .status.phase
       name: Phase
       type: string
+    - jsonPath: .status.rotation.phase
+      name: Rotation
+      type: string
+    - jsonPath: .status.rotation.graceHits
+      name: GraceHits
+      type: integer
     - jsonPath: .metadata.creationTimestamp
       name: Age
       type: date
@@ -134,6 +140,59 @@ spec:
                 - Ready
                 - Error
                 type: string
+              rotation:
+                description: |-
+                  Rotation holds AGE keypair rotation state.
+                  nil when no rotation is in progress.
+                properties:
+                  activeKeyId:
+                    description: ActiveKeyID is a short identifier for the active
+                      AGE public key (recipient string)
+                    type: string
+                  deprecatedAt:
+                    description: DeprecatedAt is when the previous key was removed
+                    format: date-time
+                    type: string
+                  graceHits:
+                    description: GraceHits is the count of decryptions using the previous
+                      key since startup
+                    format: int64
+                    type: integer
+                  pending:
+                    description: Pending is the count of ZenLock CRDs still encrypted
+                      with the previous key
+                    format: int32
+                    type: integer
+                  phase:
+                    description: 'Phase of the rotation: idle, rotating, or deprecated'
+                    enum:
+                    - idle
+                    - rotating
+                    - deprecated
+                    type: string
+                  previousKeyId:
+                    description: PreviousKeyID is a short identifier for the previous
+                      AGE public key
+                    type: string
+                  reencrypted:
+                    description: Reencrypted is the count of ZenLock CRDs re-encrypted
+                      with the active key
+                    format: int32
+                    type: integer
+                  rotatedAt:
+                    description: RotatedAt is when the rotation started
+                    format: date-time
+                    type: string
+                  safeToDeprecate:
+                    description: |-
+                      SafeToDeprecate is true when all ZenLocks are re-encrypted and no grace hits
+                      are being recorded. The operator should verify this before running deprecate.
+                    type: boolean
+                required:
+                - graceHits
+                - pending
+                - reencrypted
+                type: object
             type: object
         type: object
     served: true

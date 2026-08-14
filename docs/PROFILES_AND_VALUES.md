@@ -129,7 +129,7 @@ helm install zen-agent charts/zen-agent/ \
 - **TLS:** mTLS enabled (production certificates)
 - **Resources:** Medium (512Mi RAM, 200m CPU)
 - **Replicas:** 2+ (HA)
-- **SaaS Endpoint:** https://agent.kube-zen.io (HTTPS only)
+- **SaaS Endpoint:** https://agent.zen-mesh.io (HTTPS only)
 - **Secrets:** External secrets (sealed-secrets, external-secrets-operator)
 
 **Example Values:** `docs/examples/values-gitops.yaml`
@@ -153,7 +153,7 @@ spec:
     name: zen-agent-values
   values:
     saas:
-      endpoint: "https://agent.kube-zen.io"
+      endpoint: "https://agent.zen-mesh.io"
     tenant:
       id: "TENANT_ID"  # From ConfigMap
     cluster:
@@ -185,7 +185,7 @@ spec:
 - **TLS:** Production certificates (Let's Encrypt or AWS ACM)
 - **Resources:** Production-ready (512Mi-1Gi RAM, auto-scaling)
 - **Replicas:** 3+ (HA with HPA)
-- **SaaS Endpoint:** https://agent.kube-zen.io (public FQDN)
+- **SaaS Endpoint:** https://agent.zen-mesh.io (public FQDN)
 - **Secrets:** AWS Secrets Manager (IRSA)
 
 **Example Values:** `docs/examples/values-aws.yaml`

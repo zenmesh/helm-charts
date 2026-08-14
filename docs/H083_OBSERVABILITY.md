@@ -138,9 +138,9 @@ metadata:
 # Lease annotations (Profile B/C)
 metadata:
   annotations:
-    leadership.kube-zen.io/leader-pod-name: "zen-flow-controller-abc123"
-    leadership.kube-zen.io/leader-pod-uid: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-    leadership.kube-zen.io/last-transition-time: "2015-12-31T10:30:00Z"
+    leadership.zen-mesh.io/leader-pod-name: "zen-flow-controller-abc123"
+    leadership.zen-mesh.io/leader-pod-uid: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+    leadership.zen-mesh.io/last-transition-time: "2015-12-31T10:30:00Z"
 ```
 
 ## Alert Recommendations

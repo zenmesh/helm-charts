@@ -94,7 +94,7 @@ helm install zen-watcher charts/zen-watcher/ -f docs/examples/values-aws.yaml
 
 **Chart Values:**
 - TLS enabled (public certificates, not mkcert)
-- SaaS endpoint: public FQDN (e.g., `https://agent.kube-zen.io`)
+- SaaS endpoint: public FQDN (e.g., `https://agent.zen-mesh.io`)
 - IRSA for AWS integration
 - Resources: production-ready
 
@@ -331,13 +331,13 @@ helm install zen-watcher charts/zen-watcher/ -f docs/examples/values-aws.yaml
 ### Allowed Registries (from GUARDRAILS.md)
 
 **Current:**
-- zen-watcher: `kubezen/zen-watcher` ✅
+- zen-watcher: `zenmesh/zen-watcher` ✅
 
 **Policy:**
-- Prefer `kubezen/*` (Docker Hub official namespace)
-- Internal dev: `registry.kube-zen.io:5000/*`
-- CI: `ghcr.io/kube-zen/*`
-- Prohibited: `docker.io/*` (except kubezen namespace)
+- Prefer `zenmesh/*` (Docker Hub official namespace)
+- Internal dev: `registry.zen-mesh.io:5000/*`
+- CI: `ghcr.io/zen-mesh/*`
+- Prohibited: `docker.io/*` (except zenmesh namespace)
 
 **Validation:**
 - `scripts/ci/helm-lint-and-render.sh` checks registry policies when `RUN_GUARDRAILS=1`

@@ -6,20 +6,20 @@ version: 0.0.2-alpha
 appVersion: "0.1.0"
 keywords:
   - kubernetes
-  - kube-zen
+  - zen-mesh
   - leader-election
   - high-availability
   - ha
   - operator
   - controller
 
-home: https://github.com/kube-zen/zen-lead
+home: https://github.com/zenmesh/zen-lead
 sources:
-  - https://github.com/kube-zen/zen-lead
+  - https://github.com/zenmesh/zen-lead
 
 maintainers:
-  - name: Kube-ZEN Team
-    email: team@kube-zen.io
+  - name: Zen Mesh Team
+    email: zen@zen-mesh.io
 
 annotations:
   category: High Availability
@@ -30,11 +30,11 @@ annotations:
     - Controller-driven leader selection
   artifacthub.io/links: |
     - name: Documentation
-      url: https://github.com/kube-zen/zen-lead/blob/main/README.md
+      url: https://github.com/zenmesh/zen-lead/blob/main/README.md
     - name: Source
-      url: https://github.com/kube-zen/zen-lead
+      url: https://github.com/zenmesh/zen-lead
     - name: Support
-      url: https://github.com/kube-zen/zen-lead/issues
+      url: https://github.com/zenmesh/zen-lead/issues
   artifacthub.io/imagesWhitelist: |
-    - kubezen/zen-lead
+    - zenmesh/zen-lead
 

@@ -1,4 +1,4 @@
-# Copyright 2025 Kube-ZEN Contributors
+# Copyright 2025 Zen Mesh
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ appVersion: "1.2.3"
 
 keywords:
   - kubernetes
-  - kube-zen
+  - zen-mesh
   - observability
   - events
   - monitoring
@@ -29,13 +29,13 @@ keywords:
   - compliance
   - operator
 
-home: https://github.com/kube-zen/zen-watcher
+home: https://github.com/zenmesh/zen-watcher
 sources:
-  - https://github.com/kube-zen/zen-watcher
+  - https://github.com/zenmesh/zen-watcher
 
 maintainers:
-  - name: Kube-ZEN Team
-    email: team@kube-zen.io
+  - name: Zen Mesh Team
+    email: zen@zen-mesh.io
 
 annotations:
   category: Observability
@@ -45,14 +45,14 @@ annotations:
     - Supports multiple sources (Trivy, Kyverno, Falco, Audit logs, Kube-bench)
   artifacthub.io/links: |
     - name: Documentation
-      url: https://github.com/kube-zen/zen-watcher/blob/main/README.md
+      url: https://github.com/zenmesh/zen-watcher/blob/main/README.md
     - name: Source
-      url: https://github.com/kube-zen/zen-watcher
+      url: https://github.com/zenmesh/zen-watcher
     - name: Support
-      url: https://github.com/kube-zen/zen-watcher/issues
+      url: https://github.com/zenmesh/zen-watcher/issues
   artifacthub.io/images: |
     - name: zen-watcher
-      image: kubezen/zen-watcher:1.2.3
+      image: zenmesh/zen-watcher:1.2.3
   artifacthub.io/imagesWhitelist: |
-    - kubezen/zen-watcher
+    - zenmesh/zen-watcher
 

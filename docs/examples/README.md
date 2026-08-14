@@ -51,7 +51,7 @@ spec:
   values:
     # Reference values-gitops.yaml
     saas:
-      endpoint: "https://agent.kube-zen.io"
+      endpoint: "https://agent.zen-mesh.io"
     # Secrets managed via external-secrets
 ```
 

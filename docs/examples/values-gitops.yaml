@@ -3,12 +3,12 @@
 # See: docs/ROADMAP_HELM.md for GitOps integration details
 
 image:
-  repository: kubezen/zen-agent
+  repository: zenmesh/zen-agent
   tag: "1.0.2"  # Pin to specific version for GitOps
   pullPolicy: IfNotPresent
 
 saas:
-  endpoint: "https://agent.kube-zen.io"  # Production SaaS FQDN (HTTPS only)
+  endpoint: "https://agent.zen-mesh.io"  # Production SaaS FQDN (HTTPS only)
   clusterToken: ""  # Set via Secret (external-secrets or sealed-secrets)
 
 tenant:

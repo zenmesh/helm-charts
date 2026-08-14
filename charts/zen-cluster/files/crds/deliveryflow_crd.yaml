@@ -1,9 +1,9 @@
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  name: deliveryflows.routing.zen.kube-zen.io
+  name: deliveryflows.routing.zen.zen-mesh.io
 spec:
-  group: routing.zen.kube-zen.io
+  group: routing.zen.zen-mesh.io
   names:
     kind: DeliveryFlow
     listKind: DeliveryFlowList

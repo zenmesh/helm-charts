@@ -1,6 +1,6 @@
 # Development Guide
 
-This guide covers development setup, workflows, and best practices for Kube-Zen Helm Charts.
+This guide covers development setup, workflows, and best practices for Zen Mesh Helm Charts.
 
 ## Prerequisites
 
@@ -12,7 +12,7 @@ This guide covers development setup, workflows, and best practices for Kube-Zen 
 ## Installation
 
 ```bash
-git clone https://github.com/kube-zen/helm-charts.git
+git clone https://github.com/zenmesh/helm-charts.git
 cd helm-charts
 ```
 

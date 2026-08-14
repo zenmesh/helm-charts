@@ -1,18 +1,18 @@
 dependencies:
 - name: zen-lock
   repository: file://../zen-lock
-  version: 0.0.2-alpha
+  version: 0.0.4-alpha
 - name: zen-flow
   repository: file://../zen-flow
   version: 0.0.2-alpha
 - name: zen-gc
   repository: file://../zen-gc
-  version: 0.0.2-alpha
+  version: 0.0.3-alpha
 - name: zen-watcher
   repository: file://../zen-watcher
-  version: 1.2.2
+  version: 1.2.3
 - name: zen-lead
   repository: file://../zen-lead
   version: 0.0.2-alpha
-digest: sha256:e94d34c67c787f5fbce1a1d2c464dbe384c291f2fecf83e338ec3c0b1aeba819
-generated: "2026-01-08T06:45:27.491670448-05:00"
+digest: sha256:bb8c89ac661eed6f842fb22dd82c5d326db79bd4817b96547a2c48392bcc62fa
+generated: "2026-08-14T16:46:04.61709917-04:00"

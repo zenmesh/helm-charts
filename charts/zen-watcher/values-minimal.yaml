@@ -6,13 +6,13 @@
 # laptop clusters (k3d, kind, minikube), and resource-constrained environments.
 #
 # Usage:
-#   helm install zen-watcher kube-zen/zen-watcher \
+#   helm install zen-watcher zenmesh/zen-watcher \
 #     --namespace zen-system \
 #     --create-namespace \
 #     -f values-minimal.yaml
 #
 # Or override specific values:
-#   helm install zen-watcher kube-zen/zen-watcher \
+#   helm install zen-watcher zenmesh/zen-watcher \
 #     --namespace zen-system \
 #     --create-namespace \
 #     -f values-minimal.yaml \
@@ -22,7 +22,7 @@
 replicaCount: 1
 
 image:
-  repository: kubezen/zen-watcher
+  repository: zenmesh/zen-watcher
   pullPolicy: IfNotPresent
   tag: "1.2.1"
 

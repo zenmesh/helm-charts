@@ -1,10 +1,10 @@
 # zen-agent
 
-Kube-ZEN Cluster Agent for SaaS connectivity.
+Zen Mesh Cluster Agent for SaaS connectivity.
 
 ## Description
 
-zen-agent is the cluster-side component that connects your Kubernetes cluster to the Kube-ZEN SaaS platform. It handles:
+zen-agent is the cluster-side component that connects your Kubernetes cluster to the Zen Mesh SaaS platform. It handles:
 
 - Initial cluster enrollment using bootstrap tokens
 - Secret management for cluster credentials
@@ -16,13 +16,13 @@ zen-agent is the cluster-side component that connects your Kubernetes cluster to
 Use the install bundle (base64-encoded age bundle) from the SaaS UI. Same-cluster: use the in-cluster back URL for `saas.endpoint`.
 
 ```bash
-helm repo add kube-zen https://kube-zen.github.io/helm-charts
+helm repo add zenmesh https://zenmesh.github.io/helm-charts
 helm repo update
 
-helm upgrade --install zen-agent kube-zen/zen-agent \
+helm upgrade --install zen-agent zenmesh/zen-agent \
   --namespace zen-mesh \
   --create-namespace \
-  --set saas.endpoint="https://api.kube-zen.io" \
+  --set saas.endpoint="https://api.zen-mesh.io" \
   --set agent.enrollment.bundle='<BASE64_BUNDLE>'
 ```
 
@@ -38,7 +38,7 @@ Same k3d cluster (in-cluster URL):
 
 ### Required Values
 
-- `saas.endpoint` or `agent.saasBaseURL`: SaaS API base URL (e.g. `https://api.kube-zen.io` or in-cluster `http://zen-saas-back.zen-apps.svc.cluster.local:8080`)
+- `saas.endpoint` or `agent.saasBaseURL`: SaaS API base URL (e.g. `https://api.zen-mesh.io` or in-cluster `http://zen-saas-back.zen-apps.svc.cluster.local:8080`)
 - `agent.enrollment.bundle`: Base64 enrollment bundle from install-bundle. Required when `agent.enrollment.enabled=true`. Pass with `--set agent.enrollment.bundle="<BASE64_BUNDLE>"`
 
 ### Optional Values
@@ -56,7 +56,7 @@ zen-agent must run with a ServiceAccount that has the following permissions so a
   If the SA cannot list/get Secrets, bulk sync fails with "forbidden" or "not found"; fix RBAC in the agent namespace before debugging further.
 
 - **ConfigMaps (cluster-wide for adapter discovery)**  
-  The chart grants the SA a ClusterRole to **get**, **list**, **watch**, **update**, and **patch** ConfigMaps so it can discover ZenAdapter ConfigMaps (label `zen.kubezen.io/adapter=true`).
+  The chart grants the SA a ClusterRole to **get**, **list**, **watch**, **update**, and **patch** ConfigMaps so it can discover ZenAdapter ConfigMaps (label `zen-mesh.io/adapter=true`).
 
 - **Events**  
   The SA can **create** and **patch** Events in its namespace for observability.
@@ -66,7 +66,7 @@ zen-agent must run with a ServiceAccount that has the following permissions so a
 
 ## License
 
-Copyright 2025 Kube-ZEN Contributors
+Copyright 2025 Zen Mesh
 
 Licensed under the Apache License, Version 2.0
 

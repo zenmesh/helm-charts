@@ -1,4 +1,4 @@
-# Copyright 2025 Kube-ZEN Contributors
+# Copyright 2025 Zen Mesh
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,15 +13,15 @@
 # limitations under the License.
 
 # CODEOWNERS file defines who is responsible for code in this repository
-* @kube-zen/maintainers
+* @zenmesh/maintainers
 
 # Helm charts
-/charts/ @kube-zen/maintainers
+/charts/ @zenmesh/maintainers
 
 # Documentation
-/docs/ @kube-zen/maintainers
-*.md @kube-zen/maintainers
+/docs/ @zenmesh/maintainers
+*.md @zenmesh/maintainers
 
 # CI/CD
-/.github/ @kube-zen/maintainers
-/.github/workflows/ @kube-zen/maintainers
+/.github/ @zenmesh/maintainers
+/.github/workflows/ @zenmesh/maintainers

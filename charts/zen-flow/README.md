@@ -17,7 +17,7 @@ zen-flow is a Kubernetes-native job orchestration controller that provides decla
 ### Add the Helm Repository
 
 ```bash
-helm repo add zen-flow https://kube-zen.github.io/zen-flow/charts
+helm repo add zen-flow https://zenmesh.github.io/zen-flow/charts
 helm repo update
 ```
 
@@ -59,7 +59,7 @@ The following table lists the configurable parameters and their default values:
 | Parameter | Description | Default |
 |-----------|-------------|---------|
 | `replicaCount` | Number of controller replicas | `2` |
-| `image.repository` | Controller image repository | `kubezen/zen-flow-controller` |
+| `image.repository` | Controller image repository | `zenmesh/zen-flow-controller` |
 | `image.tag` | Controller image tag | `0.0.1-alpha` |
 | `image.pullPolicy` | Image pull policy | `IfNotPresent` |
 | `serviceAccount.create` | Create service account | `true` |
@@ -158,7 +158,7 @@ helm uninstall zen-flow --namespace zen-flow-system
 **Note:** CRDs are not removed by default. To remove CRDs:
 
 ```bash
-kubectl delete crd jobflows.workflow.kube-zen.io
+kubectl delete crd jobflows.workflow.zen-mesh.io
 ```
 
 ## Examples
@@ -242,7 +242,7 @@ kubectl logs -n zen-flow-system deployment/zen-flow-controller
 Ensure CRDs are installed:
 
 ```bash
-kubectl get crd jobflows.workflow.kube-zen.io
+kubectl get crd jobflows.workflow.zen-mesh.io
 ```
 
 If missing, install manually:
@@ -253,8 +253,8 @@ kubectl apply -f deploy/crds/
 
 ## Support
 
-- **Issues**: [GitHub Issues](https://github.com/kube-zen/zen-flow/issues)
-- **Documentation**: [GitHub Wiki](https://github.com/kube-zen/zen-flow/wiki)
+- **Issues**: [GitHub Issues](https://github.com/zenmesh/zen-flow/issues)
+- **Documentation**: [GitHub Wiki](https://github.com/zenmesh/zen-flow/wiki)
 
 ## License
 

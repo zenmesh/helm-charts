@@ -2,7 +2,7 @@
 # Usage: helm install zen-agent charts/zen-agent/ -f docs/examples/values-local.yaml
 
 image:
-  repository: kubezen/zen-agent
+  repository: zenmesh/zen-agent
   tag: bootstrap  # Use local image or import via k3d
   pullPolicy: IfNotPresent
 

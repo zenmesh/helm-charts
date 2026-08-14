@@ -1,10 +1,10 @@
 # Security Model
 
-This document defines explicit security boundaries for Kube-Zen components.
+This document defines explicit security boundaries for Zen Mesh components.
 
 ## Overview
 
-Each Kube-Zen component operates independently with its own security boundaries. Components are designed with least-privilege principles and zero-trust assumptions.
+Each Zen Mesh component operates independently with its own security boundaries. Components are designed with least-privilege principles and zero-trust assumptions.
 
 ## Component Security Boundaries
 
@@ -150,7 +150,7 @@ When using zen-suite chart:
 
 ## Security Reporting
 
-Security vulnerabilities should be reported to: security@kube-zen.io
+Security vulnerabilities should be reported to: security@zen-mesh.io
 
 See individual component repositories for component-specific security policies.
 

@@ -1,4 +1,4 @@
-# Contributing to Kube-Zen Helm Charts
+# Contributing to Zen Mesh Helm Charts
 
 Thank you for your interest in contributing! This document provides guidelines and instructions for contributing.
 
@@ -15,7 +15,7 @@ Thank you for your interest in contributing! This document provides guidelines a
 
 1. **Fork and clone the repository:**
    ```bash
-   git clone https://github.com/kube-zen/helm-charts.git
+   git clone https://github.com/zenmesh/helm-charts.git
    cd helm-charts
    ```
 

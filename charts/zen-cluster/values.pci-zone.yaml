@@ -15,7 +15,7 @@ pciZone:
   kmsKeyARN: ""  # Set to KMS key ARN for PCI zone encryption
   # Separate node pool selector (if using EKS node groups)
   nodeSelector:
-    zen.kube-zen.com/pci-zone: "true"
+    zen-mesh.io/pci-zone: "true"
   tolerations:
     - key: "pci-zone"
       operator: "Equal"
@@ -44,7 +44,7 @@ networkPolicy:
     - from:
         namespaceSelector:
           matchLabels:
-            zen.kube-zen.com/plane: saas
+            zen-mesh.io/plane: saas
         podSelector:
           matchLabels:
             app.kubernetes.io/component: bridge
@@ -55,7 +55,7 @@ networkPolicy:
     - to:
         namespaceSelector:
           matchLabels:
-            zen.kube-zen.com/plane: pci-egress-proxy
+            zen-mesh.io/plane: pci-egress-proxy
       ports:
         - protocol: TCP
           port: 443
@@ -63,7 +63,7 @@ networkPolicy:
     - to:
         namespaceSelector:
           matchLabels:
-            zen.kube-zen.com/plane: saas
+            zen-mesh.io/plane: saas
       ports:
         - protocol: TCP
           port: 443
@@ -84,7 +84,7 @@ ingress:
   className: nginx
   grpc:
     # PCI-specific ingress host
-    host: "pci.api.kube-zen.io"  # Separate FQDN for PCI zone
+    host: "pci.api.zen-mesh.io"  # Separate FQDN for PCI zone
     service: zen-ingester
     port: 8080
     annotations:
@@ -161,7 +161,7 @@ rbac:
       - apiGroups: [""]
         resources: ["configmaps"]
         verbs: ["get", "list"]
-      - apiGroups: ["zen.kube-zen.io"]
+      - apiGroups: ["zen.zen-mesh.io"]
         resources: ["deliveryflows", "destinations"]
         verbs: ["get", "list", "watch"]
       # No create/update/delete for PCI zone (control-plane only)
@@ -214,5 +214,5 @@ monitoring:
   serviceMonitor:
     enabled: true
     labels:
-      zen.kube-zen.com/pci-zone: "true"
+      zen-mesh.io/pci-zone: "true"
     scrapeInterval: 30s

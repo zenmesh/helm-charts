@@ -6,13 +6,13 @@
 # These values prioritize stability, security, and observability.
 #
 # Usage:
-#   helm install zen-watcher kube-zen/zen-watcher \
+#   helm install zen-watcher zenmesh/zen-watcher \
 #     --namespace zen-system \
 #     --create-namespace \
 #     -f values-production.yaml
 #
 # Or override specific values:
-#   helm install zen-watcher kube-zen/zen-watcher \
+#   helm install zen-watcher zenmesh/zen-watcher \
 #     --namespace zen-system \
 #     --create-namespace \
 #     -f values-production.yaml \
@@ -22,7 +22,7 @@
 replicaCount: 2
 
 image:
-  repository: kubezen/zen-watcher
+  repository: zenmesh/zen-watcher
   pullPolicy: IfNotPresent
   tag: "1.2.1"  # Pin to specific version for production
 

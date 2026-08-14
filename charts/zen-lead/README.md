@@ -25,7 +25,7 @@ zen-lead provides **network-level single-active routing** via a selector-less Se
 ### Add the Helm Repository
 
 ```bash
-helm repo add zen-lead https://kube-zen.github.io/zen-lead/charts
+helm repo add zen-lead https://zenmesh.github.io/zen-lead/charts
 helm repo update
 ```
 
@@ -83,7 +83,7 @@ The following table lists the configurable parameters and their default values:
 | Parameter | Description | Default |
 |-----------|-------------|---------|
 | `replicaCount` | Number of controller replicas | `2` |
-| `image.repository` | Controller image repository | `kubezen/zen-lead` |
+| `image.repository` | Controller image repository | `zenmesh/zen-lead` |
 | `image.tag` | Controller image tag | `0.1.0` |
 | `image.pullPolicy` | Image pull policy | `IfNotPresent` |
 | `serviceAccount.create` | Create service account | `true` |
@@ -255,7 +255,7 @@ kubectl get svc my-app -o jsonpath='{.metadata.annotations.zen-lead\.io/enabled}
 
 ## Support
 
-- **Documentation**: https://github.com/kube-zen/zen-lead/blob/main/README.md
-- **Issues**: https://github.com/kube-zen/zen-lead/issues
-- **Source**: https://github.com/kube-zen/zen-lead
+- **Documentation**: https://github.com/zenmesh/zen-lead/blob/main/README.md
+- **Issues**: https://github.com/zenmesh/zen-lead/issues
+- **Source**: https://github.com/zenmesh/zen-lead
 

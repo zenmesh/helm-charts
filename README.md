@@ -1,27 +1,27 @@
-# Kube-Zen Helm Charts
+# Zen Mesh Helm Charts
 
-Official Helm charts repository for Kube-Zen platform components.
+Official Helm charts repository for Zen Mesh platform components.
 
 ## Repository URL
 
 ```
-https://kube-zen.github.io/helm-charts
+https://zenmesh.github.io/helm-charts
 ```
 
 ## Quick Start
 
 ```bash
 # Add repository
-helm repo add kube-zen https://kube-zen.github.io/helm-charts
+helm repo add zenmesh https://zenmesh.github.io/helm-charts
 helm repo update
 
 # Install zen-suite (all components)
-helm install zen-suite kube-zen/zen-suite \
+helm install zen-suite zenmesh/zen-suite \
   --namespace zen-system \
   --create-namespace
 
 # Or install individual components
-helm install zen-lock kube-zen/zen-lock \
+helm install zen-lock zenmesh/zen-lock \
   --namespace zen-lock-system \
   --create-namespace
 ```
@@ -30,7 +30,7 @@ helm install zen-lock kube-zen/zen-lock \
 
 ### zen-suite (Umbrella Chart)
 
-**Reference installation for all Kube-Zen components**
+**Reference installation for all Zen Mesh components**
 
 - Installs zen-lock, zen-flow, zen-gc, and zen-watcher
 - Components can be enabled/disabled independently
@@ -45,7 +45,7 @@ helm install zen-lock kube-zen/zen-lock \
 - Kubernetes-native integration
 - Zero-knowledge architecture
 
-**Source**: [github.com/kube-zen/zen-lock](https://github.com/kube-zen/zen-lock)
+**Source**: [github.com/zenmesh/zen-lock](https://github.com/zenmesh/zen-lock)
 
 ### zen-flow
 
@@ -55,7 +55,7 @@ helm install zen-lock kube-zen/zen-lock \
 - Kubernetes-native implementation
 - Batch processing support
 
-**Source**: [github.com/kube-zen/zen-flow](https://github.com/kube-zen/zen-flow)
+**Source**: [github.com/zenmesh/zen-flow](https://github.com/zenmesh/zen-flow)
 
 ### zen-gc
 
@@ -65,7 +65,7 @@ helm install zen-lock kube-zen/zen-lock \
 - Policy-driven garbage collection
 - Kubernetes resource lifecycle management
 
-**Source**: [github.com/kube-zen/zen-gc](https://github.com/kube-zen/zen-gc)
+**Source**: [github.com/zenmesh/zen-gc](https://github.com/zenmesh/zen-gc)
 
 ### zen-watcher
 
@@ -75,7 +75,7 @@ helm install zen-lock kube-zen/zen-lock \
 - Observation CRD generation
 - Security and compliance event aggregation
 
-**Source**: [github.com/kube-zen/zen-watcher](https://github.com/kube-zen/zen-watcher)
+**Source**: [github.com/zenmesh/zen-watcher](https://github.com/zenmesh/zen-watcher)
 
 ## Installation
 
@@ -83,12 +83,12 @@ helm install zen-lock kube-zen/zen-lock \
 
 ```bash
 # Install all components
-helm install zen-suite kube-zen/zen-suite \
+helm install zen-suite zenmesh/zen-suite \
   --namespace zen-system \
   --create-namespace
 
 # Or selectively enable components
-helm install zen-suite kube-zen/zen-suite \
+helm install zen-suite zenmesh/zen-suite \
   --namespace zen-system \
   --create-namespace \
   --set zenLock.enabled=true \
@@ -103,22 +103,22 @@ See [INSTALL.md](docs/INSTALL.md) for detailed installation instructions.
 
 ```bash
 # Install zen-lock
-helm install zen-lock kube-zen/zen-lock \
+helm install zen-lock zenmesh/zen-lock \
   --namespace zen-lock-system \
   --create-namespace
 
 # Install zen-flow
-helm install zen-flow kube-zen/zen-flow \
+helm install zen-flow zenmesh/zen-flow \
   --namespace zen-flow-system \
   --create-namespace
 
 # Install zen-gc
-helm install zen-gc kube-zen/zen-gc \
+helm install zen-gc zenmesh/zen-gc \
   --namespace zen-gc-system \
   --create-namespace
 
 # Install zen-watcher
-helm install zen-watcher kube-zen/zen-watcher \
+helm install zen-watcher zenmesh/zen-watcher \
   --namespace zen-watcher-system \
   --create-namespace
 ```
@@ -166,7 +166,7 @@ Components use **independent versioning** - each chart has its own version that 
 
 ## Artifact Hub
 
-This repository is published on [Artifact Hub](https://artifacthub.io). Search for `kube-zen` to find all charts.
+This repository is published on [Artifact Hub](https://artifacthub.io). Search for `zen-mesh` to find all charts.
 
 ## License
 
@@ -178,7 +178,7 @@ This repository is published on [Artifact Hub](https://artifacthub.io). Search f
 
 ## Support
 
-- **Issues**: [github.com/kube-zen/helm-charts/issues](https://github.com/kube-zen/helm-charts/issues)
+- **Issues**: [github.com/zenmesh/helm-charts/issues](https://github.com/zenmesh/helm-charts/issues)
 - **Documentation**: [docs/](docs/)
 - **Component-specific support**: See individual component repositories
 

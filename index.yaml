@@ -4,106 +4,39 @@ entries:
   - annotations:
       artifacthub.io/changes: |
         - ENROLLMENT_BUNDLE env from enrollment.bundle (base64 only; required for install)
-        - Kube-ZEN Cluster Agent for SaaS connectivity
+        - Zen Mesh Cluster Agent for SaaS connectivity
         - Bootstrap token support for cluster enrollment
         - Secret management for cluster credentials
       artifacthub.io/links: |
         - name: Documentation
-          url: https://github.com/kube-zen/zen-platform
+          url: https://github.com/zenmesh/zen-platform
       category: Management
     apiVersion: v2
     appVersion: 0.1.1
-    created: "2026-02-21T20:56:46.315037565-05:00"
-    description: A Helm chart for zen-agent - Kube-ZEN Cluster Agent
-    digest: ff871c6c142f43ac7d43c8a4adff93ae1bfff85878f0793c04f6f1ffa13d411f
-    home: https://github.com/kube-zen/zen-platform
+    created: "2026-08-14T16:46:17.727430531-04:00"
+    description: A Helm chart for zen-agent - Zen Mesh Cluster Agent
+    digest: b911b70d27e2d1611c05f582164bda23337510fe260e604a1443efe48b6065ee
+    home: https://github.com/zenmesh/zen-platform
     keywords:
     - kubernetes
-    - kube-zen
+    - zen-mesh
     - agent
     - cluster
     - saas
     maintainers:
-    - email: team@kube-zen.io
-      name: Kube-ZEN Team
+    - email: zen@zen-mesh.io
+      name: Zen Mesh Team
     name: zen-agent
     sources:
-    - https://github.com/kube-zen/zen-platform
+    - https://github.com/zenmesh/zen-platform
     type: application
     urls:
-    - https://kube-zen.github.io/helm-charts/zen-agent-0.1.2.tgz
+    - https://zenmesh.github.io/helm-charts/zen-agent-0.1.2.tgz
     version: 0.1.2
-  - annotations:
-      artifacthub.io/changes: |
-        - Kube-ZEN Cluster Agent for SaaS connectivity
-        - Bootstrap token support for cluster enrollment
-        - Secret management for cluster credentials
-      artifacthub.io/links: |
-        - name: Documentation
-          url: https://github.com/kube-zen/zen-platform
-      category: Management
-    apiVersion: v2
-    appVersion: 0.1.1
-    created: "2026-02-21T20:56:46.313746254-05:00"
-    description: A Helm chart for zen-agent - Kube-ZEN Cluster Agent
-    digest: ba5e9b41ec69440a109a855a7e68464e7b92e5e75ee56bab456ca704cd307b39
-    home: https://github.com/kube-zen/zen-platform
-    keywords:
-    - kubernetes
-    - kube-zen
-    - agent
-    - cluster
-    - saas
-    maintainers:
-    - email: team@kube-zen.io
-      name: Kube-ZEN Team
-    name: zen-agent
-    sources:
-    - https://github.com/kube-zen/zen-platform
-    type: application
-    urls:
-    - https://kube-zen.github.io/helm-charts/zen-agent-0.1.1.tgz
-    version: 0.1.1
-  - annotations:
-      artifacthub.io/changes: |
-        - Kube-ZEN Cluster Agent for SaaS connectivity
-        - Bootstrap token support for cluster enrollment
-        - Secret management for cluster credentials
-      artifacthub.io/images: |
-        - name: zen-agent
-          image: kubezen/zen-agent:0.1.0
-      artifacthub.io/imagesWhitelist: |
-        - kubezen/zen-agent
-      artifacthub.io/links: |
-        - name: Documentation
-          url: https://github.com/kube-zen/zen-platform
-      category: Management
-    apiVersion: v2
-    appVersion: 0.1.0
-    created: "2026-02-21T20:56:46.311847854-05:00"
-    description: A Helm chart for zen-agent - Kube-ZEN Cluster Agent
-    digest: 74b51998b5995a927aa2d69960ae1529daa8389d4ec2aecb541ae26c17386577
-    home: https://github.com/kube-zen/zen-platform
-    keywords:
-    - kubernetes
-    - kube-zen
-    - agent
-    - cluster
-    - saas
-    maintainers:
-    - email: team@kube-zen.io
-      name: Kube-ZEN Team
-    name: zen-agent
-    sources:
-    - https://github.com/kube-zen/zen-platform
-    type: application
-    urls:
-    - https://kube-zen.github.io/helm-charts/zen-agent-0.1.0.tgz
-    version: 0.1.0
   zen-cluster:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-02-21T20:56:46.348289722-05:00"
+    created: "2026-08-14T16:46:17.739056737-04:00"
     dependencies:
     - condition: keda.enabled
       name: keda
@@ -115,8 +48,8 @@ entries:
       version: 20.0.0
     description: Zen Cluster-side Components (Ingester and Egress) - Customer-installed
       components
-    digest: b17563bf1835795ae426edd54d2d95c0c4a5fb73d61a57517f3849383e9654e3
-    home: https://kube-zen.io
+    digest: 569972b3cd8c7e79604d243e9c88eb1544ea3cc07a4d5a70465f30317a6b77e1
+    home: https://zen-mesh.io
     keywords:
     - kubernetes
     - observability
@@ -124,89 +57,229 @@ entries:
     - event-egress
     - cluster-management
     maintainers:
-    - email: team@kube-zen.io
-      name: Kube-Zen Team
+    - email: zen@zen-mesh.io
+      name: Zen Mesh Team
     name: zen-cluster
     sources:
     - https://github.com/leonardoneves/zen
     type: application
     urls:
-    - https://kube-zen.github.io/helm-charts/zen-cluster-1.0.0.tgz
+    - https://zenmesh.github.io/helm-charts/zen-cluster-1.0.0.tgz
     version: 1.0.0
+  zen-flow:
+  - annotations:
+      artifacthub.io/changes: |
+        - Initial release
+      artifacthub.io/imagesWhitelist: |
+        - zenmesh/zen-flow
+      artifacthub.io/links: |
+        - name: Documentation
+          url: https://github.com/zenmesh/zen-flow/blob/main/README.md
+        - name: Source
+          url: https://github.com/zenmesh/zen-flow
+        - name: Support
+          url: https://github.com/zenmesh/zen-flow/issues
+      category: Workflow
+    apiVersion: v2
+    appVersion: 0.0.1-alpha
+    created: "2026-08-14T16:46:17.739760317-04:00"
+    description: A Helm chart for zen-flow - Kubernetes-native job orchestration controller
+    digest: a132a622e91a5926a099db245a7fb206dbb33e4cdeb3709f67e7dcfebdd1bdaa
+    home: https://github.com/zenmesh/zen-flow
+    keywords:
+    - kubernetes
+    - zen-mesh
+    - workflow
+    - job-orchestration
+    - dag
+    - batch-processing
+    - operator
+    maintainers:
+    - email: zen@zen-mesh.io
+      name: Zen Mesh Team
+    name: zen-flow
+    sources:
+    - https://github.com/zenmesh/zen-flow
+    type: application
+    urls:
+    - https://zenmesh.github.io/helm-charts/zen-flow-0.0.2-alpha.tgz
+    version: 0.0.2-alpha
+  zen-gc:
+  - annotations:
+      artifacthub.io/changes: |
+        - Updated API group to gc.ops.zen-mesh.io
+      artifacthub.io/imagesWhitelist: |
+        - zenmesh/zen-gc-controller
+      artifacthub.io/links: |
+        - name: Documentation
+          url: https://github.com/zenmesh/zen-gc/blob/main/README.md
+        - name: Source
+          url: https://github.com/zenmesh/zen-gc
+        - name: Support
+          url: https://github.com/zenmesh/zen-gc/issues
+      category: Utilities
+    apiVersion: v2
+    appVersion: 0.0.1-alpha
+    created: "2026-08-14T16:46:17.740255214-04:00"
+    description: A Helm chart for the Generic Garbage Collection Controller for Kubernetes
+    digest: 1f3030eeb1ab3027313ee96ae2170893956907c3c684fe6bd319eeac1684b715
+    home: https://github.com/zenmesh/zen-gc
+    keywords:
+    - kubernetes
+    - zen-mesh
+    - garbage-collection
+    - gc
+    - ttl
+    - cleanup
+    - operator
+    maintainers:
+    - email: team@zen-mesh.io
+      name: Zen-Mesh Team
+    name: zen-gc
+    sources:
+    - https://github.com/zenmesh/zen-gc
+    type: application
+    urls:
+    - https://zenmesh.github.io/helm-charts/zen-gc-0.0.3-alpha.tgz
+    version: 0.0.3-alpha
+  zen-lead:
+  - annotations:
+      artifacthub.io/changes: |
+        - Initial release
+        - Non-invasive leader election via selector-less Service + EndpointSlice
+        - Service-first opt-in interface
+        - Controller-driven leader selection
+      artifacthub.io/imagesWhitelist: |
+        - zenmesh/zen-lead
+      artifacthub.io/links: |
+        - name: Documentation
+          url: https://github.com/zenmesh/zen-lead/blob/main/README.md
+        - name: Source
+          url: https://github.com/zenmesh/zen-lead
+        - name: Support
+          url: https://github.com/zenmesh/zen-lead/issues
+      category: High Availability
+    apiVersion: v2
+    appVersion: 0.1.0
+    created: "2026-08-14T16:46:17.741005022-04:00"
+    description: A Helm chart for zen-lead - Non-invasive leader election for Kubernetes
+      workloads
+    digest: 29c37a5300620066b0b0d7907b4b8d863dc744ef868e3f223e3bc2d2ff50e8b4
+    home: https://github.com/zenmesh/zen-lead
+    keywords:
+    - kubernetes
+    - zen-mesh
+    - leader-election
+    - high-availability
+    - ha
+    - operator
+    - controller
+    maintainers:
+    - email: zen@zen-mesh.io
+      name: Zen Mesh Team
+    name: zen-lead
+    sources:
+    - https://github.com/zenmesh/zen-lead
+    type: application
+    urls:
+    - https://zenmesh.github.io/helm-charts/zen-lead-0.0.2-alpha.tgz
+    version: 0.0.2-alpha
   zen-lock:
   - annotations:
       artifacthub.io/changes: |
         - Initial release
       artifacthub.io/imagesWhitelist: |
-        - kubezen/zen-lock
+        - zenmesh/zen-lock
       artifacthub.io/links: |
         - name: Documentation
-          url: https://github.com/kube-zen/zen-lock/blob/main/README.md
+          url: https://github.com/zenmesh/zen-lock/blob/main/README.md
         - name: Source
-          url: https://github.com/kube-zen/zen-lock
+          url: https://github.com/zenmesh/zen-lock
         - name: Support
-          url: https://github.com/kube-zen/zen-lock/issues
+          url: https://github.com/zenmesh/zen-lock/issues
       category: Security
     apiVersion: v2
-    appVersion: 0.0.3-alpha
-    created: "2026-02-21T20:56:46.351809283-05:00"
+    appVersion: 0.1.0-alpha
+    created: "2026-08-14T16:46:17.742006414-04:00"
     description: A Helm chart for zen-lock - Zero-Knowledge secret manager for Kubernetes
-    digest: be10f5ba876658fb09ff7866449bbd9a1051bec9bd4151a2fb24f3ce2843cf50
-    home: https://github.com/kube-zen/zen-lock
+    digest: 80fdf4ff87c93d50953777b44c30cb59dbb41a3b903ec15457112152f9600aa6
+    home: https://github.com/zenmesh/zen-lock
     keywords:
     - kubernetes
-    - kube-zen
+    - zen-mesh
     - secret-management
     - encryption
     - zero-knowledge
     - security
     - operator
     maintainers:
-    - email: team@kube-zen.io
-      name: Kube-ZEN Team
+    - email: zen@zen-mesh.io
+      name: Zen Mesh Team
     name: zen-lock
     sources:
-    - https://github.com/kube-zen/zen-lock
+    - https://github.com/zenmesh/zen-lock
     type: application
     urls:
-    - https://kube-zen.github.io/helm-charts/zen-lock-0.0.3-alpha.tgz
-    version: 0.0.3-alpha
+    - https://zenmesh.github.io/helm-charts/zen-lock-0.0.4-alpha.tgz
+    version: 0.0.4-alpha
+  zen-suite:
   - annotations:
       artifacthub.io/changes: |
         - Initial release
-      artifacthub.io/imagesWhitelist: |
-        - kubezen/zen-lock
+        - Umbrella chart for zen-lock, zen-flow, zen-gc, and zen-watcher
       artifacthub.io/links: |
         - name: Documentation
-          url: https://github.com/kube-zen/zen-lock/blob/main/README.md
+          url: https://github.com/zenmesh/helm-charts/blob/main/docs/INSTALL.md
         - name: Source
-          url: https://github.com/kube-zen/zen-lock
+          url: https://github.com/zenmesh/helm-charts
         - name: Support
-          url: https://github.com/kube-zen/zen-lock/issues
-      category: Security
+          url: https://github.com/zenmesh/helm-charts/issues
+      category: Integration
     apiVersion: v2
-    appVersion: 0.0.1-alpha
-    created: "2026-02-21T20:56:46.349907229-05:00"
-    description: A Helm chart for zen-lock - Zero-Knowledge secret manager for Kubernetes
-    digest: ab7a356dbd44fe1a7c389b371f7835591289074a07af84223c6c21bdd522ea39
-    home: https://github.com/kube-zen/zen-lock
+    appVersion: 0.0.2-alpha
+    created: "2026-08-14T16:46:17.746559042-04:00"
+    dependencies:
+    - condition: zenLock.enabled
+      name: zen-lock
+      repository: file://../zen-lock
+      version: 0.0.4-alpha
+    - condition: zenFlow.enabled
+      name: zen-flow
+      repository: file://../zen-flow
+      version: 0.0.2-alpha
+    - condition: zenGc.enabled
+      name: zen-gc
+      repository: file://../zen-gc
+      version: 0.0.3-alpha
+    - condition: zenWatcher.enabled
+      name: zen-watcher
+      repository: file://../zen-watcher
+      version: 1.2.3
+    - condition: zenLead.enabled
+      name: zen-lead
+      repository: file://../zen-lead
+      version: 0.0.2-alpha
+    description: Umbrella chart for Zen Mesh platform components - Complete security
+      and observability suite
+    digest: 21a1748208743289c50b6fa7396641b09e7850405dd71245ed89e70fdb08732c
+    home: https://github.com/zenmesh/helm-charts
     keywords:
     - kubernetes
-    - kube-zen
-    - secret-management
-    - encryption
-    - zero-knowledge
+    - zen-mesh
     - security
+    - observability
+    - workflow
     - operator
+    - suite
     maintainers:
-    - email: team@kube-zen.io
-      name: Kube-ZEN Team
-    name: zen-lock
+    - email: zen@zen-mesh.io
+      name: Zen Mesh Team
+    name: zen-suite
     sources:
-    - https://github.com/kube-zen/zen-lock
+    - https://github.com/zenmesh/helm-charts
     type: application
     urls:
-    - https://kube-zen.github.io/helm-charts/zen-lock-0.0.2-alpha.tgz
+    - https://zenmesh.github.io/helm-charts/zen-suite-0.0.2-alpha.tgz
     version: 0.0.2-alpha
   zen-watcher:
   - annotations:
@@ -216,26 +289,26 @@ entries:
         - Supports multiple sources (Trivy, Kyverno, Falco, Audit logs, Kube-bench)
       artifacthub.io/images: |
         - name: zen-watcher
-          image: kubezen/zen-watcher:1.2.1
+          image: zenmesh/zen-watcher:1.2.3
       artifacthub.io/imagesWhitelist: |
-        - kubezen/zen-watcher
+        - zenmesh/zen-watcher
       artifacthub.io/links: |
         - name: Documentation
-          url: https://github.com/kube-zen/zen-watcher/blob/main/README.md
+          url: https://github.com/zenmesh/zen-watcher/blob/main/README.md
         - name: Source
-          url: https://github.com/kube-zen/zen-watcher
+          url: https://github.com/zenmesh/zen-watcher
         - name: Support
-          url: https://github.com/kube-zen/zen-watcher/issues
+          url: https://github.com/zenmesh/zen-watcher/issues
       category: Observability
     apiVersion: v2
-    appVersion: 1.2.1
-    created: "2026-02-21T20:56:46.357341155-05:00"
+    appVersion: 1.2.3
+    created: "2026-08-14T16:46:17.747591722-04:00"
     description: A Helm chart for zen-watcher - Universal Kubernetes Event Aggregator
-    digest: 86034dca937c837567fd5cb44dba7ffd3124b944012d4fde2b61e19689874a2a
-    home: https://github.com/kube-zen/zen-watcher
+    digest: 8fd31ecb80a936a4098585ff922615caeeeb04ff0b360b1bb6a5c87708c3af06
+    home: https://github.com/zenmesh/zen-watcher
     keywords:
     - kubernetes
-    - kube-zen
+    - zen-mesh
     - observability
     - events
     - monitoring
@@ -243,93 +316,13 @@ entries:
     - compliance
     - operator
     maintainers:
-    - email: team@kube-zen.io
-      name: Kube-ZEN Team
+    - email: zen@zen-mesh.io
+      name: Zen Mesh Team
     name: zen-watcher
     sources:
-    - https://github.com/kube-zen/zen-watcher
+    - https://github.com/zenmesh/zen-watcher
     type: application
     urls:
-    - https://kube-zen.github.io/helm-charts/zen-watcher-1.2.1.tgz
-    version: 1.2.1
-  - annotations:
-      artifacthub.io/changes: |
-        - Universal Kubernetes Event Aggregator
-        - Secure, Extensible Event Collection
-        - Supports multiple sources (Trivy, Kyverno, Falco, Audit logs, Kube-bench)
-      artifacthub.io/imagesWhitelist: |
-        - kubezen/zen-watcher
-      artifacthub.io/links: |
-        - name: Documentation
-          url: https://github.com/kube-zen/zen-watcher/blob/main/README.md
-        - name: Source
-          url: https://github.com/kube-zen/zen-watcher
-        - name: Support
-          url: https://github.com/kube-zen/zen-watcher/issues
-      category: Observability
-    apiVersion: v2
-    appVersion: 1.2.0
-    created: "2026-02-21T20:56:46.355113775-05:00"
-    description: A Helm chart for zen-watcher - Universal Kubernetes Event Aggregator
-    digest: a6cc7215e74c2909c7841f69c70dd877483ddee68b2fdf8d333a5fe33245502b
-    home: https://github.com/kube-zen/zen-watcher
-    keywords:
-    - kubernetes
-    - kube-zen
-    - observability
-    - events
-    - monitoring
-    - security
-    - compliance
-    - operator
-    maintainers:
-    - email: team@kube-zen.io
-      name: Kube-ZEN Team
-    name: zen-watcher
-    sources:
-    - https://github.com/kube-zen/zen-watcher
-    type: application
-    urls:
-    - https://kube-zen.github.io/helm-charts/zen-watcher-1.2.0.tgz
-    version: 1.2.0
-  - annotations:
-      artifacthub.io/changes: |
-        - Universal Kubernetes Event Aggregator
-        - Secure, Extensible Event Collection
-        - Supports multiple sources (Trivy, Kyverno, Falco, Audit logs, Kube-bench)
-      artifacthub.io/imagesWhitelist: |
-        - kubezen/zen-watcher
-      artifacthub.io/links: |
-        - name: Documentation
-          url: https://github.com/kube-zen/zen-watcher/blob/main/README.md
-        - name: Source
-          url: https://github.com/kube-zen/zen-watcher
-        - name: Support
-          url: https://github.com/kube-zen/zen-watcher/issues
-      category: Observability
-    apiVersion: v2
-    appVersion: 1.0.20
-    created: "2026-02-21T20:56:46.353410638-05:00"
-    description: A Helm chart for zen-watcher - Universal Kubernetes Event Aggregator
-    digest: 2aa634d28ad62f27e2117331340349d24da40212c828c56594558c3e5abe000c
-    home: https://github.com/kube-zen/zen-watcher
-    keywords:
-    - kubernetes
-    - kube-zen
-    - observability
-    - events
-    - monitoring
-    - security
-    - compliance
-    - operator
-    maintainers:
-    - email: team@kube-zen.io
-      name: Kube-ZEN Team
-    name: zen-watcher
-    sources:
-    - https://github.com/kube-zen/zen-watcher
-    type: application
-    urls:
-    - https://kube-zen.github.io/helm-charts/zen-watcher-1.0.2.tgz
-    version: 1.0.2
-generated: "2026-02-21T20:56:46.308796583-05:00"
+    - https://zenmesh.github.io/helm-charts/zen-watcher-1.2.3.tgz
+    version: 1.2.3
+generated: "2026-08-14T16:46:17.726732325-04:00"

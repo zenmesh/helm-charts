@@ -8,7 +8,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "zen-cluster.labels" . | nindent 4 }}
-    zen.kube-zen.com/pci-zone: "true"
+    zen-mesh.io/pci-zone: "true"
     app.kubernetes.io/component: segmentation-test
 spec:
   schedule: {{ .Values.segmentationTest.schedule | quote }}

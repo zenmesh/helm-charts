@@ -1,6 +1,6 @@
 # Helm Charts Documentation
 
-Welcome to the Kube-Zen Helm Charts documentation.
+Welcome to the Zen Mesh Helm Charts documentation.
 
 ## Getting Started
 
@@ -15,7 +15,7 @@ Welcome to the Kube-Zen Helm Charts documentation.
 
 ## Resources
 
-- [GitHub Repository](https://github.com/kube-zen/helm-charts)
+- [GitHub Repository](https://github.com/zenmesh/helm-charts)
 - [Security Policy](../SECURITY.md)
 - [Code of Conduct](../CODE_OF_CONDUCT.md)
 - [Changelog](../CHANGELOG.md)

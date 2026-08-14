@@ -17,12 +17,12 @@ Using `syft` (or `cyclonedx`):
 
 ```bash
 # Generate SBOM for image
-syft docker:kubezen/zen-flow-controller:0.0.1-alpha \
+syft docker:zenmesh/zen-flow-controller:0.0.1-alpha \
   -o spdx-json \
   > zen-flow-controller-0.0.1-alpha.sbom.spdx.json
 
 # Generate SBOM in CycloneDX format
-syft docker:kubezen/zen-flow-controller:0.0.1-alpha \
+syft docker:zenmesh/zen-flow-controller:0.0.1-alpha \
   -o cyclonedx-json \
   > zen-flow-controller-0.0.1-alpha.sbom.cyclonedx.json
 ```
@@ -44,10 +44,10 @@ Using `cosign`:
 
 ```bash
 # Sign image
-cosign sign --key cosign.key kubezen/zen-flow-controller:0.0.1-alpha
+cosign sign --key cosign.key zenmesh/zen-flow-controller:0.0.1-alpha
 
 # Verify signature
-cosign verify --key cosign.pub kubezen/zen-flow-controller:0.0.1-alpha
+cosign verify --key cosign.pub zenmesh/zen-flow-controller:0.0.1-alpha
 ```
 
 ### 3. Chart Package Signing
@@ -79,7 +79,7 @@ Record provenance metadata in release artifacts:
   "gitCommit": "a1b2c3d4e5f6...",
   "gitTag": "v0.0.1-alpha",
   "buildSystem": "GitHub Actions",
-  "buildJob": "https://github.com/kube-zen/zen-flow/actions/runs/123456",
+  "buildJob": "https://github.com/zenmesh/zen-flow/actions/runs/123456",
   "sbom": {
     "image": "zen-flow-controller-0.0.1-alpha.sbom.spdx.json",
     "chart": "zen-flow-chart-0.0.1-alpha.sbom.spdx.json"
@@ -103,7 +103,7 @@ set -euo pipefail
 
 COMPONENT="${1:-zen-flow}"
 VERSION="${2:-0.0.1-alpha}"
-IMAGE="kubezen/${COMPONENT}-controller:${VERSION}"
+IMAGE="zenmesh/${COMPONENT}-controller:${VERSION}"
 
 # Generate SBOMs
 echo "Generating SBOMs..."
@@ -147,10 +147,10 @@ EOF
 
 ```bash
 # Verify image signature
-cosign verify --key cosign.pub kubezen/zen-flow-controller:0.0.1-alpha
+cosign verify --key cosign.pub zenmesh/zen-flow-controller:0.0.1-alpha
 
 # Verify SBOM
-syft attest verify --key cosign.pub kubezen/zen-flow-controller:0.0.1-alpha
+syft attest verify --key cosign.pub zenmesh/zen-flow-controller:0.0.1-alpha
 ```
 
 ### Verify Chart Signature
@@ -201,7 +201,7 @@ H085: Supply Chain Controls
   • Chart SBOM: zen-flow-chart-0.0.1-alpha.sbom.spdx.json
 
 ✅ Signing image...
-  • Image: kubezen/zen-flow-controller:0.0.1-alpha
+  • Image: zenmesh/zen-flow-controller:0.0.1-alpha
   • Signature: cosign signature
 
 ✅ Packaging and signing chart...

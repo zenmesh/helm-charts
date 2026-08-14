@@ -1,6 +1,6 @@
 # zen-suite
 
-Umbrella Helm chart for Kube-Zen platform components. This chart provides a convenient way to install and manage multiple Kube-Zen components together.
+Umbrella Helm chart for Zen Mesh platform components. This chart provides a convenient way to install and manage multiple Zen Mesh components together.
 
 ## Overview
 
@@ -16,11 +16,11 @@ The zen-suite chart is a reference installation that bundles:
 
 ```bash
 # Add repository
-helm repo add kube-zen https://kube-zen.github.io/helm-charts
+helm repo add zenmesh https://zenmesh.github.io/helm-charts
 helm repo update
 
 # Install all components
-helm install zen-suite kube-zen/zen-suite \
+helm install zen-suite zenmesh/zen-suite \
   --namespace zen-system \
   --create-namespace
 ```
@@ -30,7 +30,7 @@ helm install zen-suite kube-zen/zen-suite \
 Enable zen-lead for network-only leader election (Profile A):
 
 ```bash
-helm install zen-suite kube-zen/zen-suite \
+helm install zen-suite zenmesh/zen-suite \
   --namespace zen-system \
   --create-namespace \
   --set zenLead.enabled=true
@@ -41,7 +41,7 @@ helm install zen-suite kube-zen/zen-suite \
 Enable automatic pruning of zen-watcher Observations via zen-gc:
 
 ```bash
-helm install zen-suite kube-zen/zen-suite \
+helm install zen-suite zenmesh/zen-suite \
   --namespace zen-system \
   --create-namespace \
   --set integrations.observationsGc.enabled=true
@@ -54,7 +54,7 @@ helm install zen-suite kube-zen/zen-suite \
 Enable Observation CRD installation (suite-managed):
 
 ```bash
-helm install zen-suite kube-zen/zen-suite \
+helm install zen-suite zenmesh/zen-suite \
   --namespace zen-system \
   --create-namespace
 ```
@@ -66,7 +66,7 @@ helm install zen-suite kube-zen/zen-suite \
 Enable only the components you need:
 
 ```bash
-helm install zen-suite kube-zen/zen-suite \
+helm install zen-suite zenmesh/zen-suite \
   --namespace zen-system \
   --create-namespace \
   --set zenLock.enabled=true \
@@ -85,7 +85,7 @@ zenLock:
   # zen-lock specific values
   replicaCount: 1
   image:
-    repository: kubezen/zen-lock
+    repository: zenmesh/zen-lock
     tag: "0.0.1-alpha"
 
 zenFlow:

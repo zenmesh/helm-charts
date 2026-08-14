@@ -9,30 +9,30 @@ metadata:
   namespace: {{ .Values.customerNamespace | default "default" }}
 rules:
   # H037: Customers can manage Ingester CRDs in their namespace
-  - apiGroups: ["zen.kube-zen.io"]
+  - apiGroups: ["zen.zen-mesh.io"]
     resources: ["ingesters"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
   
   # H037: Customers can manage DeliveryFlow CRDs in their namespace
-  - apiGroups: ["routing.zen.kube-zen.io"]
+  - apiGroups: ["routing.zen.zen-mesh.io"]
     resources: ["deliveryflows"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
   
   # H037: Customers can manage Destination CRDs in their namespace
-  - apiGroups: ["routing.zen.kube-zen.io"]
+  - apiGroups: ["routing.zen.zen-mesh.io"]
     resources: ["destinations"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
   
   # H037: Customers can manage EndpointConfig CRDs in their namespace
-  - apiGroups: ["routing.zen.kube-zen.io"]
+  - apiGroups: ["routing.zen.zen-mesh.io"]
     resources: ["endpointconfigs"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
   
   # H037: Customers can read status subresources
-  - apiGroups: ["zen.kube-zen.io"]
+  - apiGroups: ["zen.zen-mesh.io"]
     resources: ["ingesters/status"]
     verbs: ["get", "list", "watch"]
-  - apiGroups: ["routing.zen.kube-zen.io"]
+  - apiGroups: ["routing.zen.zen-mesh.io"]
     resources: ["deliveryflows/status", "destinations/status", "endpointconfigs/status"]
     verbs: ["get", "list", "watch"]
 ---

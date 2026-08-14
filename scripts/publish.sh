@@ -9,7 +9,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
-REPO_URL="${HELM_REPO_URL:-https://kube-zen.github.io/helm-charts}"
+REPO_URL="${HELM_REPO_URL:-https://zenmesh.github.io/helm-charts}"
 
 CHARTS=("${@:-zen-cluster}")
 # If zen-cluster was requested but missing, try to sync from zen-platform first

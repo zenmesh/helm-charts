@@ -15,7 +15,7 @@ Add the Helm repository and install:
 
 ```bash
 # Add the Helm repository
-helm repo add zen-gc https://kube-zen.github.io/zen-gc
+helm repo add zen-gc https://zenmesh.github.io/zen-gc
 helm repo update
 
 # Install the chart
@@ -27,13 +27,13 @@ helm install gc-controller zen-gc/gc-controller --namespace gc-system --create-n
 **Using install script:**
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/kube-zen/zen-gc/main/install.sh | bash -s -- --method helm
+curl -sSL https://raw.githubusercontent.com/zenmesh/zen-gc/main/install.sh | bash -s -- --method helm
 ```
 
 **Manual clone (for customization):**
 
 ```bash
-git clone https://github.com/kube-zen/zen-gc.git
+git clone https://github.com/zenmesh/zen-gc.git
 cd zen-gc
 helm install gc-controller ./charts/gc-controller --namespace gc-system --create-namespace
 ```
@@ -45,7 +45,7 @@ The following table lists the configurable parameters and their default values:
 | Parameter | Description | Default |
 |-----------|-------------|---------|
 | `replicaCount` | Number of replicas | `2` |
-| `image.repository` | Image repository | `docker.io/kube-zen/gc-controller` |
+| `image.repository` | Image repository | `docker.io/zen-mesh/gc-controller` |
 | `image.tag` | Image tag | `latest` |
 | `image.pullPolicy` | Image pull policy | `IfNotPresent` |
 | `serviceAccount.create` | Create service account | `true` |

@@ -1,17 +1,17 @@
 # P227: Docker Hub defaults for published chart.
-# Use: helm upgrade --install xxx kube-zen/zen-cluster -f values-dockerhub.yaml
+# Use: helm upgrade --install xxx zenmesh/zen-cluster -f values-dockerhub.yaml
 global:
   registry: docker.io
   imageTag: "1.0.0"
 ingester:
   image:
-    repository: kubezen/zen-ingester
+    repository: zenmesh/zen-ingester
     tag: "1.0.0"
 egress:
   image:
-    repository: kubezen/zen-egress
+    repository: zenmesh/zen-egress
     tag: "1.0.0"
 agent:
   image:
-    repository: kubezen/zen-agent
+    repository: zenmesh/zen-agent
     tag: "1.0.0"

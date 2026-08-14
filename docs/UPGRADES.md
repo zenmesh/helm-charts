@@ -1,6 +1,6 @@
 # Upgrade Guide
 
-This guide covers upgrading Kube-Zen components and managing CRD upgrades.
+This guide covers upgrading Zen Mesh components and managing CRD upgrades.
 
 ## Upgrade Strategy
 
@@ -15,11 +15,11 @@ Components use independent versioning. You can upgrade components independently 
 helm list -n zen-lock-system
 
 # Upgrade to latest
-helm upgrade zen-lock kube-zen/zen-lock \
+helm upgrade zen-lock zenmesh/zen-lock \
   --namespace zen-lock-system
 
 # Upgrade to specific version
-helm upgrade zen-lock kube-zen/zen-lock \
+helm upgrade zen-lock zenmesh/zen-lock \
   --namespace zen-lock-system \
   --version 0.0.2
 ```
@@ -28,7 +28,7 @@ helm upgrade zen-lock kube-zen/zen-lock \
 
 ```bash
 # Upgrade suite
-helm upgrade zen-suite kube-zen/zen-suite \
+helm upgrade zen-suite zenmesh/zen-suite \
   --namespace zen-system
 
 # Check component versions after upgrade
@@ -54,19 +54,19 @@ CRDs are installed automatically by Helm charts. Each chart includes its CRDs in
 2. **Backup existing CRDs** (optional but recommended):
 
 ```bash
-kubectl get crd zenlocks.security.kube-zen.io -o yaml > zenlocks-crd-backup.yaml
+kubectl get crd zenlocks.security.zen-mesh.io -o yaml > zenlocks-crd-backup.yaml
 ```
 
 3. **Upgrade the chart** (CRDs are updated automatically):
 
 ```bash
-helm upgrade zen-lock kube-zen/zen-lock --namespace zen-lock-system
+helm upgrade zen-lock zenmesh/zen-lock --namespace zen-lock-system
 ```
 
 4. **Verify CRD upgrade**:
 
 ```bash
-kubectl get crd zenlocks.security.kube-zen.io -o yaml | grep version
+kubectl get crd zenlocks.security.zen-mesh.io -o yaml | grep version
 ```
 
 ### CRD Schema Changes
@@ -90,7 +90,7 @@ If a CRD upgrade includes breaking changes:
 kubectl get zenlocks -A -o yaml > zenlocks-backup.yaml
 
 # Upgrade chart (CRDs will be updated)
-helm upgrade zen-lock kube-zen/zen-lock --namespace zen-lock-system
+helm upgrade zen-lock zenmesh/zen-lock --namespace zen-lock-system
 
 # If resources need migration, apply updated resources
 kubectl apply -f zenlocks-migrated.yaml
@@ -122,8 +122,8 @@ To rollback CRDs manually:
 kubectl apply -f zenlocks-crd-backup.yaml
 
 # Or delete and reinstall from previous chart version
-kubectl delete crd zenlocks.security.kube-zen.io
-helm install zen-lock kube-zen/zen-lock --version 0.0.1 -n zen-lock-system --dry-run | grep -A 1000 "kind: CustomResourceDefinition" | kubectl apply -f -
+kubectl delete crd zenlocks.security.zen-mesh.io
+helm install zen-lock zenmesh/zen-lock --version 0.0.1 -n zen-lock-system --dry-run | grep -A 1000 "kind: CustomResourceDefinition" | kubectl apply -f -
 ```
 
 **Warning**: Rolling back CRDs may cause issues if:
@@ -194,16 +194,16 @@ If CRD version doesn't match expected version:
 
 ```bash
 # Check current CRD version
-kubectl get crd zenlocks.security.kube-zen.io -o jsonpath='{.spec.versions[*].name}'
+kubectl get crd zenlocks.security.zen-mesh.io -o jsonpath='{.spec.versions[*].name}'
 
 # Compare with chart version
-helm template zen-lock kube-zen/zen-lock | grep -A 20 "kind: CustomResourceDefinition"
+helm template zen-lock zenmesh/zen-lock | grep -A 20 "kind: CustomResourceDefinition"
 ```
 
 ## Support
 
 For upgrade issues, see:
 - Component-specific documentation
-- [GitHub Issues](https://github.com/kube-zen/helm-charts/issues)
+- [GitHub Issues](https://github.com/zenmesh/helm-charts/issues)
 - Component repositories for component-specific upgrade notes
 

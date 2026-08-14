@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2025 Kube-ZEN Contributors
+# Copyright 2025 Zen Mesh
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -63,13 +63,13 @@ for component in "${COMPONENTS[@]}"; do
         fi
         
         # Tag and push to local registry
-        IMAGE_NAME="kubezen/${component}"
+        IMAGE_NAME="zenmesh/${component}"
         if [ "${component}" == "zen-lead" ]; then
-            IMAGE_NAME="kubezen/zen-lead"
+            IMAGE_NAME="zenmesh/zen-lead"
         elif [ "${component}" == "zen-flow" ]; then
-            IMAGE_NAME="kubezen/zen-flow-controller"
+            IMAGE_NAME="zenmesh/zen-flow-controller"
         elif [ "${component}" == "zen-gc" ]; then
-            IMAGE_NAME="kubezen/gc-controller"
+            IMAGE_NAME="zenmesh/gc-controller"
         fi
         
         docker tag "${IMAGE_NAME}:latest" "localhost:${REGISTRY_PORT}/${IMAGE_NAME##*/}:latest" 2>/dev/null || true

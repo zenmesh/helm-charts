@@ -20,7 +20,7 @@ After installing zen-watcher, you need to create an Ingester resource to start c
 Install with the default Kubernetes Events Ingester enabled:
 
 ```bash
-helm install zen-watcher kube-zen/zen-watcher \
+helm install zen-watcher zenmesh/zen-watcher \
   --namespace zen-system \
   --create-namespace \
   --set ingester.createDefaultK8sEvents=true
@@ -34,13 +34,13 @@ Install the chart, then manually create an Ingester:
 
 ```bash
 # 1. Install zen-watcher (CRDs are installed by default)
-helm install zen-watcher kube-zen/zen-watcher \
+helm install zen-watcher zenmesh/zen-watcher \
   --namespace zen-system \
   --create-namespace
 
 # 2. Apply a minimal Kubernetes Events Ingester
 cat <<EOF | kubectl apply -f -
-apiVersion: zen.kube-zen.io/v1alpha1
+apiVersion: zen.zen-mesh.io/v1alpha1
 kind: Ingester
 metadata:
   name: k8s-events-demo
@@ -74,7 +74,7 @@ kubectl get observations -n zen-system
 To install the chart with the release name `zen-watcher`:
 
 ```bash
-helm install zen-watcher kube-zen/zen-watcher \
+helm install zen-watcher zenmesh/zen-watcher \
   --namespace zen-system \
   --create-namespace
 ```
@@ -92,8 +92,8 @@ helm uninstall zen-watcher --namespace zen-watcher-system
 ### CRD Installation (Default Behavior)
 
 By default, CRDs are **installed automatically** with the chart (`crds.enabled=true`). This chart includes both:
-- **Observation CRD** (`observations.zen.kube-zen.io`) - stores aggregated events
-- **Ingester CRD** (`ingesters.zen.kube-zen.io`) - configures event sources
+- **Observation CRD** (`observations.zen.zen-mesh.io`) - stores aggregated events
+- **Ingester CRD** (`ingesters.zen.zen-mesh.io`) - configures event sources
 
 This provides the fastest path to a working installation - no manual CRD installation required.
 
@@ -108,11 +108,11 @@ This provides the fastest path to a working installation - no manual CRD install
 
 ```bash
 # 1. Install CRDs separately (outside Helm lifecycle)
-kubectl apply -f https://raw.githubusercontent.com/kube-zen/zen-watcher/main/deployments/crds/observation_crd.yaml
-kubectl apply -f https://raw.githubusercontent.com/kube-zen/zen-watcher/main/deployments/crds/ingester_crd.yaml
+kubectl apply -f https://raw.githubusercontent.com/zenmesh/zen-watcher/main/deployments/crds/observation_crd.yaml
+kubectl apply -f https://raw.githubusercontent.com/zenmesh/zen-watcher/main/deployments/crds/ingester_crd.yaml
 
 # 2. Install zen-watcher with CRDs disabled
-helm install zen-watcher kube-zen/zen-watcher \
+helm install zen-watcher zenmesh/zen-watcher \
   --namespace zen-system \
   --create-namespace \
   --set crds.enabled=false \
@@ -153,7 +153,7 @@ The following table lists the configurable parameters and their default values.
 | Parameter | Description | Default |
 |-----------|-------------|---------|
 | `replicaCount` | Number of replicas | `2` |
-| `image.repository` | Image repository | `kubezen/zen-watcher` |
+| `image.repository` | Image repository | `zenmesh/zen-watcher` |
 | `image.tag` | Image tag (defaults to appVersion) | `""` |
 | `image.pullPolicy` | Image pull policy | `IfNotPresent` |
 | `serviceAccount.create` | Create service account | `true` |
@@ -183,11 +183,11 @@ The following table lists the configurable parameters and their default values.
 
 ```bash
 # 1. Install CRDs separately (outside Helm lifecycle)
-kubectl apply -f https://raw.githubusercontent.com/kube-zen/zen-watcher/main/deployments/crds/observation_crd.yaml
-kubectl apply -f https://raw.githubusercontent.com/kube-zen/zen-watcher/main/deployments/crds/ingester_crd.yaml
+kubectl apply -f https://raw.githubusercontent.com/zenmesh/zen-watcher/main/deployments/crds/observation_crd.yaml
+kubectl apply -f https://raw.githubusercontent.com/zenmesh/zen-watcher/main/deployments/crds/ingester_crd.yaml
 
 # 2. Install zen-watcher with CRDs disabled
-helm install zen-watcher kube-zen/zen-watcher \
+helm install zen-watcher zenmesh/zen-watcher \
   --namespace zen-system \
   --create-namespace \
   --set crds.enabled=false
@@ -316,8 +316,8 @@ kubectl patch clusterrole zen-watcher --type='json' \
 ```
 
 **See documentation for complete RBAC requirements:**
-- [RBAC Security Documentation](https://github.com/kube-zen/zen-watcher/blob/main/docs/SECURITY_RBAC.md)
-- Example Ingesters: [Trivy](https://github.com/kube-zen/zen-watcher/blob/main/examples/ingesters/trivy-informer.yaml), [Kyverno](https://github.com/kube-zen/zen-watcher/blob/main/examples/ingesters/kyverno-informer.yaml)
+- [RBAC Security Documentation](https://github.com/zenmesh/zen-watcher/blob/main/docs/SECURITY_RBAC.md)
+- Example Ingesters: [Trivy](https://github.com/zenmesh/zen-watcher/blob/main/examples/ingesters/trivy-informer.yaml), [Kyverno](https://github.com/zenmesh/zen-watcher/blob/main/examples/ingesters/kyverno-informer.yaml)
 
 ### 4. Webhook Security Configuration
 
@@ -359,7 +359,7 @@ kubectl create secret generic zen-watcher-webhook-auth \
   -n zen-system
 
 # Install with Secret reference
-helm install zen-watcher kube-zen/zen-watcher \
+helm install zen-watcher zenmesh/zen-watcher \
   --namespace zen-system \
   --create-namespace \
   --set server.webhook.authTokenSecret.name=zen-watcher-webhook-auth \
@@ -408,8 +408,8 @@ service:
    ```
 
 **Documentation:**
-- [Webhook Authentication](https://github.com/kube-zen/zen-watcher/blob/main/docs/SOURCE_ADAPTERS.md#authentication-configuration)
-- [Ingester API](https://github.com/kube-zen/zen-watcher/blob/main/docs/INGESTER_API.md#webhook-ingester)
+- [Webhook Authentication](https://github.com/zenmesh/zen-watcher/blob/main/docs/SOURCE_ADAPTERS.md#authentication-configuration)
+- [Ingester API](https://github.com/zenmesh/zen-watcher/blob/main/docs/INGESTER_API.md#webhook-ingester)
 
 ### 6. Known Limitations
 
@@ -436,12 +436,12 @@ service:
 3. **Monitoring and alerting** for source staleness and leader transitions
 
 **For detailed mitigation strategies, see:**
-- [Informer Failover Gap Documentation](https://github.com/kube-zen/zen-watcher/blob/main/docs/OPERATIONAL_EXCELLENCE.md#informer-failover-gap)
-- [Leader Election Documentation](https://github.com/kube-zen/zen-watcher/blob/main/docs/LEADER_ELECTION.md#informer-failover-gap)
-- [Architecture Limitations](https://github.com/kube-zen/zen-watcher/blob/main/docs/ARCHITECTURE.md#known-limitations-and-trade-offs)
+- [Informer Failover Gap Documentation](https://github.com/zenmesh/zen-watcher/blob/main/docs/OPERATIONAL_EXCELLENCE.md#informer-failover-gap)
+- [Leader Election Documentation](https://github.com/zenmesh/zen-watcher/blob/main/docs/LEADER_ELECTION.md#informer-failover-gap)
+- [Architecture Limitations](https://github.com/zenmesh/zen-watcher/blob/main/docs/ARCHITECTURE.md#known-limitations-and-trade-offs)
 
 **Future Improvements:**
-See [ROADMAP.md](https://github.com/kube-zen/zen-watcher/blob/main/ROADMAP.md) for planned improvements including leader takeover catch-up scan and optional active-active processing.
+See [ROADMAP.md](https://github.com/zenmesh/zen-watcher/blob/main/ROADMAP.md) for planned improvements including leader takeover catch-up scan and optional active-active processing.
 
 ### 8. PrometheusRule and Alerting (Informer Failover Gap Detection)
 
@@ -457,7 +457,7 @@ prometheusRule:
 **If Prometheus Operator is not available**, apply alerts manually:
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/kube-zen/zen-watcher/main/config/prometheus/rules/leader-election-alerts.yml
+kubectl apply -f https://raw.githubusercontent.com/zenmesh/zen-watcher/main/config/prometheus/rules/leader-election-alerts.yml
 ```
 
 **Key Alerts:**
@@ -467,8 +467,8 @@ kubectl apply -f https://raw.githubusercontent.com/kube-zen/zen-watcher/main/con
 - **Failover Duration**: Monitors leader transition time (should be < 20s p95)
 
 **For complete alert documentation, see:**
-- [config/prometheus/rules/README.md](https://github.com/kube-zen/zen-watcher/blob/main/config/prometheus/rules/README.md)
-- [HIGH_AVAILABILITY_AND_SCALING.md](https://github.com/kube-zen/zen-watcher/blob/main/docs/HIGH_AVAILABILITY_AND_SCALING.md#monitoring--alerting)
+- [config/prometheus/rules/README.md](https://github.com/zenmesh/zen-watcher/blob/main/config/prometheus/rules/README.md)
+- [HIGH_AVAILABILITY_AND_SCALING.md](https://github.com/zenmesh/zen-watcher/blob/main/docs/HIGH_AVAILABILITY_AND_SCALING.md#monitoring--alerting)
 
 ### 7. Ensure Ingestion is Enabled
 
@@ -478,7 +478,7 @@ kubectl apply -f https://raw.githubusercontent.com/kube-zen/zen-watcher/main/con
 
 **Option A**: Enable default Kubernetes Events Ingester
 ```bash
-helm install zen-watcher kube-zen/zen-watcher \
+helm install zen-watcher zenmesh/zen-watcher \
   --set ingester.createDefaultK8sEvents=true
 ```
 
@@ -509,18 +509,18 @@ image:
 ```
 
 **Vulnerability scanning and SBOM**:
-- Run Trivy scan: `trivy image kubezen/zen-watcher:1.2.0`
-- Generate SBOM: `syft kubezen/zen-watcher:1.2.0 -o spdx-json`
+- Run Trivy scan: `trivy image zenmesh/zen-watcher:1.2.0`
+- Generate SBOM: `syft zenmesh/zen-watcher:1.2.0 -o spdx-json`
 - Review scan results before deployment
 
 **Image signing and verification**:
-- Sign images with Cosign: See [COSIGN.md](https://github.com/kube-zen/zen-watcher/blob/main/docs/COSIGN.md)
+- Sign images with Cosign: See [COSIGN.md](https://github.com/zenmesh/zen-watcher/blob/main/docs/COSIGN.md)
 - Verify signatures in CI/CD pipeline
 - Configure admission controllers to reject unsigned images
 
 **Documentation:**
-- [Image and Registry Guide](https://github.com/kube-zen/zen-watcher/blob/main/docs/IMAGE_AND_REGISTRY_GUIDE.md)
-- [Cosign Signing Guide](https://github.com/kube-zen/zen-watcher/blob/main/docs/COSIGN.md)
+- [Image and Registry Guide](https://github.com/zenmesh/zen-watcher/blob/main/docs/IMAGE_AND_REGISTRY_GUIDE.md)
+- [Cosign Signing Guide](https://github.com/zenmesh/zen-watcher/blob/main/docs/COSIGN.md)
 
 ### 2. Retention/etcd Safety
 
@@ -567,8 +567,8 @@ retention:
 - Set resource quotas: Limit Observation CRD creation rate if needed
 
 **Documentation:**
-- [Configuration Guide](https://github.com/kube-zen/zen-watcher/blob/main/docs/CONFIGURATION.md#ttl-configuration)
-- [Performance Tuning](https://github.com/kube-zen/zen-watcher/blob/main/docs/PERFORMANCE.md)
+- [Configuration Guide](https://github.com/zenmesh/zen-watcher/blob/main/docs/CONFIGURATION.md#ttl-configuration)
+- [Performance Tuning](https://github.com/zenmesh/zen-watcher/blob/main/docs/PERFORMANCE.md)
 
 ### 3. Observability
 
@@ -612,16 +612,16 @@ curl http://localhost:8080/metrics | grep zen_watcher
 ```
 
 **Documentation:**
-- [Observability Guide](https://github.com/kube-zen/zen-watcher/blob/main/docs/OBSERVABILITY.md)
-- [Dashboard Guide](https://github.com/kube-zen/zen-watcher/blob/main/docs/DASHBOARD_GUIDE.md)
-- [Alerting Integration Guide](https://github.com/kube-zen/zen-watcher/blob/main/docs/alerting/ALERTING-INTEGRATION-GUIDE.md)
+- [Observability Guide](https://github.com/zenmesh/zen-watcher/blob/main/docs/OBSERVABILITY.md)
+- [Dashboard Guide](https://github.com/zenmesh/zen-watcher/blob/main/docs/DASHBOARD_GUIDE.md)
+- [Alerting Integration Guide](https://github.com/zenmesh/zen-watcher/blob/main/docs/alerting/ALERTING-INTEGRATION-GUIDE.md)
 
 ### 4. Operational Readiness
 
 **Runbook and rollback plan:**
 
-- **Runbook**: See [OPERATIONAL_EXCELLENCE.md](https://github.com/kube-zen/zen-watcher/blob/main/docs/OPERATIONAL_EXCELLENCE.md)
-- **Rollback procedure**: See [STABILITY.md](https://github.com/kube-zen/zen-watcher/blob/main/docs/STABILITY.md#upgrade--migration)
+- **Runbook**: See [OPERATIONAL_EXCELLENCE.md](https://github.com/zenmesh/zen-watcher/blob/main/docs/OPERATIONAL_EXCELLENCE.md)
+- **Rollback procedure**: See [STABILITY.md](https://github.com/zenmesh/zen-watcher/blob/main/docs/STABILITY.md#upgrade--migration)
 
 **Key operational procedures:**
 1. **Upgrade procedure**: Zero-downtime upgrades with multiple replicas
@@ -630,14 +630,14 @@ curl http://localhost:8080/metrics | grep zen_watcher
 4. **Capacity planning**: Resource sizing, etcd impact estimation
 
 **Documentation:**
-- [Operational Excellence](https://github.com/kube-zen/zen-watcher/blob/main/docs/OPERATIONAL_EXCELLENCE.md)
-- [Stability and Reliability](https://github.com/kube-zen/zen-watcher/blob/main/docs/STABILITY.md)
-- [Troubleshooting Guide](https://github.com/kube-zen/zen-watcher/blob/main/docs/TROUBLESHOOTING.md)
+- [Operational Excellence](https://github.com/zenmesh/zen-watcher/blob/main/docs/OPERATIONAL_EXCELLENCE.md)
+- [Stability and Reliability](https://github.com/zenmesh/zen-watcher/blob/main/docs/STABILITY.md)
+- [Troubleshooting Guide](https://github.com/zenmesh/zen-watcher/blob/main/docs/TROUBLESHOOTING.md)
 
 ---
 
 ## More Information
 
-- [zen-watcher Documentation](https://github.com/kube-zen/zen-watcher)
-- [zen-watcher Source Code](https://github.com/kube-zen/zen-watcher)
+- [zen-watcher Documentation](https://github.com/zenmesh/zen-watcher)
+- [zen-watcher Source Code](https://github.com/zenmesh/zen-watcher)
 

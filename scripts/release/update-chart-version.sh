@@ -142,7 +142,7 @@ echo -e "${GREEN}✓${NC} Created package: $PACKAGE_NAME"
 # Regenerate index.yaml
 echo ""
 echo -e "${GREEN}→${NC} Regenerating index.yaml..."
-helm repo index . --url https://kube-zen.github.io/helm-charts
+helm repo index . --url https://zenmesh.github.io/helm-charts
 
 if [ ! -f "index.yaml" ]; then
     echo -e "${RED}✗${NC} Error: index.yaml not created"

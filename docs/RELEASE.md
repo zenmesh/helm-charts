@@ -1,6 +1,6 @@
 # Release Process
 
-This document describes the release process for Kube-Zen Helm Charts.
+This document describes the release process for Zen Mesh Helm Charts.
 
 ## Versioning
 
@@ -32,7 +32,7 @@ We follow [Semantic Versioning](https://semver.org/):
 
 ### Controllers (zen-flow, zen-gc, zen-watcher, zen-lock, zen-lead)
 - Tag: `v0.0.1-alpha`
-- Image: `kubezen/<project-name>:v0.0.1-alpha` (from project.yaml.imageName)
+- Image: `zenmesh/<project-name>:v0.0.1-alpha` (from project.yaml.imageName)
 - Changelog: Required entry in CHANGELOG.md
 
 ### Charts (helm-charts)

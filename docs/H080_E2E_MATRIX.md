@@ -296,7 +296,7 @@ kubectl get lease -n zen-flow-system zen-flow-leader-election \
 
 # Build and push images
 make -C zen-flow build-image
-docker tag kubezen/zen-flow-controller:latest localhost:5000/zen-flow-controller:latest
+docker tag zenmesh/zen-flow-controller:latest localhost:5000/zen-flow-controller:latest
 docker push localhost:5000/zen-flow-controller:latest
 ```
 

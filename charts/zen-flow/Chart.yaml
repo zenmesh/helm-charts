@@ -6,20 +6,20 @@ version: 0.0.2-alpha
 appVersion: "0.0.1-alpha"
 keywords:
   - kubernetes
-  - kube-zen
+  - zen-mesh
   - workflow
   - job-orchestration
   - dag
   - batch-processing
   - operator
 
-home: https://github.com/kube-zen/zen-flow
+home: https://github.com/zenmesh/zen-flow
 sources:
-  - https://github.com/kube-zen/zen-flow
+  - https://github.com/zenmesh/zen-flow
 
 maintainers:
-  - name: Kube-ZEN Team
-    email: team@kube-zen.io
+  - name: Zen Mesh Team
+    email: zen@zen-mesh.io
 
 annotations:
   category: Workflow
@@ -27,10 +27,10 @@ annotations:
     - Initial release
   artifacthub.io/links: |
     - name: Documentation
-      url: https://github.com/kube-zen/zen-flow/blob/main/README.md
+      url: https://github.com/zenmesh/zen-flow/blob/main/README.md
     - name: Source
-      url: https://github.com/kube-zen/zen-flow
+      url: https://github.com/zenmesh/zen-flow
     - name: Support
-      url: https://github.com/kube-zen/zen-flow/issues
+      url: https://github.com/zenmesh/zen-flow/issues
   artifacthub.io/imagesWhitelist: |
-    - kubezen/zen-flow
+    - zenmesh/zen-flow
