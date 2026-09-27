@@ -66,7 +66,5 @@ zen-agent must run with a ServiceAccount that has the following permissions so a
 
 ## License
 
-Copyright 2025 Zen Mesh
-
-Licensed under the Apache License, Version 2.0
-
+Copyright 2026 Zen Mesh. All rights reserved. This chart is proprietary;
+no license is granted except by a written agreement with Zen Mesh.
