@@ -27,35 +27,3 @@ zenGc:
   enabled: true
   # Pass-through values to zen-gc chart
   # See zen-gc/values.yaml for all available options
-
-zenWatcher:
-  enabled: true
-  # Pass-through values to zen-watcher chart
-  # See zen-watcher/values.yaml for all available options
-  # CRD installation toggle (passes through to zen-watcher.crds.enabled)
-  crds:
-    enabled: false  # Default: CRDs not installed by chart (manage separately)
-
-zenLead:
-  enabled: false
-  # Pass-through values to zen-lead chart
-  # See zen-lead/values.yaml for all available options
-
-# Suite integrations
-integrations:
-  # Observation GC integration: zen-watcher Observations pruned by zen-gc
-  observationsGc:
-    enabled: false
-    # Target all namespaces by default (zen-gc normalizes empty -> cluster-wide)
-    targetNamespace: ""
-    # Optional label selectors (default: prune all Observations)
-    labelSelector: {}
-    # TTL behavior: use per-object TTL if present, else default
-    ttl:
-      fieldPath: "spec.ttlSecondsAfterCreation"
-      defaultSeconds: 604800  # 7 days
-    behavior:
-      dryRun: false
-      batchSize: 200
-      maxDeletionsPerSecond: 5
-      propagationPolicy: Background

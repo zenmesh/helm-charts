@@ -19,7 +19,6 @@ MIRROR=(
   "zen-agent:0.1.1"
   "zen-flow-controller:0.0.1-alpha"
   "gc-controller:0.0.1-alpha"
-  "zen-watcher:1.2.1"
 )
 
 push_one() {
@@ -69,7 +68,6 @@ done
 
 # NOTE (2026-08): not mirrorable yet — no public source images exist:
 #   zenmesh/zen-ingester:1.0.0-b311, zenmesh/zen-egress:1.0.0 (kubezen repos empty)
-#   zenmesh/zen-lead:0.1.0 (only 0.1.0-alpha exists upstream)
-# These need native CI builds; zen-cluster/zen-lead installs stay blocked until then.
+# These need native CI builds; zen-cluster installs stay blocked until then.
 
 [ "$FAIL" -eq 0 ] && echo "Done — all images pushed." || { echo "Some pushes failed." >&2; exit 1; }

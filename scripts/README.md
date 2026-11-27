@@ -1,6 +1,6 @@
 # Helm Charts Scripts
 
-This directory contains validation and testing scripts for the zen-agent and zen-watcher Helm charts.
+This directory contains validation and testing scripts for the Helm charts in this repository.
 
 ## CI Scripts (`ci/`)
 
@@ -32,49 +32,7 @@ cd /path/to/helm-charts
 
 **Notes:**
 - zen-agent requires `saas.apiBase` and `saas.wsBase` values (provided automatically)
-- zen-watcher validates without additional requirements
 - Dependency metadata warnings for zen-agent are non-blocking
-
-## Demo Scripts (`demo/`)
-
-### `helm-smoke-k3d.sh`
-
-Creates a local k3d cluster, installs charts, and verifies basic health.
-
-**Purpose:** End-to-end validation that charts can be installed and pods start
-
-**Prerequisites:**
-- `k3d`
-- `helm` (v3 or later)
-- `kubectl`
-- Docker
-
-**Usage:**
-```bash
-cd /path/to/helm-charts
-./scripts/demo/helm-smoke-k3d.sh
-```
-
-**Optional Environment Variables:**
-- `CLUSTER_NAME` - k3d cluster name (default: `helm-smoke`)
-- `NAMESPACE` - Kubernetes namespace (default: `zen-system`)
-
-**Expected Output (GREEN):**
-```
-✅ Helm Charts Smoke Test → GREEN
-```
-
-**What it does:**
-1. Creates ephemeral k3d cluster
-2. Installs zen-watcher chart
-3. Installs zen-agent chart (with TLS disabled for testing)
-4. Verifies zen-watcher pod reaches Ready state
-5. Automatically cleans up cluster on exit
-
-**Notes:**
-- Cluster is destroyed after test completes
-- Requires actual Docker images (or image pull disabled)
-- zen-agent may require additional TLS/secret configuration for full functionality
 
 ## Integration with zen-main
 
@@ -123,7 +81,7 @@ If `helm-lint-and-render.sh` fails:
 If `helm-smoke-k3d.sh` fails:
 1. Check that k3d/kubectl/docker are installed and running
 2. Verify no port conflicts (k3d uses random ports by default)
-3. Check logs: `kubectl logs -n zen-system -l app.kubernetes.io/name=zen-watcher`
+3. Check logs: `kubectl logs -n zen-system -l app.kubernetes.io/name=<component>`
 4. Cluster is auto-cleaned on exit, but can be inspected during test with:
    ```bash
    kubectl config use-context k3d-helm-smoke

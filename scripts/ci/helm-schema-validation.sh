@@ -33,7 +33,6 @@ CHARTS=(
     "charts/zen-lock"
     "charts/zen-flow"
     "charts/zen-gc"
-    "charts/zen-watcher"
     "charts/zen-suite"
 )
 

@@ -22,7 +22,7 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 # Components to test
-COMPONENTS=("zen-flow" "zen-gc" "zen-watcher" "zen-lead")
+COMPONENTS=("zen-flow" "zen-gc")
 
 FAILED=0
 PASSED=0
@@ -55,9 +55,7 @@ for component in "${COMPONENTS[@]}"; do
         
         # Tag and push to local registry
         IMAGE_NAME="zenmesh/${component}"
-        if [ "${component}" == "zen-lead" ]; then
-            IMAGE_NAME="zenmesh/zen-lead"
-        elif [ "${component}" == "zen-flow" ]; then
+        if [ "${component}" == "zen-flow" ]; then
             IMAGE_NAME="zenmesh/zen-flow-controller"
         elif [ "${component}" == "zen-gc" ]; then
             IMAGE_NAME="zenmesh/gc-controller"

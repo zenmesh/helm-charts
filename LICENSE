@@ -1,5 +1,31 @@
-Copyright 2026 Zen Mesh. All rights reserved.
+Zen Mesh Inc. — Proprietary Licence
+Copyright 2026 Zen Mesh Inc. All rights reserved.
 
-This software is proprietary to Zen Mesh and may not be copied,
-modified, or distributed without explicit prior written permission
-from Zen Mesh.
+1. Grant of licence
+   Zen Mesh Inc. ("Zen Mesh") grants you a limited, non-exclusive, non-transferable,
+   revocable licence to download, copy, install and run the Helm charts and the
+   accompanying files in this repository (the "Materials"), and to modify them only
+   as far as needed to configure them, for the sole purpose of installing and
+   operating Zen Mesh components under a valid agreement with Zen Mesh for those
+   components — including evaluation and free-tier terms accepted on the Zen Mesh
+   website.
+
+2. Restrictions
+   You may not: (a) distribute, sublicense, sell, publish or otherwise make the
+   Materials, or any substantial part of them, available to any third party, except
+   to the extent strictly necessary to install and run the components as documented;
+   (b) reverse engineer, decompile or disassemble any Zen Mesh software obtained
+   through the Materials, or attempt to derive its source code, underlying structure
+   or algorithms, except to the extent that applicable law expressly permits
+   notwithstanding this restriction; (c) use the Materials to develop a competing
+   product or service; (d) remove or alter any copyright or proprietary notice.
+
+3. No warranty
+   THE MATERIALS ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+
+4. Third-party materials
+   Some charts depend on third-party charts or images that are covered by their own
+   licences. Those licences apply to those materials.
+
+5. Termination
+   This licence ends automatically if you breach it.

@@ -31,7 +31,6 @@ Each component chart maintains its own version:
 - **zen-lock**: `0.0.1-alpha`
 - **zen-flow**: `0.0.1-alpha`
 - **zen-gc**: `0.0.1-alpha`
-- **zen-watcher**: `1.2.0` (independent versioning)
 
 Components can be upgraded independently. There is no lockstep versioning requirement.
 
@@ -184,7 +183,6 @@ Examples:
 - `zen-lock-0.0.1-alpha`
 - `zen-flow-0.1.0`
 - `zen-gc-0.0.2-alpha`
-- `zen-watcher-1.0.2`
 - `zen-suite-0.0.1-alpha`
 
 ## Avoiding Lockstep Versioning

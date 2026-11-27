@@ -48,7 +48,7 @@ CHARTS_TESTED=0
 CHARTS_PASSED=0
 
 # Charts to test
-CHARTS=("zen-flow" "zen-gc" "zen-watcher" "zen-lead" "zen-lock")
+CHARTS=("zen-flow" "zen-gc" "zen-lock")
 
 # Test specific chart if provided
 if [ $# -gt 0 ]; then
@@ -102,7 +102,7 @@ for chart in "${CHARTS[@]}"; do
     fi
     
     # Test 4: Invalid configs (only for charts with leaderElection)
-    if [ "${chart}" != "zen-lead" ]; then
+    if true; then   # the one chart without leaderElection is no longer in this repository
         # Test 4a: Unsafe HA (replicas > 1 + disabled)
         echo "  Testing invalid config (replicas=2 + mode=disabled)..."
         if helm template test "${CHART_DIR}" --namespace default \

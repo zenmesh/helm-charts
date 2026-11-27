@@ -85,7 +85,7 @@ fi
 # 3. Run upgrade tests
 # 4. Clean up
 
-if ct lint-and-install --config "$CT_CONFIG" --charts charts/zen-lock,charts/zen-flow,charts/zen-gc,charts/zen-watcher; then
+if ct lint-and-install --config "$CT_CONFIG" --charts charts/zen-lock,charts/zen-flow,charts/zen-gc; then
     echo ""
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo "✅ Chart Testing → GREEN"

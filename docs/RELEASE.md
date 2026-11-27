@@ -30,7 +30,7 @@ We follow [Semantic Versioning](https://semver.org/):
 - Artifact: Go module version
 - Changelog: Required entry in CHANGELOG.md
 
-### Controllers (zen-flow, zen-gc, zen-watcher, zen-lock, zen-lead)
+### Controllers (zen-flow, zen-gc, zen-lock)
 - Tag: `v0.0.1-alpha`
 - Image: `zenmesh/<project-name>:v0.0.1-alpha` (from project.yaml.imageName)
 - Changelog: Required entry in CHANGELOG.md
@@ -38,7 +38,6 @@ We follow [Semantic Versioning](https://semver.org/):
 ### Charts (helm-charts)
 - Tag: Chart version (e.g., `v0.0.2-alpha`)
 - Artifact: Helm chart package
-- Matrix: See `docs/RELEASE_VERSION_MATRIX.md` for canonical mapping
 
 ## Pre-Release Checklist
 

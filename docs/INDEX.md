@@ -1,22 +1,9 @@
 # Helm Charts Documentation
 
-Welcome to the Zen Mesh Helm Charts documentation.
+- [Installation](INSTALL.md)
+- [Upgrades](UPGRADES.md)
+- [Compatibility](COMPATIBILITY.md)
+- [Versioning](VERSIONING.md)
+- [Releases](RELEASE.md)
 
-## Getting Started
-
-- [Installation Guide](DEVELOPMENT.md#installation)
-- [Quick Start](DEVELOPMENT.md#quick-start)
-
-## Development
-
-- [Development Setup](DEVELOPMENT.md)
-- [Contributing Guidelines](../CONTRIBUTING.md)
-- [Release Process](RELEASE.md)
-
-## Resources
-
-- [GitHub Repository](https://github.com/zenmesh/helm-charts)
-- [Security Policy](../SECURITY.md)
-- [Code of Conduct](../CODE_OF_CONDUCT.md)
-- [Changelog](../CHANGELOG.md)
-
+Each chart's own guide is the `README.md` under `charts/<name>/`.

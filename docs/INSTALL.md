@@ -23,7 +23,7 @@ helm install zen-suite zenmesh/zen-suite \
 
 ### Prerequisites
 
-- Kubernetes 1.20+ (1.26+ for zen-watcher)
+- Kubernetes 1.20+
 - Helm 3.8+
 - kubectl configured to access your cluster
 
@@ -56,14 +56,6 @@ helm install zen-gc zenmesh/zen-gc \
   --create-namespace
 ```
 
-### zen-watcher
-
-```bash
-helm install zen-watcher zenmesh/zen-watcher \
-  --namespace zen-watcher-system \
-  --create-namespace
-```
-
 ## Production Installation Guidelines
 
 ### 1. Separate Namespaces
@@ -75,13 +67,11 @@ Install each component in its own namespace for better isolation:
 kubectl create namespace zen-lock-system
 kubectl create namespace zen-flow-system
 kubectl create namespace zen-gc-system
-kubectl create namespace zen-watcher-system
 
 # Install components
 helm install zen-lock zenmesh/zen-lock --namespace zen-lock-system
 helm install zen-flow zenmesh/zen-flow --namespace zen-flow-system
 helm install zen-gc zenmesh/zen-gc --namespace zen-gc-system
-helm install zen-watcher zenmesh/zen-watcher --namespace zen-watcher-system
 ```
 
 ### 2. Custom Values
@@ -191,7 +181,6 @@ After installation, verify components are running:
 kubectl get pods -n zen-lock-system
 kubectl get pods -n zen-flow-system
 kubectl get pods -n zen-gc-system
-kubectl get pods -n zen-watcher-system
 
 # Check CRDs
 kubectl get crds | grep zen-mesh.io
@@ -200,7 +189,6 @@ kubectl get crds | grep zen-mesh.io
 kubectl get svc -n zen-lock-system
 kubectl get svc -n zen-flow-system
 kubectl get svc -n zen-gc-system
-kubectl get svc -n zen-watcher-system
 ```
 
 ## Uninstallation
@@ -215,15 +203,12 @@ helm uninstall zen-suite --namespace zen-system
 helm uninstall zen-lock --namespace zen-lock-system
 helm uninstall zen-flow --namespace zen-flow-system
 helm uninstall zen-gc --namespace zen-gc-system
-helm uninstall zen-watcher --namespace zen-watcher-system
 
 # Note: CRDs are not automatically removed (by design)
 # To remove CRDs manually:
 kubectl delete crd zenlocks.security.zen-mesh.io
 kubectl delete crd jobflows.workflow.zen-mesh.io
 kubectl delete crd garbagecollectionpolicies.gc.zen-mesh.io
-kubectl delete crd observations.zen.zen-mesh.io
-kubectl delete crd ingesters.zen.zen-mesh.io
 ```
 
 ## Troubleshooting
@@ -265,5 +250,4 @@ kubectl describe clusterrole -l app.kubernetes.io/name=zen-lock
 
 - See [UPGRADES.md](UPGRADES.md) for upgrade procedures
 - See [COMPATIBILITY.md](COMPATIBILITY.md) for version compatibility
-- See [SECURITY_MODEL.md](SECURITY_MODEL.md) for security considerations
 

@@ -3,16 +3,15 @@
 
 apiVersion: v2
 name: zen-suite
-description: Umbrella chart for Zen Mesh platform components - Complete security and observability suite
+description: Umbrella chart for Zen Mesh component charts - zen-lock, zen-flow and zen-gc in one release
 type: application
-version: 0.0.2-alpha
+version: 0.0.3-alpha
 appVersion: "0.0.2-alpha"
 
 keywords:
   - kubernetes
   - zen-mesh
   - security
-  - observability
   - workflow
   - operator
   - suite
@@ -29,7 +28,8 @@ annotations:
   category: Integration
   artifacthub.io/changes: |
     - Initial release
-    - Umbrella chart for zen-lock, zen-flow, zen-gc, and zen-watcher
+    - Umbrella chart for zen-lock, zen-flow, and zen-gc
+    - 0.0.3-alpha removes zen-watcher and zen-lead (proprietary components, no longer published)
   artifacthub.io/links: |
     - name: Documentation
       url: https://github.com/zenmesh/helm-charts/blob/main/docs/INSTALL.md
@@ -51,12 +51,3 @@ dependencies:
     version: "0.0.3-alpha"
     repository: "file://../zen-gc"
     condition: zenGc.enabled
-  - name: zen-watcher
-    version: "1.2.3"
-    repository: "file://../zen-watcher"
-    condition: zenWatcher.enabled
-  - name: zen-lead
-    version: "0.0.2-alpha"
-    repository: "file://../zen-lead"
-    condition: zenLead.enabled
-
