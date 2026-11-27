@@ -24,7 +24,7 @@ The charts are proprietary. See [LICENSE](LICENSE).
 | `zen-gc` | Generic garbage-collection controller for Kubernetes | [charts/zen-gc/README.md](charts/zen-gc/README.md) |
 | `zen-suite` | Umbrella chart: zen-lock, zen-flow and zen-gc in one release | [charts/zen-suite/README.md](charts/zen-suite/README.md) |
 
-Each chart's guide holds its install command and its values. The agent chart takes the enrollment bundle that the Zen Mesh dashboard issues for a cluster. For which charts a Zen Mesh installation uses, follow the [Zen Mesh documentation](https://www.zen-mesh.io/docs/helm-charts/).
+Each chart's guide holds its install command and its values. The agent chart takes the install bundle that the Zen Mesh dashboard issues for a cluster. For which charts a Zen Mesh installation uses, follow the [Zen Mesh documentation](https://www.zen-mesh.io/docs/helm-charts/).
 
 ## Documentation
 
