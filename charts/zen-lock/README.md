@@ -22,16 +22,14 @@ ZenLock CRDs store only ciphertext (source-of-truth). During Pod injection, zen-
 
 ```bash
 # Add the repository
-helm repo add zen-lock https://zenmesh.github.io/zen-lock
+helm repo add zenmesh https://zenmesh.github.io/helm-charts
 helm repo update
 
 # Install zen-lock
-helm install zen-lock zen-lock/zen-lock \
+helm install zen-lock zenmesh/zen-lock \
   --namespace zen-lock-system \
   --create-namespace
 ```
-
-**Note**: The chart is also available on [Artifact Hub](https://artifacthub.io/packages/helm/zen-lock/zen-lock).
 
 ### From Local Chart
 
@@ -75,13 +73,13 @@ Key configuration options (see `values.yaml` for all options):
 | Parameter | Description | Default |
 |-----------|-------------|---------|
 | `image.repository` | Container image repository | `zenmesh/zen-lock` |
-| `image.tag` | Container image tag | `0.0.1-alpha` |
+| `image.tag` | Container image tag | `0.1.0-alpha` |
 | `replicaCount` | Number of replicas | `1` |
 | `webhook.enabled` | Enable mutating webhook | `true` |
 | `webhook.certManager.enabled` | Use cert-manager for TLS | `false` |
 | `privateKey.secretName` | Secret name containing private key | `zen-lock-master-key` |
 | `privateKey.secretKey` | Key within secret | `key.txt` |
-| `namespace.create` | Create namespace | `true` |
+| `namespace.create` | Create namespace | `false` |
 | `namespace.name` | Namespace name | `zen-lock-system` |
 | `metrics.enabled` | Enable metrics endpoint | `true` |
 | `metrics.port` | Metrics port | `8080` |
@@ -219,7 +217,7 @@ zen-lock is designed for static secrets in GitOps workflows. For dynamic secrets
 - **Secrets Store CSI Driver**: For mounting external secret stores
 - **1Password Kubernetes Operator**: For automated secret synchronization
 
-See [docs/FAQ.md](../../docs/FAQ.md) for detailed positioning and [docs/INTEGRATIONS.md](../../docs/INTEGRATIONS.md) for integration strategies.
+See [docs/FAQ.md](https://github.com/zenmesh/zen-lock/blob/main/docs/FAQ.md) for detailed positioning and [docs/INTEGRATIONS.md](https://github.com/zenmesh/zen-lock/blob/main/docs/INTEGRATIONS.md) for integration strategies.
 
 ## Security Considerations
 
@@ -231,13 +229,11 @@ See [docs/FAQ.md](../../docs/FAQ.md) for detailed positioning and [docs/INTEGRAT
 
 ## Chart Repository
 
-- **GitHub Pages**: https://zenmesh.github.io/zen-lock
-- **Artifact Hub**: https://artifacthub.io/packages/helm/zen-lock/zen-lock
+- **GitHub Pages**: https://zenmesh.github.io/helm-charts
 
 ## Support
 
 For issues and questions:
 - GitHub: https://github.com/zenmesh/zen-lock
 - Documentation: https://github.com/zenmesh/zen-lock/docs
-- Helm Repository: See [docs/HELM_REPOSITORY.md](../../docs/HELM_REPOSITORY.md)
 

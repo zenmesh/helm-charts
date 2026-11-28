@@ -21,7 +21,7 @@ helm upgrade zen-lock zenmesh/zen-lock \
 # Upgrade to specific version
 helm upgrade zen-lock zenmesh/zen-lock \
   --namespace zen-lock-system \
-  --version 0.0.2
+  --version 0.0.4-alpha
 ```
 
 ### Upgrading Suite Chart

@@ -17,7 +17,7 @@ zen-flow is a Kubernetes-native job orchestration controller that provides decla
 ### Add the Helm Repository
 
 ```bash
-helm repo add zen-flow https://zenmesh.github.io/zen-flow/charts
+helm repo add zenmesh https://zenmesh.github.io/helm-charts
 helm repo update
 ```
 
@@ -26,7 +26,7 @@ helm repo update
 To install the chart with the release name `zen-flow`:
 
 ```bash
-helm install zen-flow zen-flow/zen-flow \
+helm install zen-flow zenmesh/zen-flow \
   --namespace zen-flow-system \
   --create-namespace
 ```
@@ -34,7 +34,7 @@ helm install zen-flow zen-flow/zen-flow \
 ### Install with Custom Values
 
 ```bash
-helm install zen-flow zen-flow/zen-flow \
+helm install zen-flow zenmesh/zen-flow \
   --namespace zen-flow-system \
   --create-namespace \
   --set image.tag=0.0.1-alpha \
@@ -168,7 +168,7 @@ kubectl delete crd jobflows.workflow.zen-mesh.io
 ```yaml
 replicaCount: 3
 leaderElection:
-  enabled: true
+  mode: builtin
 resources:
   requests:
     cpu: 200m
@@ -185,7 +185,7 @@ replicaCount: 1
 webhook:
   enabled: false
 leaderElection:
-  enabled: false
+  mode: disabled
 resources:
   requests:
     cpu: 50m
@@ -234,7 +234,7 @@ kubectl describe validatingwebhookconfiguration zen-flow-validating-webhook
 Check controller logs:
 
 ```bash
-kubectl logs -n zen-flow-system deployment/zen-flow-controller
+kubectl logs -n zen-flow-system deployment/zen-flow
 ```
 
 ### CRD Not Found

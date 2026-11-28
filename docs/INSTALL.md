@@ -208,7 +208,7 @@ helm uninstall zen-gc --namespace zen-gc-system
 # To remove CRDs manually:
 kubectl delete crd zenlocks.security.zen-mesh.io
 kubectl delete crd jobflows.workflow.zen-mesh.io
-kubectl delete crd garbagecollectionpolicies.gc.zen-mesh.io
+kubectl delete crd garbagecollectionpolicies.gc.ops.zen-mesh.io
 ```
 
 ## Troubleshooting

@@ -17,18 +17,21 @@ Each component chart follows independent versioning. This allows components to b
 
 | Chart Version | App Version | Kubernetes | Notes |
 |---------------|-------------|------------|-------|
+| 0.0.4-alpha   | 0.1.0-alpha | 1.20+      | Current release |
 | 0.0.1-alpha   | 0.0.1-alpha | 1.20+      | Initial release |
 
 ### zen-flow
 
 | Chart Version | App Version | Kubernetes | Notes |
 |---------------|-------------|------------|-------|
+| 0.0.2-alpha   | 0.0.1-alpha | 1.24+      | Current release |
 | 0.0.1-alpha   | 0.0.1-alpha | 1.20+      | Initial release |
 
 ### zen-gc
 
 | Chart Version | App Version | Kubernetes | Notes |
 |---------------|-------------|------------|-------|
+| 0.0.3-alpha   | 0.0.1-alpha | 1.23+      | Current release |
 | 0.0.1-alpha   | 0.0.1-alpha | 1.20+      | Initial release |
 
 ## Versioning Strategy

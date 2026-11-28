@@ -39,8 +39,6 @@ helm upgrade --install zen-cluster ./charts/zen-cluster \
   --set bootstrap.enabled=false
 ```
 
-See [ADAPTER_ENROLLMENT_RUNBOOK.md](../../zen-platform/docs/04-operations/ADAPTER_ENROLLMENT_RUNBOOK.md) for verification steps.
-
 ### Legacy (clusterID/tenantID)
 
 When not using adapter mode, you can install with explicit cluster/tenant (e.g. pre-agent or non–agent-mediated flows):
@@ -73,8 +71,6 @@ helm install zen-cluster ./charts/zen-cluster \
 - `ENVIRONMENT=production` - Enforces TLS requirements for gRPC, requires Kubernetes Secrets for tenant secrets
 - `GRPC_INSECURE_ALLOWED=true` - Development only: Explicit opt-in for insecure gRPC connections (ignored in production)
 - `ALLOW_K8S_SECRETS_FALLBACK=true` - Development only: Explicit opt-in for K8s Secrets fallback (ignored in production)
-
-See [gRPC TLS Implementation](../../docs/04-operations/GRPC_TLS_IMPLEMENTATION.md) for details.
 
 ## TLS/mTLS Configuration
 

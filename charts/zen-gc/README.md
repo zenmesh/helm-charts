@@ -15,11 +15,11 @@ Add the Helm repository and install:
 
 ```bash
 # Add the Helm repository
-helm repo add zen-gc https://zenmesh.github.io/zen-gc
+helm repo add zenmesh https://zenmesh.github.io/helm-charts
 helm repo update
 
 # Install the chart
-helm install gc-controller zen-gc/gc-controller --namespace gc-system --create-namespace
+helm install gc-controller zenmesh/zen-gc --namespace gc-system --create-namespace
 ```
 
 ### Alternative Installation Methods
@@ -35,7 +35,7 @@ curl -sSL https://raw.githubusercontent.com/zenmesh/zen-gc/main/install.sh | bas
 ```bash
 git clone https://github.com/zenmesh/zen-gc.git
 cd zen-gc
-helm install gc-controller ./charts/gc-controller --namespace gc-system --create-namespace
+helm install gc-controller ./deploy/helm/zen-gc --namespace gc-system --create-namespace
 ```
 
 ## Configuration
@@ -45,8 +45,8 @@ The following table lists the configurable parameters and their default values:
 | Parameter | Description | Default |
 |-----------|-------------|---------|
 | `replicaCount` | Number of replicas | `2` |
-| `image.repository` | Image repository | `docker.io/zen-mesh/gc-controller` |
-| `image.tag` | Image tag | `latest` |
+| `image.repository` | Image repository | `docker.io/zenmesh/gc-controller` |
+| `image.tag` | Image tag | `""` (uses Chart.AppVersion) |
 | `image.pullPolicy` | Image pull policy | `IfNotPresent` |
 | `serviceAccount.create` | Create service account | `true` |
 | `service.type` | Service type | `ClusterIP` |
@@ -56,11 +56,11 @@ The following table lists the configurable parameters and their default values:
 | `resources.requests.cpu` | CPU request | `100m` |
 | `resources.requests.memory` | Memory request | `128Mi` |
 | `leaderElection.enabled` | Enable leader election | `true` |
-| `prometheus.prometheusRule.enabled` | Enable PrometheusRule | `true` |
+| `prometheus.prometheusRule.enabled` | Enable PrometheusRule | `false` |
 
 ### Resource Recommendations
 
-Resource requirements vary based on workload scale. See [OPERATOR_GUIDE.md](../../docs/OPERATOR_GUIDE.md#resource-limits) for detailed recommendations:
+Resource requirements vary based on workload scale. See [OPERATOR_GUIDE.md](https://github.com/zenmesh/zen-gc/blob/main/docs/OPERATOR_GUIDE.md#resource-limits) for detailed recommendations:
 
 - **Small Scale** (< 10 policies, < 1,000 resources): Default values are sufficient
 - **Medium Scale** (10-50 policies, 1,000-10,000 resources): Increase to 200m CPU / 256Mi memory requests, 1 CPU / 1Gi limits
@@ -79,7 +79,7 @@ kubectl apply -f deploy/manifests/vpa.yaml
 kubectl describe vpa gc-controller-vpa -n gc-system
 ```
 
-See [OPERATOR_GUIDE.md](../../docs/OPERATOR_GUIDE.md#vertical-pod-autoscaler-vpa-support) for VPA configuration details.
+See [OPERATOR_GUIDE.md](https://github.com/zenmesh/zen-gc/blob/main/docs/OPERATOR_GUIDE.md#vertical-pod-autoscaler-vpa-support) for VPA configuration details.
 
 ## Values
 
@@ -93,5 +93,6 @@ helm uninstall gc-controller --namespace gc-system
 
 ## License
 
-Apache License 2.0
+Copyright 2026 Zen Mesh. All rights reserved. This chart is proprietary;
+no license is granted except by a written agreement with Zen Mesh.
 
